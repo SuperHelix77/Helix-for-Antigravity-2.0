@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 360" role="img" aria-labelledby="title description">
+<!-- Adapted from the Helix Harness v3.0.1 banner; see docs/ASSETS.md and the upstream AGPL-3.0 attribution. -->
+<title id="title">HELIX Engine</title><desc id="description">Double-strand HELIX emblem beside the HELIX Engine wordmark.</desc>
+<rect width="1600" height="360" rx="40" fill="#172027"/>
+<path d="M0 292H1600" stroke="#91AFBB" stroke-opacity=".16"/><path d="M0 68H1600" stroke="#91AFBB" stroke-opacity=".1"/>
+<g transform="translate(92 44)" fill="none" stroke-linecap="round"><path d="M36 24c88 46 164 104 164 112S124 202 36 248" stroke="#F4F7F8" stroke-width="28"/><path d="M200 24C112 70 36 128 36 136s76 66 164 112" stroke="#F4F7F8" stroke-width="28"/><path d="M68 82h100M56 136h124M68 190h100" stroke="#91AFBB" stroke-width="16"/></g>
+<g fill="#F4F7F8" font-family="-apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif"><text x="400" y="176" font-size="106" font-weight="650" letter-spacing="10">HELIX</text><text x="410" y="241" font-size="36" font-weight="520" letter-spacing="24" fill="#AFC3CC">ENGINE</text><text x="410" y="295" font-size="18" font-weight="450" letter-spacing="3" fill="#8096A0">LESS REPLAY · EXACT EVIDENCE · MORE USEFUL WORK</text></g>
+<path d="M1414 112v136M1460 92v176M1506 124v112" stroke="#91AFBB" stroke-width="5" stroke-linecap="round" opacity=".55"/>
+</svg>
