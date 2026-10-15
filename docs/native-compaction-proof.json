@@ -1,0 +1,37 @@
+{
+  "schema": "helix.native-compaction-probe.v1",
+  "external_model_calls": 0,
+  "native_threshold_override": null,
+  "public_catalog_sha256": "fbf12194de08352fdba9cc092e5ecceeb47e651ce4a4830727454f45f09c0fd7",
+  "model": "gpt-6.1-sol",
+  "effort": "high",
+  "reports": [
+    {
+      "synthetic_input_tokens": 300000,
+      "exit": 0,
+      "requests": 2,
+      "ordinary_responses_compaction_requests": 0,
+      "native_threshold_override": null
+    },
+    {
+      "synthetic_input_tokens": 440000,
+      "exit": 0,
+      "requests": 2,
+      "ordinary_responses_compaction_requests": 0,
+      "native_threshold_override": null
+    },
+    {
+      "synthetic_input_tokens": 460000,
+      "exit": 0,
+      "requests": 3,
+      "ordinary_responses_compaction_requests": 1,
+      "native_threshold_override": null
+    }
+  ],
+  "limitations": [
+    "Synthetic reported usage, not a model quality or token-savings benchmark.",
+    "One intentionally unsupported inert tool produces a native tool-result boundary; no command runs.",
+    "CodeMode host is disabled in this isolated transport fixture. The real benchmark retains its native CodeMode configuration.",
+    "Native fallback compacts through ordinary Responses, not necessarily /responses/compact."
+  ]
+}

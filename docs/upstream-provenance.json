@@ -1,0 +1,209 @@
+{
+  "schema": "helix.source-import.v1",
+  "upstream": "codex-router",
+  "base_commit": "1a339dda8e6934024d933f9a48f4b9a7d954f6d0",
+  "working_tree_sources": true,
+  "files": [
+    {
+      "file": "bin/helix-context-mcp.mjs",
+      "sha256": "4dd24c09852b052219d106621b4b6177eff7c6693fdf7cddc2cfa56b9b4f8b23"
+    },
+    {
+      "file": "bin/helix-source-bundle.py",
+      "sha256": "6b1234fe05f701c4a5bef2ced5463a33637b2716fc88c61758bcb05e0535afd7"
+    },
+    {
+      "file": "LICENSE",
+      "sha256": "dfca474307c3cf842c08a09c542e98ebce83ffe3c90d4ac964663cf0e11bf2cc"
+    },
+    {
+      "file": "skills/helixcontext/SKILL.md",
+      "sha256": "6716fad52de4476eac7cbeb0a65e25ef21917c3d4cbe6d60e48f614482587d82"
+    },
+    {
+      "file": "src/cache-stable-aging.mjs",
+      "sha256": "316a382c57271642d479ab4c13aab09ad65b221532107c12a7f3c30b7439e37f"
+    },
+    {
+      "file": "src/caller-auth.mjs",
+      "sha256": "b8385dcd857711e4ec3771fb2d2c6b6e4ac15aa440efee723238bcddad4b75c9"
+    },
+    {
+      "file": "src/codex-patch-hook-endpoint.mjs",
+      "sha256": "c206f714d66a777ba1997f351ed0193965fbee8bbc1cae124d313d7d0d540b58"
+    },
+    {
+      "file": "src/compaction-checkpoint.mjs",
+      "sha256": "5d4644687f328a19e7c96f628621e4a48a59532af8d6105c624e5adda0d95390"
+    },
+    {
+      "file": "src/context-archive.mjs",
+      "sha256": "36722895cf3b7de9113ece9f1d003c3c23a012fc328aa4a8b490a7d6a110cd75"
+    },
+    {
+      "file": "src/helix-candidate-cost.mjs",
+      "sha256": "09f9ff94c4638a2b1142ebbbf66fd5e936f7734be6023ca4a15c7265cf23166a"
+    },
+    {
+      "file": "src/helix-checkpoint-operation.mjs",
+      "sha256": "10c3de4ec7c178fb07b12d16e7de5b5e76d537976e7a585f6b5fe7daac0172ad"
+    },
+    {
+      "file": "src/helix-evidence-delta.mjs",
+      "sha256": "6d08ea6adde7660194acc002f290308fa03aabf5176cb2c906e68c891fad1e5e"
+    },
+    {
+      "file": "src/helix-evidence.mjs",
+      "sha256": "c351917c16c24b1a174615bae9e760939bba91cb8c1880d41a75bf42ac0d6054"
+    },
+    {
+      "file": "src/helix-flow-admission.mjs",
+      "sha256": "d2b941736c540068907290af99d1590e34e8cb2f6699ce249924e5cc0bd9bfbc"
+    },
+    {
+      "file": "src/helix-goal-engine.mjs",
+      "sha256": "3bf9cebc72260786bb43c8bc19e4edc5a268ba4ed122519e7aef1adec1bff75b"
+    },
+    {
+      "file": "src/helix-initial-observation.mjs",
+      "sha256": "a3f55b9c64de9c4132ffea0aa1744e5358bd9bc9f6b9101c3ed47cdc2e87d55e"
+    },
+    {
+      "file": "src/helix-lazy-tool-help.mjs",
+      "sha256": "360bb0afcc276f1fcee449a32bd26c1a39dc2c022e914745b0f705a94b0fe1b2"
+    },
+    {
+      "file": "src/helix-native-function-bridge.mjs",
+      "sha256": "323f79e19506fc6f8d64425661fea74f231d776413025d05c6b935902ab9389f"
+    },
+    {
+      "file": "src/helix-operation-broker.mjs",
+      "sha256": "64811859ced47fdc1a205f3782e5ebf655f18749b2227508753de624c55b9a8e"
+    },
+    {
+      "file": "src/helix-patch-evidence.mjs",
+      "sha256": "28f7b179cd5fea847263f06a34b787f469220d51364077fe5175bf634426482b"
+    },
+    {
+      "file": "src/helix-post-test-git.mjs",
+      "sha256": "37d598223476d0a1d3a54186cc83236a330bf0d02cd09f4af3122b9b1a12086f"
+    },
+    {
+      "file": "src/helix-tool-flow.mjs",
+      "sha256": "f0039711ce3d61efe8841d29a85fc34125b9ce87548a0b42ffec81a474e6cb65"
+    },
+    {
+      "file": "src/native-operation-rejection.mjs",
+      "sha256": "cba87ede8cd98ebfaaf66f2a61b100d20bb4c214025a234045124ef55f0b144a"
+    },
+    {
+      "file": "src/process-identity.mjs",
+      "sha256": "0c31a51bf123b9d3fc469639bdac8f6bd0cacf3fd7cc3f382e96cfff56d4add1"
+    },
+    {
+      "file": "src/process-tree.mjs",
+      "sha256": "073b3758c23e8f5fd1a87d46de49bafa6a9c3af1fba05c350324c4b3f08fa2d9"
+    },
+    {
+      "file": "src/tool-call-aging.mjs",
+      "sha256": "24db95f4871bd27bea8dc300a8d8b6eeec8f9e960914c2d3e15005c46e651b72"
+    },
+    {
+      "file": "src/tool-call-retention.mjs",
+      "sha256": "925d937967cb55032d6cb713d099c2e6f03fd6a276cf8f096b7479b13554f616"
+    },
+    {
+      "file": "src/tool-result-aging.mjs",
+      "sha256": "6c5b69eb2348b9ecb14ce7e1c9df7a022643a6b90e3a6603152ef7a39d6ba205"
+    },
+    {
+      "file": "src/tool-result-retention.mjs",
+      "sha256": "d757b2888f30269255d515f840da365ff372bdcf97ae9dfb773358f1f0259dd5"
+    },
+    {
+      "file": "src/tool-result-store.mjs",
+      "sha256": "812fce40a6b8ba27d3a137f21548ae20ecdc4a44fd644d990f43281ab07a19de"
+    },
+    {
+      "file": "src/windows-process-tree.ps1",
+      "sha256": "590d76280f744f0fc768d2bd2202e25a208c8246506f9960413b5a10d40629b9"
+    },
+    {
+      "file": "test/cache-stable-aging.test.mjs",
+      "sha256": "e32cc8e07b21f52f9fb12c8bad74ef654d2c7c05909fd01ab6afb08a4866bbc6"
+    },
+    {
+      "file": "test/helix-candidate-cost.test.mjs",
+      "sha256": "dcd7721200b8f75f7414f3e21273d1eabd4d10887cf0a36c97b03a3b8375bf43"
+    },
+    {
+      "file": "test/helix-checkpoint-operation.test.mjs",
+      "sha256": "d8d90c3e87a7a025d9e1e0a713670d657f57073051cd597abb64f6e93fcb42d4"
+    },
+    {
+      "file": "test/helix-evidence-delta.test.mjs",
+      "sha256": "8504c9922319d113821eecba750c82af4ea591e2bd78f2f55c9706f8048473a8"
+    },
+    {
+      "file": "test/helix-evidence.test.mjs",
+      "sha256": "8801486647c9c87f66d487258545e129b43917505f0b1bd87b8640b4c74931d3"
+    },
+    {
+      "file": "test/helix-flow-admission.test.mjs",
+      "sha256": "efc9042421b89732fc5fd59658d043c654af84b0e44f3e3cb9f5191298018e87"
+    },
+    {
+      "file": "test/helix-goal-engine.test.mjs",
+      "sha256": "e822edbe121c8dbc76a384fd73c1681599576d89ac9ba7ddd7a541ef503139d9"
+    },
+    {
+      "file": "test/helix-initial-observation.test.mjs",
+      "sha256": "a373a10e730467039a81eeaec6300e75cfaf84c7565b410767f25e3008b26cc5"
+    },
+    {
+      "file": "test/helix-lazy-tool-help.test.mjs",
+      "sha256": "843bf0f11d9f9431bdec2a4b75bf8da456b78481ede8aee1a75404b1d97302e3"
+    },
+    {
+      "file": "test/helix-native-function-bridge.test.mjs",
+      "sha256": "56f58038ca394b022e1bdfe38da85dc282b92e0804275b8bab13474aa482b77a"
+    },
+    {
+      "file": "test/helix-operation-broker.test.mjs",
+      "sha256": "1071a89effbd69f524979f75f0b64ac01f625a36b19b021ae595ca3808fdcda8"
+    },
+    {
+      "file": "test/helix-patch-evidence.test.mjs",
+      "sha256": "a45002f9da366e7809c55aa4750f4d2809693ab8d4e4b5485d862932e08ee642"
+    },
+    {
+      "file": "test/helix-post-test-git.test.mjs",
+      "sha256": "fea38024081d2ab9604c6c7c9e133b0444e11098e37e0ef16479f74aafaf9c4e"
+    },
+    {
+      "file": "test/helix-tool-flow.test.mjs",
+      "sha256": "a752a33c5b756deea796d6992899ba33a924691b54519973e4d28cd1c03291ab"
+    },
+    {
+      "file": "test/tool-call-aging.test.mjs",
+      "sha256": "5a74080959132257f0c302c0ff43281c85919ebc142d6c02a1c68d9334e8088f"
+    },
+    {
+      "file": "test/tool-call-retention.test.mjs",
+      "sha256": "fcb9ed4374460235da61dd597f3685a1c1741476e8264cec47149c3ae77c680e"
+    },
+    {
+      "file": "test/tool-result-store.test.mjs",
+      "sha256": "82bba4d999e11cbc4b625f8072a12778de1f86a1191fd1ac3734230a937ec1f2"
+    }
+  ],
+  "adaptation": "Portable src/paths.mjs replaces provider/service discovery. Subsequent HELIX changes are tracked in this repository.",
+  "excluded": [
+    "credentials",
+    "sessions",
+    "personal memory",
+    "raw requests",
+    "generated workspaces",
+    "Claude engine"
+  ]
+}

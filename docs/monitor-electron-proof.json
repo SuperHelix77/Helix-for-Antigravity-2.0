@@ -1,0 +1,22 @@
+{
+  "schema": "helix.electron-smoke.v1",
+  "actual_electron": true,
+  "explicit_synthetic_local_memory": true,
+  "live_service_ipc": true,
+  "hash_navigation_ipc": true,
+  "context_isolation": true,
+  "sandbox": true,
+  "node_in_renderer": false,
+  "monitor_build": true,
+  "packaged_release": false,
+  "packaged_monitor_flag_ignored": false,
+  "platform": "darwin",
+  "arch": "arm64",
+  "versions": {
+    "electron": "43.7.11",
+    "node": "24.21.0"
+  },
+  "background_model_calls": 0,
+  "page_errors": 0,
+  "personal_data_used": false
+}

@@ -1,0 +1,2009 @@
+{
+  "schema": "helix.public-v3.v1",
+  "engine": "HELIX 1.0",
+  "treatment": "V3",
+  "model": "gpt-6.1-sol",
+  "effort": "high",
+  "verbosity": "medium",
+  "tasks": 50,
+  "official_grades_complete": true,
+  "clean_native_exit": false,
+  "comparison": "Post-hoc same50 historical vanilla versus modified package, one continuous native conversation per lane; infrastructure resumes, no per-issue reset",
+  "acceptance": {
+    "output_reduction": false,
+    "solve_parity": false,
+    "overall_savings_target_85_percent": false
+  },
+  "solves": {
+    "vanilla": 38,
+    "modified": 34
+  },
+  "primary": {
+    "vanilla": {
+      "requests": 341,
+      "failed_requests": 0,
+      "known_input": 50630785,
+      "known_output": 55283,
+      "known_reasoning": 6504,
+      "known_tokens": 50686068,
+      "unknown_usage": 0,
+      "unknown_output": 0
+    },
+    "modified": {
+      "requests": 420,
+      "failed_requests": 1,
+      "known_input": 11212326,
+      "known_output": 75814,
+      "known_reasoning": 18010,
+      "known_tokens": 11288140,
+      "unknown_usage": 1,
+      "unknown_output": 1
+    },
+    "known_tokens_saved": 39397928,
+    "known_savings_percent": 77.72930423405501,
+    "known_output_growth_percent": 37.13799902320786
+  },
+  "all_attempts": {
+    "vanilla": {
+      "requests": 346,
+      "failed_requests": 5,
+      "known_input": 50630785,
+      "known_output": 55283,
+      "known_reasoning": 6504,
+      "known_tokens": 50686068,
+      "unknown_usage": 5,
+      "unknown_output": 5
+    },
+    "modified": {
+      "requests": 423,
+      "failed_requests": 4,
+      "known_input": 11212326,
+      "known_output": 75814,
+      "known_reasoning": 18010,
+      "known_tokens": 11288140,
+      "unknown_usage": 4,
+      "unknown_output": 4
+    },
+    "known_tokens_saved": 39397928,
+    "known_savings_percent": 77.72930423405501,
+    "known_output_growth_percent": 37.13799902320786
+  },
+  "excluded_confirmed_overloads": {
+    "vanilla": {
+      "requests": 5,
+      "failed_requests": 5,
+      "known_input": 0,
+      "known_output": 0,
+      "known_reasoning": 0,
+      "known_tokens": 0,
+      "unknown_usage": 5,
+      "unknown_output": 5
+    },
+    "modified": {
+      "requests": 3,
+      "failed_requests": 3,
+      "known_input": 0,
+      "known_output": 0,
+      "known_reasoning": 0,
+      "known_tokens": 0,
+      "unknown_usage": 3,
+      "unknown_output": 3
+    }
+  },
+  "finalization": {
+    "vanilla": {
+      "requests": 1,
+      "failed_requests": 0,
+      "known_input": 268031,
+      "known_output": 113,
+      "known_reasoning": 0,
+      "known_tokens": 268144,
+      "unknown_usage": 0,
+      "unknown_output": 0
+    },
+    "modified": {
+      "requests": 2,
+      "failed_requests": 0,
+      "known_input": 70912,
+      "known_output": 309,
+      "known_reasoning": 0,
+      "known_tokens": 71221,
+      "unknown_usage": 0,
+      "unknown_output": 0
+    }
+  },
+  "failed_tasks": {
+    "vanilla": {
+      "issues": 12,
+      "primary": {
+        "requests": 87,
+        "failed_requests": 0,
+        "known_input": 14525890,
+        "known_output": 15711,
+        "known_reasoning": 2514,
+        "known_tokens": 14541601,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "per_task": [
+        {
+          "order": 5,
+          "instance_id": "scikit-learn__scikit-learn-10949",
+          "requests": 6,
+          "failed_requests": 0,
+          "known_input": 286105,
+          "known_output": 1285,
+          "known_reasoning": 156,
+          "known_tokens": 287390,
+          "unknown_usage": 0,
+          "unknown_output": 0,
+          "environment_commands": 2,
+          "native_tool_calls": 6
+        },
+        {
+          "order": 16,
+          "instance_id": "pallets__flask-4045",
+          "requests": 6,
+          "failed_requests": 0,
+          "known_input": 646041,
+          "known_output": 741,
+          "known_reasoning": 51,
+          "known_tokens": 646782,
+          "unknown_usage": 0,
+          "unknown_output": 0,
+          "environment_commands": 2,
+          "native_tool_calls": 6
+        },
+        {
+          "order": 20,
+          "instance_id": "django__django-11564",
+          "requests": 6,
+          "failed_requests": 0,
+          "known_input": 765063,
+          "known_output": 1797,
+          "known_reasoning": 532,
+          "known_tokens": 766860,
+          "unknown_usage": 0,
+          "unknown_output": 0,
+          "environment_commands": 2,
+          "native_tool_calls": 6
+        },
+        {
+          "order": 21,
+          "instance_id": "pylint-dev__pylint-7114",
+          "requests": 8,
+          "failed_requests": 0,
+          "known_input": 1072949,
+          "known_output": 1071,
+          "known_reasoning": 107,
+          "known_tokens": 1074020,
+          "unknown_usage": 0,
+          "unknown_output": 0,
+          "environment_commands": 3,
+          "native_tool_calls": 8
+        },
+        {
+          "order": 22,
+          "instance_id": "django__django-15202",
+          "requests": 5,
+          "failed_requests": 0,
+          "known_input": 692583,
+          "known_output": 963,
+          "known_reasoning": 41,
+          "known_tokens": 693546,
+          "unknown_usage": 0,
+          "unknown_output": 0,
+          "environment_commands": 2,
+          "native_tool_calls": 5
+        },
+        {
+          "order": 27,
+          "instance_id": "django__django-16820",
+          "requests": 7,
+          "failed_requests": 0,
+          "known_input": 1153501,
+          "known_output": 1568,
+          "known_reasoning": 343,
+          "known_tokens": 1155069,
+          "unknown_usage": 0,
+          "unknown_output": 0,
+          "environment_commands": 2,
+          "native_tool_calls": 7
+        },
+        {
+          "order": 30,
+          "instance_id": "sympy__sympy-16988",
+          "requests": 13,
+          "failed_requests": 0,
+          "known_input": 2351930,
+          "known_output": 1791,
+          "known_reasoning": 252,
+          "known_tokens": 2353721,
+          "unknown_usage": 0,
+          "unknown_output": 0,
+          "environment_commands": 4,
+          "native_tool_calls": 13
+        },
+        {
+          "order": 31,
+          "instance_id": "django__django-15213",
+          "requests": 7,
+          "failed_requests": 0,
+          "known_input": 1315552,
+          "known_output": 1681,
+          "known_reasoning": 212,
+          "known_tokens": 1317233,
+          "unknown_usage": 0,
+          "unknown_output": 0,
+          "environment_commands": 3,
+          "native_tool_calls": 7
+        },
+        {
+          "order": 32,
+          "instance_id": "sympy__sympy-18199",
+          "requests": 6,
+          "failed_requests": 0,
+          "known_input": 1153365,
+          "known_output": 699,
+          "known_reasoning": 71,
+          "known_tokens": 1154064,
+          "unknown_usage": 0,
+          "unknown_output": 0,
+          "environment_commands": 2,
+          "native_tool_calls": 6
+        },
+        {
+          "order": 36,
+          "instance_id": "sympy__sympy-14317",
+          "requests": 9,
+          "failed_requests": 0,
+          "known_input": 1864492,
+          "known_output": 1464,
+          "known_reasoning": 219,
+          "known_tokens": 1865956,
+          "unknown_usage": 0,
+          "unknown_output": 0,
+          "environment_commands": 2,
+          "native_tool_calls": 9
+        },
+        {
+          "order": 38,
+          "instance_id": "sphinx-doc__sphinx-8282",
+          "requests": 7,
+          "failed_requests": 0,
+          "known_input": 1525966,
+          "known_output": 1349,
+          "known_reasoning": 308,
+          "known_tokens": 1527315,
+          "unknown_usage": 0,
+          "unknown_output": 0,
+          "environment_commands": 2,
+          "native_tool_calls": 7
+        },
+        {
+          "order": 44,
+          "instance_id": "pytest-dev__pytest-8365",
+          "requests": 7,
+          "failed_requests": 0,
+          "known_input": 1698343,
+          "known_output": 1302,
+          "known_reasoning": 222,
+          "known_tokens": 1699645,
+          "unknown_usage": 0,
+          "unknown_output": 0,
+          "environment_commands": 3,
+          "native_tool_calls": 7
+        }
+      ]
+    },
+    "modified": {
+      "issues": 16,
+      "primary": {
+        "requests": 144,
+        "failed_requests": 0,
+        "known_input": 4193074,
+        "known_output": 29038,
+        "known_reasoning": 8480,
+        "known_tokens": 4222112,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "per_task": [
+        {
+          "order": 2,
+          "instance_id": "django__django-13220",
+          "requests": 7,
+          "failed_requests": 0,
+          "known_input": 120377,
+          "known_output": 2499,
+          "known_reasoning": 926,
+          "known_tokens": 122876,
+          "unknown_usage": 0,
+          "unknown_output": 0,
+          "environment_commands": 8,
+          "native_tool_calls": 7
+        },
+        {
+          "order": 5,
+          "instance_id": "scikit-learn__scikit-learn-10949",
+          "requests": 8,
+          "failed_requests": 0,
+          "known_input": 138585,
+          "known_output": 1779,
+          "known_reasoning": 484,
+          "known_tokens": 140364,
+          "unknown_usage": 0,
+          "unknown_output": 0,
+          "environment_commands": 6,
+          "native_tool_calls": 8
+        },
+        {
+          "order": 16,
+          "instance_id": "pallets__flask-4045",
+          "requests": 9,
+          "failed_requests": 0,
+          "known_input": 176690,
+          "known_output": 1173,
+          "known_reasoning": 192,
+          "known_tokens": 177863,
+          "unknown_usage": 0,
+          "unknown_output": 0,
+          "environment_commands": 6,
+          "native_tool_calls": 9
+        },
+        {
+          "order": 20,
+          "instance_id": "django__django-11564",
+          "requests": 11,
+          "failed_requests": 0,
+          "known_input": 255711,
+          "known_output": 3327,
+          "known_reasoning": 1472,
+          "known_tokens": 259038,
+          "unknown_usage": 0,
+          "unknown_output": 0,
+          "environment_commands": 7,
+          "native_tool_calls": 11
+        },
+        {
+          "order": 21,
+          "instance_id": "pylint-dev__pylint-7114",
+          "requests": 8,
+          "failed_requests": 0,
+          "known_input": 180632,
+          "known_output": 1064,
+          "known_reasoning": 233,
+          "known_tokens": 181696,
+          "unknown_usage": 0,
+          "unknown_output": 0,
+          "environment_commands": 6,
+          "native_tool_calls": 8
+        },
+        {
+          "order": 22,
+          "instance_id": "django__django-15202",
+          "requests": 6,
+          "failed_requests": 0,
+          "known_input": 137267,
+          "known_output": 1009,
+          "known_reasoning": 160,
+          "known_tokens": 138276,
+          "unknown_usage": 0,
+          "unknown_output": 0,
+          "environment_commands": 4,
+          "native_tool_calls": 6
+        },
+        {
+          "order": 25,
+          "instance_id": "sympy__sympy-20049",
+          "requests": 7,
+          "failed_requests": 0,
+          "known_input": 218729,
+          "known_output": 2090,
+          "known_reasoning": 715,
+          "known_tokens": 220819,
+          "unknown_usage": 0,
+          "unknown_output": 0,
+          "environment_commands": 5,
+          "native_tool_calls": 7
+        },
+        {
+          "order": 27,
+          "instance_id": "django__django-16820",
+          "requests": 11,
+          "failed_requests": 0,
+          "known_input": 319101,
+          "known_output": 2449,
+          "known_reasoning": 482,
+          "known_tokens": 321550,
+          "unknown_usage": 0,
+          "unknown_output": 0,
+          "environment_commands": 8,
+          "native_tool_calls": 11
+        },
+        {
+          "order": 30,
+          "instance_id": "sympy__sympy-16988",
+          "requests": 13,
+          "failed_requests": 0,
+          "known_input": 423601,
+          "known_output": 2457,
+          "known_reasoning": 765,
+          "known_tokens": 426058,
+          "unknown_usage": 0,
+          "unknown_output": 0,
+          "environment_commands": 8,
+          "native_tool_calls": 13
+        },
+        {
+          "order": 31,
+          "instance_id": "django__django-15213",
+          "requests": 8,
+          "failed_requests": 0,
+          "known_input": 255844,
+          "known_output": 1664,
+          "known_reasoning": 321,
+          "known_tokens": 257508,
+          "unknown_usage": 0,
+          "unknown_output": 0,
+          "environment_commands": 6,
+          "native_tool_calls": 8
+        },
+        {
+          "order": 32,
+          "instance_id": "sympy__sympy-18199",
+          "requests": 7,
+          "failed_requests": 0,
+          "known_input": 211226,
+          "known_output": 1570,
+          "known_reasoning": 325,
+          "known_tokens": 212796,
+          "unknown_usage": 0,
+          "unknown_output": 0,
+          "environment_commands": 8,
+          "native_tool_calls": 7
+        },
+        {
+          "order": 36,
+          "instance_id": "sympy__sympy-14317",
+          "requests": 9,
+          "failed_requests": 0,
+          "known_input": 309935,
+          "known_output": 1759,
+          "known_reasoning": 561,
+          "known_tokens": 311694,
+          "unknown_usage": 0,
+          "unknown_output": 0,
+          "environment_commands": 7,
+          "native_tool_calls": 9
+        },
+        {
+          "order": 37,
+          "instance_id": "sympy__sympy-24909",
+          "requests": 6,
+          "failed_requests": 0,
+          "known_input": 201084,
+          "known_output": 703,
+          "known_reasoning": 108,
+          "known_tokens": 201787,
+          "unknown_usage": 0,
+          "unknown_output": 0,
+          "environment_commands": 4,
+          "native_tool_calls": 6
+        },
+        {
+          "order": 38,
+          "instance_id": "sphinx-doc__sphinx-8282",
+          "requests": 11,
+          "failed_requests": 0,
+          "known_input": 385306,
+          "known_output": 1998,
+          "known_reasoning": 613,
+          "known_tokens": 387304,
+          "unknown_usage": 0,
+          "unknown_output": 0,
+          "environment_commands": 6,
+          "native_tool_calls": 11
+        },
+        {
+          "order": 44,
+          "instance_id": "pytest-dev__pytest-8365",
+          "requests": 11,
+          "failed_requests": 0,
+          "known_input": 405058,
+          "known_output": 1565,
+          "known_reasoning": 461,
+          "known_tokens": 406623,
+          "unknown_usage": 0,
+          "unknown_output": 0,
+          "environment_commands": 9,
+          "native_tool_calls": 11
+        },
+        {
+          "order": 46,
+          "instance_id": "sphinx-doc__sphinx-7686",
+          "requests": 12,
+          "failed_requests": 0,
+          "known_input": 453928,
+          "known_output": 1932,
+          "known_reasoning": 662,
+          "known_tokens": 455860,
+          "unknown_usage": 0,
+          "unknown_output": 0,
+          "environment_commands": 8,
+          "native_tool_calls": 12
+        }
+      ]
+    }
+  },
+  "recovery": {
+    "retained_originals": 261,
+    "program_originals": 758,
+    "archived_pairs": 417,
+    "advertised_handles_verified": 92
+  },
+  "native_compactions": 0,
+  "source_audit_sha256": "ff69598e778874ceb404bd31d35728ce8c650299a930a294e75d8e9a7118c2a1",
+  "limitations": [
+    "Known provider counters are not billed cost or subscription savings. One non-overload modified request has unknown usage.",
+    "Only exact confirmed server-overload errors are excluded symmetrically; they remain in all-attempt totals.",
+    "Failed tasks, ordinary errors, successful retries and two rejected finalization operations remain included.",
+    "The solver was terminated after all official grades because the post-completion broker rejected further operations; clean exit is not claimed.",
+    "Root, consultation and infrastructure orchestration inference overhead is unmeasured.",
+    "V3 benchmark did not run RTK or import personal Claude-Mem. New release adapters have local integration tests, not a new paid savings benchmark.",
+    "No actual native compaction occurred; compaction-quality parity is unestablished.",
+    "This is not a fresh holdout, simultaneous A/B test or causal component ablation."
+  ],
+  "cumulative": [
+    {
+      "order": 1,
+      "instance_id": "django__django-15061",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla": {
+        "requests": 10,
+        "failed_requests": 0,
+        "known_input": 164190,
+        "known_output": 1247,
+        "known_reasoning": 97,
+        "known_tokens": 165437,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 16,
+        "failed_requests": 0,
+        "known_input": 219424,
+        "known_output": 1885,
+        "known_reasoning": 232,
+        "known_tokens": 221309,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "known_tokens_saved": -55872,
+      "known_savings_percent": -33.77237256478297,
+      "known_output_growth_percent": 51.16279069767442
+    },
+    {
+      "order": 2,
+      "instance_id": "django__django-13220",
+      "vanilla_pass": true,
+      "modified_pass": false,
+      "vanilla": {
+        "requests": 16,
+        "failed_requests": 0,
+        "known_input": 293533,
+        "known_output": 2840,
+        "known_reasoning": 449,
+        "known_tokens": 296373,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 23,
+        "failed_requests": 0,
+        "known_input": 339801,
+        "known_output": 4384,
+        "known_reasoning": 1158,
+        "known_tokens": 344185,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "known_tokens_saved": -47812,
+      "known_savings_percent": -16.132373731750192,
+      "known_output_growth_percent": 54.36619718309859
+    },
+    {
+      "order": 3,
+      "instance_id": "sympy__sympy-14024",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla": {
+        "requests": 25,
+        "failed_requests": 0,
+        "known_input": 562561,
+        "known_output": 4214,
+        "known_reasoning": 520,
+        "known_tokens": 566775,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 41,
+        "failed_requests": 0,
+        "known_input": 680646,
+        "known_output": 6835,
+        "known_reasoning": 1567,
+        "known_tokens": 687481,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "known_tokens_saved": -120706,
+      "known_savings_percent": -21.296987340655463,
+      "known_output_growth_percent": 62.197437114380634
+    },
+    {
+      "order": 4,
+      "instance_id": "django__django-16910",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla": {
+        "requests": 33,
+        "failed_requests": 0,
+        "known_input": 871589,
+        "known_output": 5469,
+        "known_reasoning": 732,
+        "known_tokens": 877058,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 52,
+        "failed_requests": 0,
+        "known_input": 861679,
+        "known_output": 8811,
+        "known_reasoning": 2048,
+        "known_tokens": 870490,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "known_tokens_saved": 6568,
+      "known_savings_percent": 0.7488672356902281,
+      "known_output_growth_percent": 61.10806363137685
+    },
+    {
+      "order": 5,
+      "instance_id": "scikit-learn__scikit-learn-10949",
+      "vanilla_pass": false,
+      "modified_pass": false,
+      "vanilla": {
+        "requests": 39,
+        "failed_requests": 0,
+        "known_input": 1157694,
+        "known_output": 6754,
+        "known_reasoning": 888,
+        "known_tokens": 1164448,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 60,
+        "failed_requests": 0,
+        "known_input": 1000264,
+        "known_output": 10590,
+        "known_reasoning": 2532,
+        "known_tokens": 1010854,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "known_tokens_saved": 153594,
+      "known_savings_percent": 13.190284151804116,
+      "known_output_growth_percent": 56.79597275688481
+    },
+    {
+      "order": 6,
+      "instance_id": "django__django-11422",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla": {
+        "requests": 44,
+        "failed_requests": 0,
+        "known_input": 1424420,
+        "known_output": 7572,
+        "known_reasoning": 922,
+        "known_tokens": 1431992,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 66,
+        "failed_requests": 0,
+        "known_input": 1097694,
+        "known_output": 11494,
+        "known_reasoning": 2652,
+        "known_tokens": 1109188,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "known_tokens_saved": 322804,
+      "known_savings_percent": 22.54230470561288,
+      "known_output_growth_percent": 51.79609086106709
+    },
+    {
+      "order": 7,
+      "instance_id": "matplotlib__matplotlib-23987",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla": {
+        "requests": 57,
+        "failed_requests": 0,
+        "known_input": 2205787,
+        "known_output": 9427,
+        "known_reasoning": 1046,
+        "known_tokens": 2215214,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 76,
+        "failed_requests": 0,
+        "known_input": 1291988,
+        "known_output": 13018,
+        "known_reasoning": 2884,
+        "known_tokens": 1305006,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "known_tokens_saved": 910208,
+      "known_savings_percent": 41.0889421970067,
+      "known_output_growth_percent": 38.09271242176727
+    },
+    {
+      "order": 8,
+      "instance_id": "sympy__sympy-18087",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla": {
+        "requests": 73,
+        "failed_requests": 0,
+        "known_input": 3369868,
+        "known_output": 11409,
+        "known_reasoning": 1267,
+        "known_tokens": 3381277,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 97,
+        "failed_requests": 0,
+        "known_input": 1716845,
+        "known_output": 15521,
+        "known_reasoning": 3411,
+        "known_tokens": 1732366,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "known_tokens_saved": 1648911,
+      "known_savings_percent": 48.765924826626154,
+      "known_output_growth_percent": 36.04172144797967
+    },
+    {
+      "order": 9,
+      "instance_id": "scikit-learn__scikit-learn-14894",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla": {
+        "requests": 79,
+        "failed_requests": 0,
+        "known_input": 3840610,
+        "known_output": 12115,
+        "known_reasoning": 1286,
+        "known_tokens": 3852725,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 104,
+        "failed_requests": 0,
+        "known_input": 1844362,
+        "known_output": 16293,
+        "known_reasoning": 3512,
+        "known_tokens": 1860655,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "known_tokens_saved": 1992070,
+      "known_savings_percent": 51.70548118539475,
+      "known_output_growth_percent": 34.48617416425918
+    },
+    {
+      "order": 10,
+      "instance_id": "sympy__sympy-15678",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla": {
+        "requests": 85,
+        "failed_requests": 0,
+        "known_input": 4329346,
+        "known_output": 12933,
+        "known_reasoning": 1348,
+        "known_tokens": 4342279,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 109,
+        "failed_requests": 0,
+        "known_input": 1936751,
+        "known_output": 17218,
+        "known_reasoning": 3658,
+        "known_tokens": 1953969,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "known_tokens_saved": 2388310,
+      "known_savings_percent": 55.001302311528114,
+      "known_output_growth_percent": 33.13229722415526
+    },
+    {
+      "order": 11,
+      "instance_id": "django__django-14534",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla": {
+        "requests": 90,
+        "failed_requests": 0,
+        "known_input": 4750378,
+        "known_output": 13632,
+        "known_reasoning": 1362,
+        "known_tokens": 4764010,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 118,
+        "failed_requests": 0,
+        "known_input": 2102362,
+        "known_output": 18576,
+        "known_reasoning": 3823,
+        "known_tokens": 2120938,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "known_tokens_saved": 2643072,
+      "known_savings_percent": 55.47998429894144,
+      "known_output_growth_percent": 36.267605633802816
+    },
+    {
+      "order": 12,
+      "instance_id": "django__django-13448",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla": {
+        "requests": 95,
+        "failed_requests": 0,
+        "known_input": 5193971,
+        "known_output": 14545,
+        "known_reasoning": 1428,
+        "known_tokens": 5208516,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 123,
+        "failed_requests": 0,
+        "known_input": 2204145,
+        "known_output": 19576,
+        "known_reasoning": 4017,
+        "known_tokens": 2223721,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "known_tokens_saved": 2984795,
+      "known_savings_percent": 57.30605416206843,
+      "known_output_growth_percent": 34.58920591268477
+    },
+    {
+      "order": 13,
+      "instance_id": "sympy__sympy-13647",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla": {
+        "requests": 101,
+        "failed_requests": 0,
+        "known_input": 5749841,
+        "known_output": 15230,
+        "known_reasoning": 1438,
+        "known_tokens": 5765071,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 129,
+        "failed_requests": 0,
+        "known_input": 2313471,
+        "known_output": 20315,
+        "known_reasoning": 4045,
+        "known_tokens": 2333786,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "known_tokens_saved": 3431285,
+      "known_savings_percent": 59.51852110754577,
+      "known_output_growth_percent": 33.38804990151018
+    },
+    {
+      "order": 14,
+      "instance_id": "django__django-11583",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla": {
+        "requests": 105,
+        "failed_requests": 0,
+        "known_input": 6142301,
+        "known_output": 16094,
+        "known_reasoning": 1451,
+        "known_tokens": 6158395,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 135,
+        "failed_requests": 0,
+        "known_input": 2438179,
+        "known_output": 20944,
+        "known_reasoning": 4077,
+        "known_tokens": 2459123,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "known_tokens_saved": 3699272,
+      "known_savings_percent": 60.0687679176149,
+      "known_output_growth_percent": 30.135454206536597
+    },
+    {
+      "order": 15,
+      "instance_id": "django__django-14999",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla": {
+        "requests": 112,
+        "failed_requests": 0,
+        "known_input": 6862849,
+        "known_output": 17110,
+        "known_reasoning": 1537,
+        "known_tokens": 6879959,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 141,
+        "failed_requests": 0,
+        "known_input": 2550048,
+        "known_output": 21996,
+        "known_reasoning": 4315,
+        "known_tokens": 2572044,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "known_tokens_saved": 4307915,
+      "known_savings_percent": 62.61541674884981,
+      "known_output_growth_percent": 28.556399766218586
+    },
+    {
+      "order": 16,
+      "instance_id": "pallets__flask-4045",
+      "vanilla_pass": false,
+      "modified_pass": false,
+      "vanilla": {
+        "requests": 118,
+        "failed_requests": 0,
+        "known_input": 7508890,
+        "known_output": 17851,
+        "known_reasoning": 1588,
+        "known_tokens": 7526741,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 150,
+        "failed_requests": 0,
+        "known_input": 2726738,
+        "known_output": 23169,
+        "known_reasoning": 4507,
+        "known_tokens": 2749907,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "known_tokens_saved": 4776834,
+      "known_savings_percent": 63.46483823476854,
+      "known_output_growth_percent": 29.79104812055347
+    },
+    {
+      "order": 17,
+      "instance_id": "sympy__sympy-18835",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla": {
+        "requests": 124,
+        "failed_requests": 0,
+        "known_input": 8188987,
+        "known_output": 18811,
+        "known_reasoning": 1666,
+        "known_tokens": 8207798,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 157,
+        "failed_requests": 0,
+        "known_input": 2869671,
+        "known_output": 24277,
+        "known_reasoning": 4643,
+        "known_tokens": 2893948,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "known_tokens_saved": 5313850,
+      "known_savings_percent": 64.74148121091675,
+      "known_output_growth_percent": 29.057466376056563
+    },
+    {
+      "order": 18,
+      "instance_id": "sympy__sympy-20590",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla": {
+        "requests": 130,
+        "failed_requests": 0,
+        "known_input": 8890984,
+        "known_output": 19803,
+        "known_reasoning": 1710,
+        "known_tokens": 8910787,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 164,
+        "failed_requests": 0,
+        "known_input": 3008199,
+        "known_output": 25199,
+        "known_reasoning": 4707,
+        "known_tokens": 3033398,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "known_tokens_saved": 5877389,
+      "known_savings_percent": 65.95813590875868,
+      "known_output_growth_percent": 27.24839670756956
+    },
+    {
+      "order": 19,
+      "instance_id": "scikit-learn__scikit-learn-10297",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla": {
+        "requests": 137,
+        "failed_requests": 0,
+        "known_input": 9742220,
+        "known_output": 21130,
+        "known_reasoning": 1852,
+        "known_tokens": 9763350,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 173,
+        "failed_requests": 1,
+        "known_input": 3192215,
+        "known_output": 26663,
+        "known_reasoning": 4808,
+        "known_tokens": 3218878,
+        "unknown_usage": 1,
+        "unknown_output": 1
+      },
+      "known_tokens_saved": 6544472,
+      "known_savings_percent": 67.0310088238156,
+      "known_output_growth_percent": 26.185518220539517
+    },
+    {
+      "order": 20,
+      "instance_id": "django__django-11564",
+      "vanilla_pass": false,
+      "modified_pass": false,
+      "vanilla": {
+        "requests": 143,
+        "failed_requests": 0,
+        "known_input": 10507283,
+        "known_output": 22927,
+        "known_reasoning": 2384,
+        "known_tokens": 10530210,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 184,
+        "failed_requests": 1,
+        "known_input": 3447926,
+        "known_output": 29990,
+        "known_reasoning": 6280,
+        "known_tokens": 3477916,
+        "unknown_usage": 1,
+        "unknown_output": 1
+      },
+      "known_tokens_saved": 7052294,
+      "known_savings_percent": 66.97201670242094,
+      "known_output_growth_percent": 30.806472717756357
+    },
+    {
+      "order": 21,
+      "instance_id": "pylint-dev__pylint-7114",
+      "vanilla_pass": false,
+      "modified_pass": false,
+      "vanilla": {
+        "requests": 151,
+        "failed_requests": 0,
+        "known_input": 11580232,
+        "known_output": 23998,
+        "known_reasoning": 2491,
+        "known_tokens": 11604230,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 192,
+        "failed_requests": 1,
+        "known_input": 3628558,
+        "known_output": 31054,
+        "known_reasoning": 6513,
+        "known_tokens": 3659612,
+        "unknown_usage": 1,
+        "unknown_output": 1
+      },
+      "known_tokens_saved": 7944618,
+      "known_savings_percent": 68.46312077578607,
+      "known_output_growth_percent": 29.402450204183683
+    },
+    {
+      "order": 22,
+      "instance_id": "django__django-15202",
+      "vanilla_pass": false,
+      "modified_pass": false,
+      "vanilla": {
+        "requests": 156,
+        "failed_requests": 0,
+        "known_input": 12272815,
+        "known_output": 24961,
+        "known_reasoning": 2532,
+        "known_tokens": 12297776,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 198,
+        "failed_requests": 1,
+        "known_input": 3765825,
+        "known_output": 32063,
+        "known_reasoning": 6673,
+        "known_tokens": 3797888,
+        "unknown_usage": 1,
+        "unknown_output": 1
+      },
+      "known_tokens_saved": 8499888,
+      "known_savings_percent": 69.11727779071597,
+      "known_output_growth_percent": 28.452385721725893
+    },
+    {
+      "order": 23,
+      "instance_id": "django__django-14752",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla": {
+        "requests": 161,
+        "failed_requests": 0,
+        "known_input": 12982518,
+        "known_output": 25519,
+        "known_reasoning": 2549,
+        "known_tokens": 13008037,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 204,
+        "failed_requests": 1,
+        "known_input": 3906670,
+        "known_output": 32934,
+        "known_reasoning": 6690,
+        "known_tokens": 3939604,
+        "unknown_usage": 1,
+        "unknown_output": 1
+      },
+      "known_tokens_saved": 9068433,
+      "known_savings_percent": 69.71407753529607,
+      "known_output_growth_percent": 29.05678122183471
+    },
+    {
+      "order": 24,
+      "instance_id": "sympy__sympy-13895",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla": {
+        "requests": 166,
+        "failed_requests": 0,
+        "known_input": 13716127,
+        "known_output": 26633,
+        "known_reasoning": 2713,
+        "known_tokens": 13742760,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 218,
+        "failed_requests": 1,
+        "known_input": 4302118,
+        "known_output": 37258,
+        "known_reasoning": 8404,
+        "known_tokens": 4339376,
+        "unknown_usage": 1,
+        "unknown_output": 1
+      },
+      "known_tokens_saved": 9403384,
+      "known_savings_percent": 68.42427576411143,
+      "known_output_growth_percent": 39.894116321856345
+    },
+    {
+      "order": 25,
+      "instance_id": "sympy__sympy-20049",
+      "vanilla_pass": true,
+      "modified_pass": false,
+      "vanilla": {
+        "requests": 173,
+        "failed_requests": 0,
+        "known_input": 14787247,
+        "known_output": 28219,
+        "known_reasoning": 3013,
+        "known_tokens": 14815466,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 225,
+        "failed_requests": 1,
+        "known_input": 4520847,
+        "known_output": 39348,
+        "known_reasoning": 9119,
+        "known_tokens": 4560195,
+        "unknown_usage": 1,
+        "unknown_output": 1
+      },
+      "known_tokens_saved": 10255271,
+      "known_savings_percent": 69.22003668328759,
+      "known_output_growth_percent": 39.437967326978274
+    },
+    {
+      "order": 26,
+      "instance_id": "sympy__sympy-17655",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla": {
+        "requests": 181,
+        "failed_requests": 0,
+        "known_input": 16058540,
+        "known_output": 29303,
+        "known_reasoning": 3101,
+        "known_tokens": 16087843,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 231,
+        "failed_requests": 1,
+        "known_input": 4701721,
+        "known_output": 40836,
+        "known_reasoning": 9678,
+        "known_tokens": 4742557,
+        "unknown_usage": 1,
+        "unknown_output": 1
+      },
+      "known_tokens_saved": 11345286,
+      "known_savings_percent": 70.52086472997033,
+      "known_output_growth_percent": 39.357744940791044
+    },
+    {
+      "order": 27,
+      "instance_id": "django__django-16820",
+      "vanilla_pass": false,
+      "modified_pass": false,
+      "vanilla": {
+        "requests": 188,
+        "failed_requests": 0,
+        "known_input": 17212041,
+        "known_output": 30871,
+        "known_reasoning": 3444,
+        "known_tokens": 17242912,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 242,
+        "failed_requests": 1,
+        "known_input": 5020822,
+        "known_output": 43285,
+        "known_reasoning": 10160,
+        "known_tokens": 5064107,
+        "unknown_usage": 1,
+        "unknown_output": 1
+      },
+      "known_tokens_saved": 12178805,
+      "known_savings_percent": 70.63079020527391,
+      "known_output_growth_percent": 40.2124971656247
+    },
+    {
+      "order": 28,
+      "instance_id": "matplotlib__matplotlib-25332",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla": {
+        "requests": 195,
+        "failed_requests": 0,
+        "known_input": 18405070,
+        "known_output": 31912,
+        "known_reasoning": 3540,
+        "known_tokens": 18436982,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 251,
+        "failed_requests": 1,
+        "known_input": 5298571,
+        "known_output": 45135,
+        "known_reasoning": 10614,
+        "known_tokens": 5343706,
+        "unknown_usage": 1,
+        "unknown_output": 1
+      },
+      "known_tokens_saved": 13093276,
+      "known_savings_percent": 71.01637350408001,
+      "known_output_growth_percent": 41.43582351466533
+    },
+    {
+      "order": 29,
+      "instance_id": "sphinx-doc__sphinx-10325",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla": {
+        "requests": 201,
+        "failed_requests": 0,
+        "known_input": 19451444,
+        "known_output": 33258,
+        "known_reasoning": 3817,
+        "known_tokens": 19484702,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 259,
+        "failed_requests": 1,
+        "known_input": 5538263,
+        "known_output": 47401,
+        "known_reasoning": 11263,
+        "known_tokens": 5585664,
+        "unknown_usage": 1,
+        "unknown_output": 1
+      },
+      "known_tokens_saved": 13899038,
+      "known_savings_percent": 71.33307966424121,
+      "known_output_growth_percent": 42.52510674123519
+    },
+    {
+      "order": 30,
+      "instance_id": "sympy__sympy-16988",
+      "vanilla_pass": false,
+      "modified_pass": false,
+      "vanilla": {
+        "requests": 214,
+        "failed_requests": 0,
+        "known_input": 21803374,
+        "known_output": 35049,
+        "known_reasoning": 4069,
+        "known_tokens": 21838423,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 272,
+        "failed_requests": 1,
+        "known_input": 5961864,
+        "known_output": 49858,
+        "known_reasoning": 12028,
+        "known_tokens": 6011722,
+        "unknown_usage": 1,
+        "unknown_output": 1
+      },
+      "known_tokens_saved": 15826701,
+      "known_savings_percent": 72.47181263958483,
+      "known_output_growth_percent": 42.252275385888325
+    },
+    {
+      "order": 31,
+      "instance_id": "django__django-15213",
+      "vanilla_pass": false,
+      "modified_pass": false,
+      "vanilla": {
+        "requests": 221,
+        "failed_requests": 0,
+        "known_input": 23118926,
+        "known_output": 36730,
+        "known_reasoning": 4281,
+        "known_tokens": 23155656,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 280,
+        "failed_requests": 1,
+        "known_input": 6217708,
+        "known_output": 51522,
+        "known_reasoning": 12349,
+        "known_tokens": 6269230,
+        "unknown_usage": 1,
+        "unknown_output": 1
+      },
+      "known_tokens_saved": 16886426,
+      "known_savings_percent": 72.92570765431996,
+      "known_output_growth_percent": 40.27225701061802
+    },
+    {
+      "order": 32,
+      "instance_id": "sympy__sympy-18199",
+      "vanilla_pass": false,
+      "modified_pass": false,
+      "vanilla": {
+        "requests": 227,
+        "failed_requests": 0,
+        "known_input": 24272291,
+        "known_output": 37429,
+        "known_reasoning": 4352,
+        "known_tokens": 24309720,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 287,
+        "failed_requests": 1,
+        "known_input": 6428934,
+        "known_output": 53092,
+        "known_reasoning": 12674,
+        "known_tokens": 6482026,
+        "unknown_usage": 1,
+        "unknown_output": 1
+      },
+      "known_tokens_saved": 17827694,
+      "known_savings_percent": 73.3356616201256,
+      "known_output_growth_percent": 41.847230756899734
+    },
+    {
+      "order": 33,
+      "instance_id": "django__django-13768",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla": {
+        "requests": 232,
+        "failed_requests": 0,
+        "known_input": 25244229,
+        "known_output": 38069,
+        "known_reasoning": 4352,
+        "known_tokens": 25282298,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 292,
+        "failed_requests": 1,
+        "known_input": 6574131,
+        "known_output": 53838,
+        "known_reasoning": 12772,
+        "known_tokens": 6627969,
+        "unknown_usage": 1,
+        "unknown_output": 1
+      },
+      "known_tokens_saved": 18654329,
+      "known_savings_percent": 73.78415126662932,
+      "known_output_growth_percent": 41.42215450891802
+    },
+    {
+      "order": 34,
+      "instance_id": "django__django-14017",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla": {
+        "requests": 240,
+        "failed_requests": 0,
+        "known_input": 26827572,
+        "known_output": 39289,
+        "known_reasoning": 4484,
+        "known_tokens": 26866861,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 297,
+        "failed_requests": 1,
+        "known_input": 6739932,
+        "known_output": 55141,
+        "known_reasoning": 13196,
+        "known_tokens": 6795073,
+        "unknown_usage": 1,
+        "unknown_output": 1
+      },
+      "known_tokens_saved": 20071788,
+      "known_savings_percent": 74.7083479532648,
+      "known_output_growth_percent": 40.34717096388302
+    },
+    {
+      "order": 35,
+      "instance_id": "sympy__sympy-15011",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla": {
+        "requests": 246,
+        "failed_requests": 0,
+        "known_input": 28038319,
+        "known_output": 40141,
+        "known_reasoning": 4570,
+        "known_tokens": 28078460,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 304,
+        "failed_requests": 1,
+        "known_input": 6971834,
+        "known_output": 56267,
+        "known_reasoning": 13451,
+        "known_tokens": 7028101,
+        "unknown_usage": 1,
+        "unknown_output": 1
+      },
+      "known_tokens_saved": 21050359,
+      "known_savings_percent": 74.96977754477987,
+      "known_output_growth_percent": 40.17338880446427
+    },
+    {
+      "order": 36,
+      "instance_id": "sympy__sympy-14317",
+      "vanilla_pass": false,
+      "modified_pass": false,
+      "vanilla": {
+        "requests": 255,
+        "failed_requests": 0,
+        "known_input": 29902811,
+        "known_output": 41605,
+        "known_reasoning": 4789,
+        "known_tokens": 29944416,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 313,
+        "failed_requests": 1,
+        "known_input": 7281769,
+        "known_output": 58026,
+        "known_reasoning": 14012,
+        "known_tokens": 7339795,
+        "unknown_usage": 1,
+        "unknown_output": 1
+      },
+      "known_tokens_saved": 22604621,
+      "known_savings_percent": 75.48860194835657,
+      "known_output_growth_percent": 39.468813844489844
+    },
+    {
+      "order": 37,
+      "instance_id": "sympy__sympy-24909",
+      "vanilla_pass": true,
+      "modified_pass": false,
+      "vanilla": {
+        "requests": 260,
+        "failed_requests": 0,
+        "known_input": 30967772,
+        "known_output": 42369,
+        "known_reasoning": 4911,
+        "known_tokens": 31010141,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 319,
+        "failed_requests": 1,
+        "known_input": 7482853,
+        "known_output": 58729,
+        "known_reasoning": 14120,
+        "known_tokens": 7541582,
+        "unknown_usage": 1,
+        "unknown_output": 1
+      },
+      "known_tokens_saved": 23468559,
+      "known_savings_percent": 75.68027181817716,
+      "known_output_growth_percent": 38.613136963345845
+    },
+    {
+      "order": 38,
+      "instance_id": "sphinx-doc__sphinx-8282",
+      "vanilla_pass": false,
+      "modified_pass": false,
+      "vanilla": {
+        "requests": 267,
+        "failed_requests": 0,
+        "known_input": 32493738,
+        "known_output": 43718,
+        "known_reasoning": 5219,
+        "known_tokens": 32537456,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 330,
+        "failed_requests": 1,
+        "known_input": 7868159,
+        "known_output": 60727,
+        "known_reasoning": 14733,
+        "known_tokens": 7928886,
+        "unknown_usage": 1,
+        "unknown_output": 1
+      },
+      "known_tokens_saved": 24608570,
+      "known_savings_percent": 75.6315121870622,
+      "known_output_growth_percent": 38.906171371059976
+    },
+    {
+      "order": 39,
+      "instance_id": "django__django-16379",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla": {
+        "requests": 272,
+        "failed_requests": 0,
+        "known_input": 33602371,
+        "known_output": 44430,
+        "known_reasoning": 5253,
+        "known_tokens": 33646801,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 335,
+        "failed_requests": 1,
+        "known_input": 8034725,
+        "known_output": 61430,
+        "known_reasoning": 14749,
+        "known_tokens": 8096155,
+        "unknown_usage": 1,
+        "unknown_output": 1
+      },
+      "known_tokens_saved": 25550646,
+      "known_savings_percent": 75.93781649554144,
+      "known_output_growth_percent": 38.26243529146973
+    },
+    {
+      "order": 40,
+      "instance_id": "pytest-dev__pytest-7490",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla": {
+        "requests": 279,
+        "failed_requests": 0,
+        "known_input": 35198447,
+        "known_output": 45704,
+        "known_reasoning": 5404,
+        "known_tokens": 35244151,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 343,
+        "failed_requests": 1,
+        "known_input": 8354864,
+        "known_output": 62882,
+        "known_reasoning": 15247,
+        "known_tokens": 8417746,
+        "unknown_usage": 1,
+        "unknown_output": 1
+      },
+      "known_tokens_saved": 26826405,
+      "known_savings_percent": 76.11590643792213,
+      "known_output_growth_percent": 37.58533169963242
+    },
+    {
+      "order": 41,
+      "instance_id": "sympy__sympy-13971",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla": {
+        "requests": 285,
+        "failed_requests": 0,
+        "known_input": 36589533,
+        "known_output": 46421,
+        "known_reasoning": 5404,
+        "known_tokens": 36635954,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 348,
+        "failed_requests": 1,
+        "known_input": 8527590,
+        "known_output": 63638,
+        "known_reasoning": 15309,
+        "known_tokens": 8591228,
+        "unknown_usage": 1,
+        "unknown_output": 1
+      },
+      "known_tokens_saved": 28044726,
+      "known_savings_percent": 76.54973581416769,
+      "known_output_growth_percent": 37.08881756101764
+    },
+    {
+      "order": 42,
+      "instance_id": "django__django-15789",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla": {
+        "requests": 290,
+        "failed_requests": 0,
+        "known_input": 37763292,
+        "known_output": 47399,
+        "known_reasoning": 5411,
+        "known_tokens": 37810691,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 353,
+        "failed_requests": 1,
+        "known_input": 8692264,
+        "known_output": 64435,
+        "known_reasoning": 15414,
+        "known_tokens": 8756699,
+        "unknown_usage": 1,
+        "unknown_output": 1
+      },
+      "known_tokens_saved": 29053992,
+      "known_savings_percent": 76.84067979609259,
+      "known_output_growth_percent": 35.94168653347117
+    },
+    {
+      "order": 43,
+      "instance_id": "django__django-12453",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla": {
+        "requests": 295,
+        "failed_requests": 0,
+        "known_input": 38952225,
+        "known_output": 48255,
+        "known_reasoning": 5469,
+        "known_tokens": 39000480,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 364,
+        "failed_requests": 1,
+        "known_input": 9104694,
+        "known_output": 66982,
+        "known_reasoning": 15853,
+        "known_tokens": 9171676,
+        "unknown_usage": 1,
+        "unknown_output": 1
+      },
+      "known_tokens_saved": 29828804,
+      "known_savings_percent": 76.48317148917141,
+      "known_output_growth_percent": 38.808413635892656
+    },
+    {
+      "order": 44,
+      "instance_id": "pytest-dev__pytest-8365",
+      "vanilla_pass": false,
+      "modified_pass": false,
+      "vanilla": {
+        "requests": 302,
+        "failed_requests": 0,
+        "known_input": 40650568,
+        "known_output": 49557,
+        "known_reasoning": 5691,
+        "known_tokens": 40700125,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 375,
+        "failed_requests": 1,
+        "known_input": 9509752,
+        "known_output": 68547,
+        "known_reasoning": 16314,
+        "known_tokens": 9578299,
+        "unknown_usage": 1,
+        "unknown_output": 1
+      },
+      "known_tokens_saved": 31121826,
+      "known_savings_percent": 76.46616810144933,
+      "known_output_growth_percent": 38.319510866275195
+    },
+    {
+      "order": 45,
+      "instance_id": "sympy__sympy-20212",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla": {
+        "requests": 311,
+        "failed_requests": 0,
+        "known_input": 42872214,
+        "known_output": 50346,
+        "known_reasoning": 5728,
+        "known_tokens": 42922560,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 382,
+        "failed_requests": 1,
+        "known_input": 9761633,
+        "known_output": 69317,
+        "known_reasoning": 16385,
+        "known_tokens": 9830950,
+        "unknown_usage": 1,
+        "unknown_output": 1
+      },
+      "known_tokens_saved": 33091610,
+      "known_savings_percent": 77.09607721440659,
+      "known_output_growth_percent": 37.681245779207885
+    },
+    {
+      "order": 46,
+      "instance_id": "sphinx-doc__sphinx-7686",
+      "vanilla_pass": true,
+      "modified_pass": false,
+      "vanilla": {
+        "requests": 318,
+        "failed_requests": 0,
+        "known_input": 44628671,
+        "known_output": 51702,
+        "known_reasoning": 6068,
+        "known_tokens": 44680373,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 394,
+        "failed_requests": 1,
+        "known_input": 10215561,
+        "known_output": 71249,
+        "known_reasoning": 17047,
+        "known_tokens": 10286810,
+        "unknown_usage": 1,
+        "unknown_output": 1
+      },
+      "known_tokens_saved": 34393563,
+      "known_savings_percent": 76.97689318753001,
+      "known_output_growth_percent": 37.80704808324629
+    },
+    {
+      "order": 47,
+      "instance_id": "django__django-15781",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla": {
+        "requests": 324,
+        "failed_requests": 0,
+        "known_input": 46162909,
+        "known_output": 52428,
+        "known_reasoning": 6112,
+        "known_tokens": 46215337,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 399,
+        "failed_requests": 1,
+        "known_input": 10405875,
+        "known_output": 71946,
+        "known_reasoning": 17067,
+        "known_tokens": 10477821,
+        "unknown_usage": 1,
+        "unknown_output": 1
+      },
+      "known_tokens_saved": 35737516,
+      "known_savings_percent": 77.32826009685918,
+      "known_output_growth_percent": 37.2281986724651
+    },
+    {
+      "order": 48,
+      "instance_id": "django__django-16873",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla": {
+        "requests": 329,
+        "failed_requests": 0,
+        "known_input": 47455790,
+        "known_output": 53066,
+        "known_reasoning": 6112,
+        "known_tokens": 47508856,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 404,
+        "failed_requests": 1,
+        "known_input": 10588862,
+        "known_output": 72642,
+        "known_reasoning": 17097,
+        "known_tokens": 10661504,
+        "unknown_usage": 1,
+        "unknown_output": 1
+      },
+      "known_tokens_saved": 36847352,
+      "known_savings_percent": 77.55891238467203,
+      "known_output_growth_percent": 36.88991067726982
+    },
+    {
+      "order": 49,
+      "instance_id": "django__django-13033",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla": {
+        "requests": 334,
+        "failed_requests": 0,
+        "known_input": 48767099,
+        "known_output": 53886,
+        "known_reasoning": 6181,
+        "known_tokens": 48820985,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 411,
+        "failed_requests": 1,
+        "known_input": 10868027,
+        "known_output": 73847,
+        "known_reasoning": 17386,
+        "known_tokens": 10941874,
+        "unknown_usage": 1,
+        "unknown_output": 1
+      },
+      "known_tokens_saved": 37879111,
+      "known_savings_percent": 77.58776476959652,
+      "known_output_growth_percent": 37.04301673904168
+    },
+    {
+      "order": 50,
+      "instance_id": "sympy__sympy-19487",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla": {
+        "requests": 341,
+        "failed_requests": 0,
+        "known_input": 50630785,
+        "known_output": 55283,
+        "known_reasoning": 6504,
+        "known_tokens": 50686068,
+        "unknown_usage": 0,
+        "unknown_output": 0
+      },
+      "modified": {
+        "requests": 420,
+        "failed_requests": 1,
+        "known_input": 11212326,
+        "known_output": 75814,
+        "known_reasoning": 18010,
+        "known_tokens": 11288140,
+        "unknown_usage": 1,
+        "unknown_output": 1
+      },
+      "known_tokens_saved": 39397928,
+      "known_savings_percent": 77.72930423405501,
+      "known_output_growth_percent": 37.13799902320786
+    }
+  ]
+}

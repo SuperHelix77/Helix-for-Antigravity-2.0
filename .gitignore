@@ -1,0 +1,17 @@
+node_modules/
+dist/
+dist-monitor/
+release/
+.helix/
+.tastemaker/
+experiments/
+.env
+.env.*
+*.sqlite*
+*.db*
+*.log
+*.jsonl
+!benchmarks/**/*.jsonl
+test-results/
+.DS_Store
+coverage/

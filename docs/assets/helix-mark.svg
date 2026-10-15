@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-labelledby="title">
+  <!-- SPDX-License-Identifier: AGPL-3.0-only; source: SuperHelix77/Helix-Harness studio/frontend/public/helix-mark.svg -->
+  <title id="title">Helix</title>
+  <g fill="none" stroke="#232b2f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9 3.5c2.8 4.2-2.8 8.4 0 12.6 2.8 4.2-2.8 8.4 0 12.4"/>
+    <path d="M23 3.5c-2.8 4.2 2.8 8.4 0 12.6-2.8 4.2 2.8 8.4 0 12.4"/>
+    <path d="M9.6 15.2h12.8"/>
+    <path d="M11.2 11.4c3.2 1.6 6.4 1.6 9.6 0" opacity=".85"/>
+    <path d="M11.2 20.6c3.2-1.6 6.4-1.6 9.6 0" opacity=".85"/>
+  </g>
+</svg>

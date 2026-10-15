@@ -1,0 +1,24 @@
+{
+  "schema": "helix.output-attribution.v1",
+  "method": "Exact provider per-item output attribution, joined by item ID to captured response items. No byte-token estimate.",
+  "lanes": {
+    "vanilla": {
+      "programs": 43790,
+      "prose": 4989,
+      "reasoning": 6504,
+      "unmatched": 0,
+      "reported_output": 55283,
+      "unknown_requests": 5,
+      "usage_evidence_sha256": "cc2258056e736ef5deb96fa8cdcac11132aea2a5dd539d88fde4746bd24c7638"
+    },
+    "modified": {
+      "programs": 47668,
+      "prose": 3385,
+      "reasoning": 15452,
+      "unmatched": 0,
+      "reported_output": 66505,
+      "unknown_requests": 3,
+      "usage_evidence_sha256": "2bbcca6cc58f9a88ddec4f8cf863474fa4965c607c61aadc091f76fbb8c7699e"
+    }
+  }
+}

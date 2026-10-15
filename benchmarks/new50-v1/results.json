@@ -1,0 +1,454 @@
+{
+  "schema": "helix.public-benchmark.v1",
+  "name": "new50-v1",
+  "complete": true,
+  "model": "gpt-6.1-sol",
+  "effort": "high",
+  "lanes": {
+    "vanilla": {
+      "solves": 38,
+      "submitted": 50,
+      "graded": 50,
+      "requests": 346,
+      "input": 50630785,
+      "output": 55283,
+      "reasoning": 6504,
+      "tokens": 50686068,
+      "unknown": 5,
+      "failed_requests": 5,
+      "compactions": 0,
+      "failed_issues": 12,
+      "failed_issue_requests": 88
+    },
+    "modified": {
+      "solves": 36,
+      "submitted": 50,
+      "graded": 50,
+      "requests": 317,
+      "input": 17304315,
+      "output": 66505,
+      "reasoning": 15452,
+      "tokens": 17370820,
+      "unknown": 3,
+      "failed_requests": 6,
+      "compactions": 0,
+      "failed_issues": 14,
+      "failed_issue_requests": 93
+    }
+  },
+  "pairs": [
+    {
+      "order": 1,
+      "instance_id": "django__django-15061",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla_tokens": 165437,
+      "modified_tokens": 339133
+    },
+    {
+      "order": 2,
+      "instance_id": "django__django-13220",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla_tokens": 130936,
+      "modified_tokens": 151545
+    },
+    {
+      "order": 3,
+      "instance_id": "sympy__sympy-14024",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla_tokens": 270402,
+      "modified_tokens": 217754
+    },
+    {
+      "order": 4,
+      "instance_id": "django__django-16910",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla_tokens": 310283,
+      "modified_tokens": 145254
+    },
+    {
+      "order": 5,
+      "instance_id": "scikit-learn__scikit-learn-10949",
+      "vanilla_pass": false,
+      "modified_pass": false,
+      "vanilla_tokens": 287390,
+      "modified_tokens": 173205
+    },
+    {
+      "order": 6,
+      "instance_id": "django__django-11422",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla_tokens": null,
+      "modified_tokens": 128166
+    },
+    {
+      "order": 7,
+      "instance_id": "matplotlib__matplotlib-23987",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla_tokens": 783222,
+      "modified_tokens": 230561
+    },
+    {
+      "order": 8,
+      "instance_id": "sympy__sympy-18087",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla_tokens": 1166063,
+      "modified_tokens": 264273
+    },
+    {
+      "order": 9,
+      "instance_id": "scikit-learn__scikit-learn-14894",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla_tokens": 471448,
+      "modified_tokens": 120607
+    },
+    {
+      "order": 10,
+      "instance_id": "sympy__sympy-15678",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla_tokens": 489554,
+      "modified_tokens": 119001
+    },
+    {
+      "order": 11,
+      "instance_id": "django__django-14534",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla_tokens": 421731,
+      "modified_tokens": 119181
+    },
+    {
+      "order": 12,
+      "instance_id": "django__django-13448",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla_tokens": 444506,
+      "modified_tokens": 167142
+    },
+    {
+      "order": 13,
+      "instance_id": "sympy__sympy-13647",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla_tokens": 556555,
+      "modified_tokens": 158680
+    },
+    {
+      "order": 14,
+      "instance_id": "django__django-11583",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla_tokens": 393324,
+      "modified_tokens": 133614
+    },
+    {
+      "order": 15,
+      "instance_id": "django__django-14999",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla_tokens": 721564,
+      "modified_tokens": 167261
+    },
+    {
+      "order": 16,
+      "instance_id": "pallets__flask-4045",
+      "vanilla_pass": false,
+      "modified_pass": false,
+      "vanilla_tokens": 646782,
+      "modified_tokens": 207412
+    },
+    {
+      "order": 17,
+      "instance_id": "sympy__sympy-18835",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla_tokens": 681057,
+      "modified_tokens": 139741
+    },
+    {
+      "order": 18,
+      "instance_id": "sympy__sympy-20590",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla_tokens": 702989,
+      "modified_tokens": null
+    },
+    {
+      "order": 19,
+      "instance_id": "scikit-learn__scikit-learn-10297",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla_tokens": null,
+      "modified_tokens": 230526
+    },
+    {
+      "order": 20,
+      "instance_id": "django__django-11564",
+      "vanilla_pass": false,
+      "modified_pass": false,
+      "vanilla_tokens": 766860,
+      "modified_tokens": 289060
+    },
+    {
+      "order": 21,
+      "instance_id": "pylint-dev__pylint-7114",
+      "vanilla_pass": false,
+      "modified_pass": false,
+      "vanilla_tokens": 1074020,
+      "modified_tokens": 296567
+    },
+    {
+      "order": 22,
+      "instance_id": "django__django-15202",
+      "vanilla_pass": false,
+      "modified_pass": false,
+      "vanilla_tokens": 693546,
+      "modified_tokens": 198064
+    },
+    {
+      "order": 23,
+      "instance_id": "django__django-14752",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla_tokens": 710261,
+      "modified_tokens": null
+    },
+    {
+      "order": 24,
+      "instance_id": "sympy__sympy-13895",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla_tokens": 734723,
+      "modified_tokens": 902196
+    },
+    {
+      "order": 25,
+      "instance_id": "sympy__sympy-20049",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla_tokens": null,
+      "modified_tokens": 232781
+    },
+    {
+      "order": 26,
+      "instance_id": "sympy__sympy-17655",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla_tokens": 1272377,
+      "modified_tokens": 356762
+    },
+    {
+      "order": 27,
+      "instance_id": "django__django-16820",
+      "vanilla_pass": false,
+      "modified_pass": false,
+      "vanilla_tokens": 1155069,
+      "modified_tokens": 470174
+    },
+    {
+      "order": 28,
+      "instance_id": "matplotlib__matplotlib-25332",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla_tokens": 1194070,
+      "modified_tokens": 509619
+    },
+    {
+      "order": 29,
+      "instance_id": "sphinx-doc__sphinx-10325",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla_tokens": 1047720,
+      "modified_tokens": 624597
+    },
+    {
+      "order": 30,
+      "instance_id": "sympy__sympy-16988",
+      "vanilla_pass": false,
+      "modified_pass": false,
+      "vanilla_tokens": 2353721,
+      "modified_tokens": 586295
+    },
+    {
+      "order": 31,
+      "instance_id": "django__django-15213",
+      "vanilla_pass": false,
+      "modified_pass": true,
+      "vanilla_tokens": 1317233,
+      "modified_tokens": 295505
+    },
+    {
+      "order": 32,
+      "instance_id": "sympy__sympy-18199",
+      "vanilla_pass": false,
+      "modified_pass": false,
+      "vanilla_tokens": 1154064,
+      "modified_tokens": 363820
+    },
+    {
+      "order": 33,
+      "instance_id": "django__django-13768",
+      "vanilla_pass": true,
+      "modified_pass": false,
+      "vanilla_tokens": 972578,
+      "modified_tokens": 291312
+    },
+    {
+      "order": 34,
+      "instance_id": "django__django-14017",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla_tokens": null,
+      "modified_tokens": 300681
+    },
+    {
+      "order": 35,
+      "instance_id": "sympy__sympy-15011",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla_tokens": 1211599,
+      "modified_tokens": null
+    },
+    {
+      "order": 36,
+      "instance_id": "sympy__sympy-14317",
+      "vanilla_pass": false,
+      "modified_pass": false,
+      "vanilla_tokens": 1865956,
+      "modified_tokens": 557686
+    },
+    {
+      "order": 37,
+      "instance_id": "sympy__sympy-24909",
+      "vanilla_pass": true,
+      "modified_pass": false,
+      "vanilla_tokens": 1065725,
+      "modified_tokens": 312960
+    },
+    {
+      "order": 38,
+      "instance_id": "sphinx-doc__sphinx-8282",
+      "vanilla_pass": false,
+      "modified_pass": false,
+      "vanilla_tokens": 1527315,
+      "modified_tokens": 691489
+    },
+    {
+      "order": 39,
+      "instance_id": "django__django-16379",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla_tokens": 1109345,
+      "modified_tokens": 344061
+    },
+    {
+      "order": 40,
+      "instance_id": "pytest-dev__pytest-7490",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla_tokens": 1597350,
+      "modified_tokens": 459765
+    },
+    {
+      "order": 41,
+      "instance_id": "sympy__sympy-13971",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla_tokens": 1391803,
+      "modified_tokens": 446407
+    },
+    {
+      "order": 42,
+      "instance_id": "django__django-15789",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla_tokens": 1174737,
+      "modified_tokens": 352259
+    },
+    {
+      "order": 43,
+      "instance_id": "django__django-12453",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla_tokens": 1189789,
+      "modified_tokens": 362771
+    },
+    {
+      "order": 44,
+      "instance_id": "pytest-dev__pytest-8365",
+      "vanilla_pass": false,
+      "modified_pass": false,
+      "vanilla_tokens": null,
+      "modified_tokens": 646551
+    },
+    {
+      "order": 45,
+      "instance_id": "sympy__sympy-20212",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla_tokens": 2222435,
+      "modified_tokens": 464157
+    },
+    {
+      "order": 46,
+      "instance_id": "sphinx-doc__sphinx-7686",
+      "vanilla_pass": true,
+      "modified_pass": false,
+      "vanilla_tokens": 1757813,
+      "modified_tokens": 1254066
+    },
+    {
+      "order": 47,
+      "instance_id": "django__django-15781",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla_tokens": 1534964,
+      "modified_tokens": 394323
+    },
+    {
+      "order": 48,
+      "instance_id": "django__django-16873",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla_tokens": 1293519,
+      "modified_tokens": 397092
+    },
+    {
+      "order": 49,
+      "instance_id": "django__django-13033",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla_tokens": 1312129,
+      "modified_tokens": 405812
+    },
+    {
+      "order": 50,
+      "instance_id": "sympy__sympy-19487",
+      "vanilla_pass": true,
+      "modified_pass": true,
+      "vanilla_tokens": 1865083,
+      "modified_tokens": 506412
+    }
+  ],
+  "known_savings_percent": 65.72861007880903,
+  "output_savings_percent": -20.299187815422464,
+  "complete_savings_percent": null,
+  "limitations": [
+    "Known provider-reported subtotals, not complete billed cost or subscription savings.",
+    "Unknown request usage is retained as unknown, never assigned zero.",
+    "Failed tasks, failed or undelivered requests and recovery effort are included.",
+    "Root orchestration, infrastructure and any usage unavailable from the provider are unmeasured.",
+    "Same fixed NEW50 cohort. Later v2 tuning and historical-baseline reuse are post-hoc, not a new holdout."
+  ],
+  "privacy": "Allowlisted typed counts and fixed public issue IDs only; no source prose, user IDs, native sessions, private paths or raw requests.",
+  "source_results_sha256": "6015048dd40ddf2e44e7ac2902f28e9bfc8293541524ec03987805d7b6f0b215",
+  "audit_receipt_sha256": "ab5321f3533ea1a1b0c631906e15bb6e4acf7d77ecb4013e4acefe2ee3d24186"
+}

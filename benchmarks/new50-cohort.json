@@ -1,0 +1,309 @@
+{
+  "schema": "helix.public-cohort.v1",
+  "dataset": "SWE-bench/SWE-bench_Lite",
+  "revision": "b0dde1093fe417d83b7184254edf8199c1f0dff5",
+  "split": "test",
+  "selection_sha256": "319b2210b275a54a3062e97b63c496557d6c72cdd88c6594017af1b4ffa2afa0",
+  "tasks": [
+    {
+      "order": 1,
+      "instance_id": "django__django-15061",
+      "repo": "django/django",
+      "base_commit": "2c01ebb4be5d53cbf6450f356c10e436025d6d07"
+    },
+    {
+      "order": 2,
+      "instance_id": "django__django-13220",
+      "repo": "django/django",
+      "base_commit": "16218c20606d8cd89c5393970c83da04598a3e04"
+    },
+    {
+      "order": 3,
+      "instance_id": "sympy__sympy-14024",
+      "repo": "sympy/sympy",
+      "base_commit": "b17abcb09cbcee80a90f6750e0f9b53f0247656c"
+    },
+    {
+      "order": 4,
+      "instance_id": "django__django-16910",
+      "repo": "django/django",
+      "base_commit": "4142739af1cda53581af4169dbe16d6cd5e26948"
+    },
+    {
+      "order": 5,
+      "instance_id": "scikit-learn__scikit-learn-10949",
+      "repo": "scikit-learn/scikit-learn",
+      "base_commit": "3b5abf76597ce6aff76192869f92647c1b5259e7"
+    },
+    {
+      "order": 6,
+      "instance_id": "django__django-11422",
+      "repo": "django/django",
+      "base_commit": "df46b329e0900e9e4dc1d60816c1dce6dfc1094e"
+    },
+    {
+      "order": 7,
+      "instance_id": "matplotlib__matplotlib-23987",
+      "repo": "matplotlib/matplotlib",
+      "base_commit": "e98d8d085e8f53ec0467422b326f7738a2dd695e"
+    },
+    {
+      "order": 8,
+      "instance_id": "sympy__sympy-18087",
+      "repo": "sympy/sympy",
+      "base_commit": "9da013ad0ddc3cd96fe505f2e47c63e372040916"
+    },
+    {
+      "order": 9,
+      "instance_id": "scikit-learn__scikit-learn-14894",
+      "repo": "scikit-learn/scikit-learn",
+      "base_commit": "fdbaa58acbead5a254f2e6d597dc1ab3b947f4c6"
+    },
+    {
+      "order": 10,
+      "instance_id": "sympy__sympy-15678",
+      "repo": "sympy/sympy",
+      "base_commit": "31c68eef3ffef39e2e792b0ec92cd92b7010eb2a"
+    },
+    {
+      "order": 11,
+      "instance_id": "django__django-14534",
+      "repo": "django/django",
+      "base_commit": "910ecd1b8df7678f45c3d507dde6bcb1faafa243"
+    },
+    {
+      "order": 12,
+      "instance_id": "django__django-13448",
+      "repo": "django/django",
+      "base_commit": "7b9596b974fb0ad1868b10c8c2174e10b72be403"
+    },
+    {
+      "order": 13,
+      "instance_id": "sympy__sympy-13647",
+      "repo": "sympy/sympy",
+      "base_commit": "67e3c956083d0128a621f65ee86a7dacd4f9f19f"
+    },
+    {
+      "order": 14,
+      "instance_id": "django__django-11583",
+      "repo": "django/django",
+      "base_commit": "60dc957a825232fdda9138e2f8878b2ca407a7c9"
+    },
+    {
+      "order": 15,
+      "instance_id": "django__django-14999",
+      "repo": "django/django",
+      "base_commit": "a754b82dac511475b6276039471ccd17cc64aeb8"
+    },
+    {
+      "order": 16,
+      "instance_id": "pallets__flask-4045",
+      "repo": "pallets/flask",
+      "base_commit": "d8c37f43724cd9fb0870f77877b7c4c7e38a19e0"
+    },
+    {
+      "order": 17,
+      "instance_id": "sympy__sympy-18835",
+      "repo": "sympy/sympy",
+      "base_commit": "516fa83e69caf1e68306cfc912a13f36c434d51c"
+    },
+    {
+      "order": 18,
+      "instance_id": "sympy__sympy-20590",
+      "repo": "sympy/sympy",
+      "base_commit": "cffd4e0f86fefd4802349a9f9b19ed70934ea354"
+    },
+    {
+      "order": 19,
+      "instance_id": "scikit-learn__scikit-learn-10297",
+      "repo": "scikit-learn/scikit-learn",
+      "base_commit": "b90661d6a46aa3619d3eec94d5281f5888add501"
+    },
+    {
+      "order": 20,
+      "instance_id": "django__django-11564",
+      "repo": "django/django",
+      "base_commit": "580e644f24f1c5ae5b94784fb73a9953a178fd26"
+    },
+    {
+      "order": 21,
+      "instance_id": "pylint-dev__pylint-7114",
+      "repo": "pylint-dev/pylint",
+      "base_commit": "397c1703e8ae6349d33f7b99f45b2ccaf581e666"
+    },
+    {
+      "order": 22,
+      "instance_id": "django__django-15202",
+      "repo": "django/django",
+      "base_commit": "4fd3044ca0135da903a70dfb66992293f529ecf1"
+    },
+    {
+      "order": 23,
+      "instance_id": "django__django-14752",
+      "repo": "django/django",
+      "base_commit": "b64db05b9cedd96905d637a2d824cbbf428e40e7"
+    },
+    {
+      "order": 24,
+      "instance_id": "sympy__sympy-13895",
+      "repo": "sympy/sympy",
+      "base_commit": "4da0b64558e9551a11a99bccc63557ba34f50c58"
+    },
+    {
+      "order": 25,
+      "instance_id": "sympy__sympy-20049",
+      "repo": "sympy/sympy",
+      "base_commit": "d57aaf064041fe52c0fa357639b069100f8b28e1"
+    },
+    {
+      "order": 26,
+      "instance_id": "sympy__sympy-17655",
+      "repo": "sympy/sympy",
+      "base_commit": "f5e965947af2410ded92cfad987aaf45262ea434"
+    },
+    {
+      "order": 27,
+      "instance_id": "django__django-16820",
+      "repo": "django/django",
+      "base_commit": "c61219a7ae051d2baab53f041e00592011fc550c"
+    },
+    {
+      "order": 28,
+      "instance_id": "matplotlib__matplotlib-25332",
+      "repo": "matplotlib/matplotlib",
+      "base_commit": "66ba515e671638971bd11a34cff12c107a437e0b"
+    },
+    {
+      "order": 29,
+      "instance_id": "sphinx-doc__sphinx-10325",
+      "repo": "sphinx-doc/sphinx",
+      "base_commit": "7bdc11e87c7d86dcc2a087eccb7a7c129a473415"
+    },
+    {
+      "order": 30,
+      "instance_id": "sympy__sympy-16988",
+      "repo": "sympy/sympy",
+      "base_commit": "e727339af6dc22321b00f52d971cda39e4ce89fb"
+    },
+    {
+      "order": 31,
+      "instance_id": "django__django-15213",
+      "repo": "django/django",
+      "base_commit": "03cadb912c78b769d6bf4a943a2a35fc1d952960"
+    },
+    {
+      "order": 32,
+      "instance_id": "sympy__sympy-18199",
+      "repo": "sympy/sympy",
+      "base_commit": "ba80d1e493f21431b4bf729b3e0452cd47eb9566"
+    },
+    {
+      "order": 33,
+      "instance_id": "django__django-13768",
+      "repo": "django/django",
+      "base_commit": "965d2d95c630939b53eb60d9c169f5dfc77ee0c6"
+    },
+    {
+      "order": 34,
+      "instance_id": "django__django-14017",
+      "repo": "django/django",
+      "base_commit": "466920f6d726eee90d5566e0a9948e92b33a122e"
+    },
+    {
+      "order": 35,
+      "instance_id": "sympy__sympy-15011",
+      "repo": "sympy/sympy",
+      "base_commit": "b7c5ba2bf3ffd5cf453b25af7c8ddd9a639800cb"
+    },
+    {
+      "order": 36,
+      "instance_id": "sympy__sympy-14317",
+      "repo": "sympy/sympy",
+      "base_commit": "fb536869fb7aa28b2695ad7a3b70949926b291c4"
+    },
+    {
+      "order": 37,
+      "instance_id": "sympy__sympy-24909",
+      "repo": "sympy/sympy",
+      "base_commit": "d3b4158dea271485e3daa11bf82e69b8dab348ce"
+    },
+    {
+      "order": 38,
+      "instance_id": "sphinx-doc__sphinx-8282",
+      "repo": "sphinx-doc/sphinx",
+      "base_commit": "2c2335bbb8af99fa132e1573bbf45dc91584d5a2"
+    },
+    {
+      "order": 39,
+      "instance_id": "django__django-16379",
+      "repo": "django/django",
+      "base_commit": "1d0fa848e084cad62d0bb6bde3b51e4862558e57"
+    },
+    {
+      "order": 40,
+      "instance_id": "pytest-dev__pytest-7490",
+      "repo": "pytest-dev/pytest",
+      "base_commit": "7f7a36478abe7dd1fa993b115d22606aa0e35e88"
+    },
+    {
+      "order": 41,
+      "instance_id": "sympy__sympy-13971",
+      "repo": "sympy/sympy",
+      "base_commit": "84c125972ad535b2dfb245f8d311d347b45e5b8a"
+    },
+    {
+      "order": 42,
+      "instance_id": "django__django-15789",
+      "repo": "django/django",
+      "base_commit": "d4d5427571b4bf3a21c902276c2a00215c2a37cc"
+    },
+    {
+      "order": 43,
+      "instance_id": "django__django-12453",
+      "repo": "django/django",
+      "base_commit": "b330b918e979ea39a21d47b61172d112caf432c3"
+    },
+    {
+      "order": 44,
+      "instance_id": "pytest-dev__pytest-8365",
+      "repo": "pytest-dev/pytest",
+      "base_commit": "4964b468c83c06971eb743fbc57cc404f760c573"
+    },
+    {
+      "order": 45,
+      "instance_id": "sympy__sympy-20212",
+      "repo": "sympy/sympy",
+      "base_commit": "a106f4782a9dbe7f8fd16030f15401d977e03ae9"
+    },
+    {
+      "order": 46,
+      "instance_id": "sphinx-doc__sphinx-7686",
+      "repo": "sphinx-doc/sphinx",
+      "base_commit": "752d3285d250bbaf673cff25e83f03f247502021"
+    },
+    {
+      "order": 47,
+      "instance_id": "django__django-15781",
+      "repo": "django/django",
+      "base_commit": "8d160f154f0240a423e83ffe0690e472f837373c"
+    },
+    {
+      "order": 48,
+      "instance_id": "django__django-16873",
+      "repo": "django/django",
+      "base_commit": "fce90950bef348803fa7cc3e6bc65f4bce429b82"
+    },
+    {
+      "order": 49,
+      "instance_id": "django__django-13033",
+      "repo": "django/django",
+      "base_commit": "a59de6e89e8dc1f3e71c9a5a5bbceb373ea5247e"
+    },
+    {
+      "order": 50,
+      "instance_id": "sympy__sympy-19487",
+      "repo": "sympy/sympy",
+      "base_commit": "25fbcce5b1a4c7e3956e6062930f4a44ce95a632"
+    }
+  ]
+}

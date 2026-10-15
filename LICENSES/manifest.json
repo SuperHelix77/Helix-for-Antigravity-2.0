@@ -1,0 +1,37 @@
+[
+  {
+    "package": "@fontsource/ibm-plex-sans",
+    "version": "5.2.6",
+    "license": "OFL-1.1",
+    "file": "ibm-plex-sans.txt",
+    "sha256": "18aabf190848725e2576eefb5c29ba06aac1029d02132252a7f312eac2e50cf3"
+  },
+  {
+    "package": "react",
+    "version": "19.2.8",
+    "license": "MIT",
+    "file": "react.txt",
+    "sha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93"
+  },
+  {
+    "package": "react-dom",
+    "version": "19.2.8",
+    "license": "MIT",
+    "file": "react-dom.txt",
+    "sha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93"
+  },
+  {
+    "package": "lucide-react",
+    "version": "1.31.0",
+    "license": "ISC",
+    "file": "lucide-react.txt",
+    "sha256": "b495047bd93a9b06913511076f504daba17d5bbeb3e0650f3bb53a4220329c57"
+  },
+  {
+    "package": "electron",
+    "version": "43.7.11",
+    "license": "MIT",
+    "file": "electron.txt",
+    "sha256": "5154e165bd6c2cc0cfbcd8916498c7abab0497923bafcd5cb07673fe8480087d"
+  }
+]

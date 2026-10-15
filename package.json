@@ -1,0 +1,86 @@
+{
+  "name": "helix-engine",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Local evidence, memory and deterministic tool-flow engine for coding agents",
+  "license": "MIT",
+  "author": "SuperHelix77",
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "bin": {
+    "helix": "bin/helix.mjs"
+  },
+  "main": "desktop/main.cjs",
+  "scripts": {
+    "start": "node bin/helix.mjs serve",
+    "desktop": "electron .",
+    "desktop:monitor": "electron . --monitor",
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "build:monitor": "vite build --mode monitor",
+    "test": "node --test --test-timeout=120000 test/*.test.mjs",
+    "check": "node scripts/check.mjs",
+    "test:ui": "node scripts/test-ui.mjs",
+    "test:electron": "node scripts/test-electron.mjs",
+    "package": "npm run build && electron-builder --dir",
+    "privacy": "node scripts/privacy-audit.mjs"
+  },
+  "dependencies": {
+    "@fontsource/ibm-plex-sans": "5.2.6",
+    "lucide-react": "1.31.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "csv-parse": "7.0.3",
+    "electron": "43.7.11",
+    "electron-builder": "26.15.3",
+    "playwright": "1.63.0",
+    "vite": "8.2.1"
+  },
+  "overrides": {
+    "global-agent": "4.1.3"
+  },
+  "build": {
+    "appId": "ai.superhelix.engine",
+    "productName": "HELIX",
+    "files": [
+      "dist/**",
+      "desktop/**",
+      "bin/**",
+      "src/**",
+      "skills/**",
+      "package.json",
+      "LICENSE",
+      "LICENSES/**",
+      "THIRD_PARTY_NOTICES.md",
+      "docs/assets/helix-mark.svg",
+      "docs/assets/app-icon.png",
+      "docs/ASSETS.md"
+    ],
+    "asar": false,
+    "directories": {
+      "output": "release"
+    },
+    "mac": {
+      "icon": "docs/assets/app-icon.icns",
+      "category": "public.app-category.developer-tools",
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    }
+  }
+}

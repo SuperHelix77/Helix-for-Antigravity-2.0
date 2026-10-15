@@ -1,0 +1,257 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import {existsSync} from 'node:fs';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {build, createServer, preview} from 'vite';
+import {chromium} from 'playwright';
+import {playback, modelPhases} from '../ui/playback.mjs';
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const assets = path.join(root, 'docs/assets');
+await fs.mkdir(assets, {recursive: true});
+const server = await createServer({root, mode: 'monitor', server: {host: '127.0.0.1', port: 0}});
+let browser, releaseServer;
+const errors = [];
+try {
+  await server.listen();
+  const url = `http://127.0.0.1:${server.httpServer.address().port}`;
+  const channel = process.env.HELIX_UI_BROWSER_CHANNEL || (process.platform === 'darwin' && existsSync('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome') ? 'chrome' : undefined);
+  browser = await chromium.launch({headless: true, channel});
+  const page = await browser.newPage({viewport: {width: 1440, height: 1080}, reducedMotion: 'reduce'});
+  page.on('pageerror', error => errors.push(error.message));
+  await page.goto(`${url}/?demo=1`);
+  await page.getByRole('heading', {name: 'Engine overview'}).waitFor();
+  await page.getByText('DEMO / PLAYBACK', {exact: true}).first().waitFor();
+  assert.equal(await page.getByText('Synthetic fixture. No live engine, model calls, or benchmark results.').count(), 1);
+  assert.equal(await page.evaluate(() => document.documentElement.dataset.theme), 'dark');
+  await page.evaluate(() => document.fonts.ready);
+  await page.screenshot({path: path.join(assets, 'monitor-dark-desktop.png'), fullPage: true});
+  await page.getByRole('radio', {name: 'Light theme'}).click();
+  assert.equal(await page.evaluate(() => document.documentElement.dataset.theme), 'light');
+  await page.screenshot({path: path.join(assets, 'monitor-desktop.png'), fullPage: true});
+  await page.getByRole('radio', {name: 'Light theme'}).focus();
+  await page.keyboard.press('ArrowRight');
+  assert.equal(await page.getByRole('radio', {name: 'Dark theme'}).getAttribute('aria-checked'), 'true');
+  await page.reload();
+  assert.equal(await page.evaluate(() => localStorage.getItem('helix.theme')), 'dark');
+  await page.getByRole('radio', {name: 'Light theme'}).click();
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, 'Desktop must not overflow horizontally');
+  await page.getByRole('button', {name: 'Inspect tool-flow resume'}).click();
+  await page.getByRole('dialog').waitFor();
+  assert.equal(await page.getByRole('dialog').getByText('playback-event-08', {exact: true}).count(), 1);
+  await page.keyboard.press('Escape');
+  assert.equal(await page.getByRole('dialog').count(), 0);
+  await page.getByRole('link', {name: 'Evidence'}).click();
+  await page.getByRole('heading', {name: 'Operation evidence'}).waitFor();
+  assert.equal(new URL(page.url()).hash, '#evidence');
+  await page.getByLabel('Operation status', {exact: true}).selectOption('failed');
+  assert.equal(await page.locator('tbody tr').count(), 1);
+  assert.match(await page.locator('tbody').textContent(), /failed/);
+  await page.getByLabel('Search operations', {exact: true}).fill('nonexistent');
+  await page.getByText('No matching operations', {exact: true}).waitFor();
+  await page.getByRole('button', {name: 'Clear operation search'}).click();
+  await page.getByLabel('Operation status', {exact: true}).selectOption('all');
+  await page.getByLabel('Sort operations', {exact: true}).selectOption('slowest');
+  assert.match(await page.locator('tbody tr').first().textContent(), /126 ms/);
+  await page.screenshot({path: path.join(assets, 'monitor-evidence.png'), fullPage: true});
+  await page.getByRole('link', {name: 'Memory', exact: true}).click();
+  await page.getByRole('heading', {name: 'Deterministic memory'}).waitFor();
+  assert.equal(await page.getByRole('button', {name: 'Search memory', exact: true}).isDisabled(), true);
+  await page.getByRole('button', {name: /Verify a deterministic tool result/}).click();
+  assert.equal(await page.getByRole('dialog').getByText('Stored only; no request implied', {exact: true}).count(), 1);
+  await page.getByRole('button', {name: 'Close inspector'}).click();
+  await page.getByRole('link', {name: 'Benchmarks', exact: true}).click();
+  await page.getByText('No benchmark loaded', {exact: true}).waitFor();
+  assert.equal(await page.getByRole('button', {name: 'Choose evidence'}).isDisabled(), true);
+
+  await page.setViewportSize({width: 390, height: 844});
+  await page.goto(`${url}/?demo=1`);
+  await page.getByRole('heading', {name: 'Engine overview'}).waitFor();
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, 'Mobile must not overflow horizontally');
+  await page.screenshot({path: path.join(assets, 'monitor-mobile.png'), fullPage: true});
+  await page.getByRole('button', {name: 'Open navigation'}).click();
+  await page.getByRole('radio', {name: 'Dark theme'}).click();
+  await page.getByRole('link', {name: 'Flow', exact: true}).click();
+  await page.getByRole('heading', {name: 'Flow', exact: true}).waitFor();
+  assert.equal(await page.locator('.sidebar.mobile-open').count(), 0);
+  await page.screenshot({path: path.join(assets, 'monitor-dark-mobile.png'), fullPage: true});
+  await page.locator('.node-memory').click();
+  await page.getByRole('dialog').waitFor();
+  assert.equal(await page.getByRole('dialog').getByText('In use by a current request', {exact: true}).count(), 1);
+  await page.keyboard.press('Escape');
+
+  const offline = await browser.newPage({viewport: {width: 1280, height: 800}});
+  await offline.goto(url);
+  await offline.getByText('Local engine is offline', {exact: true}).waitFor();
+  assert.equal(await offline.getByText('DEMO / PLAYBACK', {exact: true}).count(), 0);
+  await offline.screenshot({path: path.join(assets, 'monitor-offline.png'), fullPage: true});
+  await offline.close();
+
+  const loading = await browser.newPage();
+  await loading.addInitScript(() => { window.helix = {snapshot: () => new Promise(() => {})}; });
+  await loading.goto(url);
+  await loading.getByText('Waiting for engine snapshot', {exact: true}).waitFor();
+  assert.equal(await loading.getByText('Connecting to engine', {exact: true}).count(), 1);
+  await loading.close();
+
+  const malformed = await browser.newPage();
+  await malformed.addInitScript(() => { window.helix = {snapshot: async () => ({schema: 'unsupported'})}; });
+  await malformed.goto(url);
+  await malformed.getByRole('alert').waitFor();
+  assert.match(await malformed.getByRole('alert').textContent(), /No snapshot available/);
+  await malformed.close();
+
+  const connected = await browser.newPage({viewport: {width: 1440, height: 1000}});
+  connected.on('pageerror', error => errors.push(error.message));
+  const empty = {...playback, active: [], events: [], goals: [], counters: {...playback.counters, operations: 0, failed: 0, memory_lookups: 0}, memory: {...playback.memory, notes: 0}, graph: {...playback.graph, active: []}, monitored_benchmark: {status: 'prepared', phase: 'Waiting for explicit launch', current: 0, requests: 0}};
+  const aggregate = {name: 'Public test aggregate', complete: false, model: 'test-model', effort: 'high', lanes: {vanilla: {solves: 1, submitted: 2, graded: 2, requests: 4, input: 100, output: 50, reasoning: 20, tokens: 150, unknown: 1, failed_requests: 1, failed_issues: 1, failed_issue_requests: 1, compactions: 0}, modified: {solves: 1, submitted: 2, graded: 2, requests: 3, input: 80, output: 40, reasoning: 10, tokens: 120, unknown: 0, failed_requests: 0, failed_issues: 1, failed_issue_requests: 1, compactions: 0}}, pairs: [{order: 'vanilla-first', instance_id: 'public-sample-01', vanilla_pass: false, modified_pass: true, vanilla_tokens: 150, modified_tokens: 120}], known_savings_percent: 20, output_savings_percent: 20, complete_savings_percent: null, limitations: ['Public synthetic test data only.']};
+  await connected.addInitScript(({snapshot, benchmark}) => {
+    window.testCalls = {snapshots: 0, memory: [], browse: [], reads: [], connections: 0, diagnostics: 0, restarts: 0, benchmark: 0, currentReads: 0, maxReads: 0};
+    window.testSnapshot = snapshot;
+    window.failSnapshot = false;
+    window.failBenchmark = false;
+    window.testBenchmark = null;
+    window.helix = {
+      snapshot: async () => { window.testCalls.snapshots++; if (window.failSnapshot) throw new Error('Test disconnect'); return window.testSnapshot; },
+      benchmark: async () => { window.testCalls.benchmark++; window.testCalls.currentReads++; window.testCalls.maxReads = Math.max(window.testCalls.maxReads, window.testCalls.currentReads); try { await new Promise(resolve => setTimeout(resolve, 30)); if (window.failBenchmark) throw new Error('Test benchmark read failed'); return window.testBenchmark; } finally { window.testCalls.currentReads--; } },
+      chooseBenchmark: async () => { window.testBenchmark = {...benchmark, live: {status: 'prepared', current: 0, instance_id: null, requests: 0, known_input: 0, known_output: 0, known_tokens: 0, unknown_usage: 0, graded: 0, submitted: 0, solved: 0, phase: 'Awaiting explicit benchmark launch', activity: []}}; return window.testBenchmark; },
+      memorySearch: async args => { window.testCalls.memory.push(args); return {content: [{type: 'text', text: 'PUBLIC TEST MEMORY RESULT'}]}; },
+      memoryProjects: async () => [{project: 'public-test', notes: 1, source: 'helix'}],
+      memoryBrowse: async args => { window.testCalls.browse.push(args); return {notes: [{id: args.cursor ? 'public-note-2' : 'public-note-1', title: args.cursor ? 'Second public note' : 'Public exact note', preview: 'Public preview', created: 1792023000000, source: args.source}], next_cursor: args.cursor ? null : 20}; },
+      memoryRead: async args => { window.testCalls.reads.push(args); return {id: args.id, body: 'EXACT_STORED_TEXT\n  preserve spacing'}; },
+      connectClaudeMem: async () => { window.testCalls.connections++; return {status: 'Public Claude-Mem connected'}; },
+      diagnostics: async () => { window.testCalls.diagnostics++; return {checks: [{id: 'public-core', label: 'Local core connection', status: 'ok', detail: 'Public core reachable', remedy: null}], checked_at: Date.now(), model_calls: 0}; },
+      restartCore: async () => { window.testCalls.restarts++; return {status: 'Public restart completed'}; },
+    };
+  }, {snapshot: empty, benchmark: aggregate});
+  await connected.goto(url);
+  await connected.getByText('No requests running', {exact: true}).waitFor();
+  await connected.getByText('No operations recorded', {exact: true}).waitFor();
+  await connected.getByText('No stored goals', {exact: true}).waitFor();
+  await connected.getByRole('region', {name: 'Development run observation'}).getByText('Pending', {exact: true}).waitFor();
+  for (const model of modelPhases) {
+    await connected.evaluate(value => { window.testSnapshot.model_state = value; }, model);
+    await connected.getByRole('button', {name: 'Refresh snapshot'}).click();
+    await connected.waitForFunction(value => document.querySelector('.model-section .badge')?.textContent === value, model.state);
+    assert.equal(await connected.getByRole('status', {name: 'Observed reasoning'}).getAttribute('data-active'), String(model.state === 'reasoning'), `Reasoning lamp during ${model.state}`);
+  }
+  await connected.evaluate(() => { window.testSnapshot.model_state = {...window.testSnapshot.model_state, state: 'reasoning', observed: false}; });
+  await connected.getByRole('button', {name: 'Refresh snapshot'}).click();
+  await connected.waitForFunction(() => document.querySelector('.model-section .badge')?.textContent === 'reasoning');
+  assert.equal(await connected.getByRole('status', {name: 'Observed reasoning'}).getAttribute('data-active'), 'false', 'Unobserved reasoning must not illuminate the lamp');
+  await connected.evaluate(() => { window.testSnapshot.model_state.observed = true; });
+  await connected.getByRole('button', {name: 'Refresh snapshot'}).click();
+  await connected.waitForFunction(() => document.querySelector('.reasoning-panel')?.dataset.active === 'true');
+  await connected.getByRole('button', {name: 'Pause updates'}).click();
+  assert.equal(await connected.getByRole('status', {name: 'Observed reasoning'}).getAttribute('data-active'), 'false', 'Paused observations cannot claim live reasoning');
+  const pausedCalls = await connected.evaluate(() => window.testCalls.snapshots);
+  await connected.waitForTimeout(2200);
+  assert.equal(await connected.evaluate(() => window.testCalls.snapshots), pausedCalls, 'Paused monitor must not poll');
+  await connected.evaluate(() => { window.failSnapshot = true; });
+  await connected.getByRole('button', {name: 'Refresh snapshot'}).click();
+  await connected.getByRole('alert').waitFor();
+  assert.match(await connected.getByRole('alert').textContent(), /Last snapshot retained/);
+  assert.equal(await connected.getByText('Engine unavailable', {exact: true}).count(), 1);
+  await connected.evaluate(() => { window.failSnapshot = false; });
+  await connected.getByRole('button', {name: 'Refresh snapshot'}).click();
+  await connected.getByText('Engine online', {exact: true}).waitFor();
+  await connected.getByRole('link', {name: 'Memory', exact: true}).click();
+  assert.deepEqual(await connected.evaluate(() => window.testCalls.memory), [], 'Memory must not search automatically');
+  await connected.getByLabel('Project', {exact: true}).fill('public-test');
+  await connected.getByLabel('Query', {exact: true}).fill('literal note');
+  await connected.getByRole('button', {name: 'Search memory', exact: true}).click();
+  await connected.getByText('PUBLIC TEST MEMORY RESULT', {exact: true}).waitFor();
+  assert.deepEqual(await connected.evaluate(() => window.testCalls.memory), [{project: 'public-test', query: 'literal note', source: 'helix', limit: 20}]);
+  assert.deepEqual(await connected.evaluate(() => window.testCalls.browse), [], 'Memory browsing requires an explicit request');
+  await connected.getByRole('button', {name: 'Browse notes', exact: true}).click();
+  await connected.getByRole('button', {name: /Public exact note/}).click();
+  await connected.getByRole('dialog').waitFor();
+  assert.match(await connected.locator('.exact-note').textContent(), /EXACT_STORED_TEXT/);
+  assert.match(await connected.locator('.exact-note').textContent(), /preserve spacing/);
+  assert.equal(await connected.locator('.exact-note').textContent(), 'EXACT_STORED_TEXT\n  preserve spacing', 'Exact note bodies preserve newlines and spacing');
+  assert.deepEqual(await connected.evaluate(() => window.testCalls.reads), [{id: 'public-note-1', project: 'public-test', source: 'helix'}]);
+  await connected.getByRole('button', {name: 'Close inspector'}).click();
+  await connected.getByRole('button', {name: 'Load more notes', exact: true}).click();
+  await connected.getByRole('button', {name: /Second public note/}).waitFor();
+  assert.equal(await connected.locator('.memory-note').count(), 2, 'Memory pagination retains the earlier page');
+  assert.equal(await connected.evaluate(() => window.testCalls.browse.at(-1).cursor), 20);
+  await connected.getByLabel('Memory source', {exact: true}).selectOption('claude-mem');
+  assert.equal(await connected.locator('.memory-note').count(), 0, 'Changing source clears earlier results');
+  await connected.getByRole('button', {name: 'Browse notes', exact: true}).click();
+  await connected.getByRole('button', {name: /Public exact note/}).waitFor();
+  assert.equal(await connected.evaluate(() => window.testCalls.browse.at(-1).source), 'claude-mem');
+  assert.equal(await connected.evaluate(() => window.testCalls.connections), 0, 'Claude-Mem connection requires an explicit request');
+  await connected.getByRole('button', {name: 'Connect Claude-Mem', exact: true}).click();
+  await connected.getByText('Public Claude-Mem connected', {exact: true}).waitFor();
+  assert.equal(await connected.evaluate(() => window.testCalls.connections), 1);
+  assert.equal(await connected.getByLabel('Memory source', {exact: true}).inputValue(), 'claude-mem');
+  await connected.getByRole('link', {name: 'Troubleshooting', exact: true}).click();
+  await connected.getByText('Public core reachable', {exact: true}).waitFor();
+  assert.equal(await connected.evaluate(() => window.testCalls.restarts), 0, 'Diagnostics must not repair automatically');
+  await connected.getByRole('button', {name: 'Restart core', exact: true}).click();
+  assert.equal(await connected.evaluate(() => window.testCalls.restarts), 0, 'Restart requires explicit confirmation');
+  await connected.getByRole('button', {name: 'Cancel', exact: true}).click();
+  assert.equal(await connected.evaluate(() => window.testCalls.restarts), 0);
+  await connected.getByRole('button', {name: 'Restart core', exact: true}).click();
+  await connected.getByRole('button', {name: 'Confirm restart', exact: true}).click();
+  await connected.getByText('Public restart completed', {exact: true}).waitFor();
+  assert.equal(await connected.evaluate(() => window.testCalls.restarts), 1, 'A confirmed restart executes once');
+  await connected.getByRole('link', {name: 'Benchmarks', exact: true}).click();
+  await connected.getByText('No benchmark loaded', {exact: true}).waitFor();
+  await connected.getByRole('button', {name: 'Choose evidence'}).click();
+  await connected.getByText('Public test aggregate', {exact: true}).waitFor();
+  await connected.getByText('Not established', {exact: true}).waitFor();
+  await connected.getByText('Failed issue requests', {exact: true}).waitFor();
+  assert.equal(await connected.getByText('public-sample-01', {exact: true}).count(), 1);
+  await connected.getByText('Pending', {exact: true}).waitFor();
+  await connected.getByText('Prepared. Execution has not started.', {exact: true}).waitFor();
+  await connected.evaluate(() => { window.testBenchmark.live = {status: 'running', current: 3, instance_id: 'public-live-test-03', requests: 9, known_input: 210, known_output: 111, known_tokens: 321, unknown_usage: 1, graded: 2, submitted: 3, solved: 1, phase: 'Evaluating public issue', activity: [{id: 'public-activity-1', at: Date.now(), kind: 'model', action: 'response', status: 'complete', input_tokens: 210, output_tokens: 111}]}; });
+  await connected.getByText('Evaluating public issue', {exact: true}).waitFor();
+  await connected.getByText('public-live-test-03', {exact: true}).waitFor();
+  await connected.getByText('321', {exact: true}).waitFor();
+  assert.equal(await connected.evaluate(() => window.testCalls.maxReads), 1, 'Benchmark reads must not overlap');
+  await connected.getByRole('button', {name: 'Pause benchmark updates'}).click();
+  const benchmarkReads = await connected.evaluate(() => window.testCalls.benchmark);
+  await connected.waitForTimeout(2200);
+  assert.equal(await connected.evaluate(() => window.testCalls.benchmark), benchmarkReads, 'Paused benchmark must not poll');
+  await connected.evaluate(() => { window.failBenchmark = true; });
+  await connected.getByRole('button', {name: 'Refresh benchmark'}).click();
+  await connected.getByText('Stale observation', {exact: true}).waitFor();
+  assert.equal(await connected.getByText('public-live-test-03', {exact: true}).count(), 1, 'Stale benchmark must retain prior data');
+  await connected.evaluate(() => { window.failBenchmark = false; window.testBenchmark.live.status = 'completed'; });
+  await connected.getByRole('button', {name: 'Refresh benchmark'}).click();
+  await connected.getByText('completed', {exact: true}).waitFor();
+  await connected.getByRole('link', {name: 'Overview', exact: true}).click();
+  const inactiveReads = await connected.evaluate(() => window.testCalls.benchmark);
+  await connected.waitForTimeout(2200);
+  assert.equal(await connected.evaluate(() => window.testCalls.benchmark), inactiveReads, 'Hidden benchmark view must not poll');
+
+  await build({root, mode: 'production', logLevel: 'error'});
+  const files = await fs.readdir(path.join(root, 'dist/assets'));
+  const releaseJS = (await Promise.all(files.filter(file => file.endsWith('.js')).map(file => fs.readFile(path.join(root, 'dist/assets', file), 'utf8')))).join('\n');
+  assert.equal(releaseJS.includes('Development benchmark monitor'), false, 'Release bundle must exclude benchmark component');
+  assert.equal(releaseJS.includes('Vanilla (historical)'), false, 'Release bundle must exclude benchmark aggregate UI');
+  assert.equal(releaseJS.includes('Development run observation'), false, 'Release bundle must exclude benchmark overview strip');
+  releaseServer = await preview({root, mode: 'production', logLevel: 'error', preview: {host: '127.0.0.1', port: 0}});
+  const releaseURL = `http://127.0.0.1:${releaseServer.httpServer.address().port}`;
+  const release = await browser.newPage({viewport: {width: 1440, height: 1000}});
+  release.on('pageerror', error => errors.push(error.message));
+  await release.goto(`${releaseURL}/?demo=1#benchmarks`);
+  await release.getByRole('heading', {name: 'Engine overview'}).waitFor();
+  assert.equal(await release.getByRole('link', {name: 'Benchmarks', exact: true}).count(), 0, 'Release navigation must exclude Benchmarks');
+  assert.equal(await release.getByRole('heading', {name: 'Development benchmark monitor'}).count(), 0, 'Release deep link must not expose benchmark view');
+  assert.equal(await release.getByRole('heading', {name: 'Engine overview'}).count(), 1);
+  await release.getByRole('radio', {name: 'System theme'}).click();
+  await release.emulateMedia({colorScheme: 'light'});
+  await release.waitForFunction(() => document.documentElement.dataset.theme === 'light');
+  await release.emulateMedia({colorScheme: 'dark'});
+  await release.waitForFunction(() => document.documentElement.dataset.theme === 'dark');
+  await release.screenshot({path: path.join(assets, 'release-dark-desktop.png'), fullPage: true});
+  assert.deepEqual(errors, [], 'No browser runtime errors');
+  console.log('UI verified: monitor-only benchmarks; real release build/preview excludes benchmark component, navigation and deep link; dark/light/system theme, keyboard selection and persistence; read-only benchmark polling, no overlapping reads, pause, stale retention, recovery and stop-on-leave; existing playback/layout/evidence/memory checks. Public fixture screenshots in docs/assets.');
+} finally {
+  await browser?.close();
+  await server.close();
+  if (releaseServer) await new Promise(resolve => releaseServer.httpServer.close(resolve));
+}
