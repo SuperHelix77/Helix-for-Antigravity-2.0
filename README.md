@@ -1,30 +1,32 @@
-# HELIX 1.0
+<p align="center">
+  <img src="docs/assets/helix-engine-banner.svg" alt="HELIX Engine — less replay, exact evidence, more useful work" width="100%">
+</p>
 
-<img src="docs/assets/helix-mark.svg" width="48" height="48" alt="HELIX double-strand logo">
+# HELIX Engine
 
-[Buy me a coffee](https://buymeacoffee.com/superhelix7)
+**Make the model think about the problem. Not the same tool output for the twentieth time.**
 
-![HELIX: plans, compact receipts, recoverable originals and memory](docs/assets/release-illustration.png)
+[Latest release](https://github.com/SuperHelix77/HELIX-1.0/releases/latest) · [Install](docs/INSTALL.md) · [Architecture](docs/ARCHITECTURE.md) · [Benchmarks](docs/BENCHMARKS.md) · [Modules](docs/MODULES.md) · [Support the project](https://buymeacoffee.com/superhelix7)
 
-It took a year of experiments to get here. HELIX started with a simple frustration: an agent should not have to read the same log, rediscover the same decision, or ask a model to wait for a process again and again. This is the first public engine release, built around that problem. It is useful, unfinished, and open about both.
+I spent a year getting here. It started with small token-saving tricks: tighter prompts, tool-output filtering, RTK. Those helped, but they didn't solve the underlying problem. Coding agents kept rereading old evidence, reconstructing decisions they had already made, and asking expensive models to coordinate work a deterministic program could do.
 
-A local evidence, memory and deterministic Tool Flow engine for coding agents, with an Electron monitor.
+So I kept building. And failing. And measuring. HELIX is the result.
 
-[Latest release](https://github.com/SuperHelix77/HELIX-1.0/releases/latest) | [1.0.1 patch notes](docs/RELEASE-1.0.1.md)
+HELIX is a **local evidence, memory and deterministic execution layer for coding agents**, with an Electron monitor. It keeps original tool results recoverable, gives the model compact evidence when that is sufficient, and moves explicitly authorized mechanical operations out of the reasoning loop.
 
-HELIX keeps exact originals outside repeated context, returns compact evidence where appropriate, and executes already-authorized mechanical steps without asking a model to decide them again. It does not lower reasoning effort, force terse thinking, or promise unchanged task quality.
+It is not a new model. It does not lower the configured reasoning effort. It is not a promise that compression preserves intelligence. The benchmark below includes failures, and I intend to keep them visible.
 
-![HELIX release interface in dark mode](docs/assets/release-dark-desktop.png)
+![HELIX desktop interface — public synthetic demonstration data](docs/assets/release-dark-desktop.png)
 
-The screenshot uses explicitly labelled public synthetic data, not a live benchmark or savings result. The release app has Overview, Flow, Evidence, Memory and Troubleshooting. Benchmark monitoring is a separate development build. The double-strand mark comes home from [Helix-Harness](https://github.com/SuperHelix77/Helix-Harness); see [visual credits](docs/ASSETS.md).
+*The desktop image uses synthetic data. It is not a screenshot of the measured benchmark.*
 
-## Current Evidence
+## The result — and the cost
 
-The V3 NEW50 comparison did **not** achieve output reduction or solve parity. It did substantially reduce known input-token replay:
+The completed V3 NEW50 experiment used the same 50 SWE issues and historical vanilla baseline. Both lanes retained a single native conversation across tasks, including infrastructure resumes.
 
 | Measure | Vanilla | HELIX V3 |
 | --- | ---: | ---: |
-| Officially solved | 38 / 50 | 34 / 50 |
+| Official solves | **38 / 50** | **34 / 50** |
 | Primary model requests | 341 | 420 |
 | All attempts, including overloads | 346 | 423 |
 | Known input tokens | 50,630,785 | 11,212,326 |
@@ -32,15 +34,38 @@ The V3 NEW50 comparison did **not** achieve output reduction or solve parity. It
 | Known total tokens | 50,686,068 | 11,288,140 |
 | Primary requests with unknown usage | 0 | 1 |
 
-Known total tokens fell **77.73%**; output rose **37.14%**, with four fewer verified solves. Only confirmed provider-overload errors are excluded from primary accounting in both lanes (vanilla 5, V3 3); they remain in the all-attempt ledger. Failed-task effort, successful retries, ordinary unknown usage and two rejected post-completion operations are included. These are known provider subtotals, not complete billed cost or subscription savings. Parent, consultation and recovery overhead was not metered.
+**77.73% fewer known provider tokens. Four fewer verified solves. 37.14% more output tokens.**
 
-V3 reused the **same known 50 issues** and historical vanilla baseline, not a fresh holdout or simultaneous A/B trial. Both lanes kept one native conversation across issues, with infrastructure resumes. All 100 official grades and 50 gold controls were audited. Exact cold recovery verified 261 result-store originals, 758 program-store originals, 417 archived pairs and 92 advertised handles. No real compaction occurred. The final solver was stopped after grading because its completion broker rejected further operations; a clean native exit is not claimed.
+That is the actual trade-off. HELIX demonstrated major input-efficiency gains; it **did not** demonstrate quality parity or output savings. Do not quote the token reduction as a subscription-quota multiplier, a complete billing estimate, or proof that the model became smarter.
 
-See [V3 aggregate data and failed-task effort](benchmarks/new50-v3/results.json), [cumulative per-issue savings](benchmarks/new50-v3/cumulative.csv), [earlier v1 results](benchmarks/new50-v1/results.json), and [methodology](docs/BENCHMARKS.md). New release memory/RTK/UI integrations have local tests; they have not been credited with a fresh provider benchmark.
+The experiment is not a clean held-out randomized trial: V3 reused the known issue cohort and historical vanilla baseline. Confirmed overloads are excluded symmetrically from primary accounting but retained in the all-attempt ledger. Failed work, retries and two rejected post-completion operations remain counted. One request has unknown usage. Parent coordination, consultation and some recovery overhead were not metered.
 
-## Run Locally
+All 100 official grades and 50 gold controls were audited. Cold recovery checked 261 result-store originals, 758 program-store originals, 417 archived pairs and 92 advertised handles. No native compaction occurred in the run. The solver was stopped after grading because the completion broker rejected further operations; I do not claim a clean native shutdown.
 
-Source installation requires Node.js 22.19 or newer, npm, and Git. Python 3 is optional for AST-aware Python source indexing. No API key is required for local memory, evidence or the monitor.
+**Read the evidence, not just the percentage:** [V3 results](benchmarks/new50-v3/results.json) · [Per-issue trajectory](benchmarks/new50-v3/cumulative.csv) · [V1 comparison](benchmarks/new50-v1/results.json) · [Methodology and limitations](docs/BENCHMARKS.md).
+
+The newer memory, RTK and desktop integrations have local tests; they are **not** credited with a fresh equivalent provider benchmark.
+
+## What HELIX actually does
+
+| Module | Job |
+| --- | --- |
+| **Goal engine** | Tracks the current task, ordered steps, scope, revision, acceptance and cancellation. Old goals never silently become new instructions. |
+| **Tool Flow** | Executes bounded, already-authorized mechanical sequences. Ambiguity returns to model judgment instead of being guessed away. |
+| **Evidence archive** | Keeps exact tool outputs and generated programs recoverable while returning compact, typed receipts when appropriate. |
+| **Context** | Retires eligible historical material, indexes references and retrieves originals on demand. Retention is not proof of semantic equivalence. |
+| **Memory** | Stores explicit project/task notes in deterministic local SQLite. Search and note round trips do not require an LLM observer. |
+| **Claude-Mem bridge** | Optional read-only lookup of an explicitly selected legacy store. It does not silently import private memories or start a background model. |
+| **RTK integration** | Filters archived output through RTK where configured, without rerunning original commands. Unavailable or unsafe paths fall back to retained evidence. |
+| **Electron monitor** | Shows observed runtime state, flow, evidence, memory and troubleshooting. Reasoning status is shown only when the provider actually exposes that state. |
+
+These components are not all automatically active on every client request. The MCP interface and the opt-in HTTP proxy have different integration boundaries. HELIX does **not** silently patch ChatGPT or Codex, intercept every conversation, or expose private chain-of-thought.
+
+See the [module-by-module guide](docs/MODULES.md) for implementation paths, automatic versus opt-in behavior, and limitations.
+
+## Install and run
+
+Requires **Node.js 22.19+**, npm and Git. Python 3 is optional for AST-aware Python indexing. Local memory, evidence and monitoring do not require an API key.
 
 ```sh
 git clone https://github.com/SuperHelix77/HELIX-1.0.git
@@ -51,50 +76,44 @@ node bin/helix.mjs start
 npm run desktop
 ```
 
-The desktop connects to one owner-private loopback service. Closing the window leaves that service available to MCP clients. To stop it:
+The desktop connects to an owner-private loopback service. Closing the window does not stop the service. Stop it explicitly with:
 
 ```sh
 node bin/helix.mjs stop
 ```
 
-The Electron distribution is downloaded by npm's normal installation script. Installing dependencies, building and packaging require network access to their registries. Fonts and icons are bundled; the renderer makes no external requests.
+The dependency install may download Electron. Platform-native packaging must be tested on its target OS; a source build is not evidence of a signed or notarized distribution. Full instructions: [INSTALL.md](docs/INSTALL.md).
 
-## Connect An Agent
-
-First generate and inspect the local MCP registration:
+### Connect Codex or another MCP client
 
 ```sh
 node bin/helix.mjs install
 ```
 
-This writes `~/.helix/codex-mcp.toml`; it does **not** edit Codex settings or authentication. After reviewing it, register the adapter with a compatible Codex CLI:
+This generates `~/.helix/codex-mcp.toml` for review; it does **not** change Codex authentication or settings. After inspection, register the adapter in a compatible Codex CLI:
 
 ```sh
 codex mcp add helix -- node "$PWD/bin/helix.mjs" mcp
 codex mcp list
 ```
 
-Reload the client's MCP tools. The adapter exposes `goal`, `context` and `memory`, sharing the same service and stores. Use only the current authorized task; memory and stored goals are historical evidence, not instructions to resume old work. The [bundled policy](skills/helixcontext/SKILL.md) is available on demand through `context policy`; it is not automatically installed into another client's skill directory.
+Reload the client's tools. The adapter exposes `goal`, `context` and `memory` over the same local service. Other compatible clients can use the same stdio entrypoint. The optional Responses proxy is documented in [INSTALL.md](docs/INSTALL.md); it is not a global router and does not replace a client's native WebSocket stack.
 
-Other MCP-capable clients can run the same stdio command. A stock ChatGPT conversation without an explicitly supported local connector is not automatically intercepted. This installation does not patch the ChatGPT or Codex desktop applications.
+## See what the engine is doing
 
-See [installation and recovery](docs/INSTALL.md) for configuration, optional Claude-Mem lookup, RTK, uninstall and an opt-in OpenAI proxy.
+The Electron application is an inspection and troubleshooting surface, not a second autonomous agent. It exposes retained operations, evidence references, explicit memories and observable request states. A reasoning indicator is **not** a window into hidden thoughts. If the native event feed is unavailable, the monitor cannot infer those states.
 
-## What Is Included
+The default release app deliberately excludes the development benchmark monitor. To inspect a reviewed benchmark run:
 
-- Ordered goals with revision, scope, explicit acceptance review and cancellation checks.
-- Compact command receipts, evidence deltas, exact edits, indexed ranges and immutable reusable workflows.
-- Bounded Tool Flow with declared commands and typed transitions. Unknown states return to model judgment.
-- Recoverable original tool results and programs. Retention/retrieval checks are not semantic correctness guarantees.
-- Deterministic SQLite memory with explicit project/task notes and bounded search. No LLM extraction, Ollama, embedding daemon or background model worker.
-- An integrated memory browser and read-only Claude-Mem bridge, connected through an explicit local database picker or service environment setting. No automatic personal-memory discovery or copying.
-- RTK stdin filtering of already archived logs through `context rtk`. Original commands are never rerun; exact source handles remain available. Missing RTK, unverified telemetry-off state or unusable output falls back to retained native evidence.
-- An opt-in official-OpenAI Responses HTTP proxy with exact result retention. It does not replace a client's native WebSocket implementation or install itself as a global router.
-- A local Electron app with light, dark and system themes, memory browsing, exact note inspection and troubleshooting. Native Codex chat monitoring is explicit, local and metadata-only; it does not require proxy routing. Its reasoning indicator lights only on observed active reasoning. An MCP-only connection without a native feed cannot expose client reasoning.
+```sh
+npm run build:monitor
+node bin/helix.mjs watch /path/to/a/reviewed/new50-run
+npm run desktop:monitor
+```
 
-Some primitives are available through MCP but are not enabled on every request automatically. In particular, the standalone proxy does not install the benchmark's full native operation broker. The benchmark's combined treatment is not evidence that each component independently saves tokens.
+Monitoring never launches a benchmark. It displays known usage and official matched grades without silently treating unknown usage as zero.
 
-## Development
+## Build, test, inspect
 
 ```sh
 npm test
@@ -105,28 +124,22 @@ npm run test:electron
 npm run privacy
 ```
 
-The separate benchmark monitor is intentionally not the release application:
+`npm run package` creates an unpacked app for the current platform. See [security and privacy](SECURITY.md), [architecture](docs/ARCHITECTURE.md), and [installation/recovery](docs/INSTALL.md).
 
-```sh
-npm run build:monitor
-node bin/helix.mjs watch /path/to/a/reviewed/new50-run
-npm run desktop:monitor
-```
+HELIX executes authorized commands with the host account's permissions. **It is not a sandbox.** A declared tool operation is consequential authorization. Keep capability tokens private, review task scopes and do not expose local execution endpoints.
 
-Monitoring never starts a run. It shows known usage, failed attempts, unknown counts and cumulative savings only for officially graded matched pairs. The default release build excludes the benchmark component, navigation and direct hash route. The source repository retains sanitized benchmark evidence for scrutiny.
+## What comes next
 
-`npm run package` builds an unpacked application for the current platform. Native platform packaging must be verified on that platform; source tests do not establish Windows/Linux binary support. This repository does not distribute signing credentials.
+The first release is a foundation, not the end of the research. The immediate problem is clear: recover the four lost solves and investigate why HELIX generated 79 additional primary model requests and more reasoning/output. Context retirement is useful; it is not enough on its own.
 
-## Architecture And Safety
+Longer-term work on memory, continuous context control, model-independent handoffs and Lean Switch remains research. **95% savings is a target, not a result.** I will not label it achieved until the measurements justify it.
 
-See [architecture](docs/ARCHITECTURE.md), [security and privacy](SECURITY.md), and [benchmark methodology](docs/BENCHMARKS.md). Model calls occur only through an explicitly configured proxy or an independently launched benchmark; local memory and the goal engine issue none. A single user turn can still contain many provider requests.
+## Acknowledgments, licensing and support
 
-The [module guide](docs/MODULES.md) explains each subsystem, where it runs, and what is automatic versus opt-in. This release does not make arbitrary ChatGPT conversations run through HELIX or expose private chain-of-thought.
+The HELIX double-strand identity comes from [Helix Harness](https://github.com/SuperHelix77/Helix-Harness). This banner adapts that project's header rather than inventing a different brand. The mark retains its separate AGPL-3.0 attribution; see [visual credits](docs/ASSETS.md).
 
-The engine's command execution has the host account's permissions. Declaring a command is consequential authorization, not a sandbox. Do not expose its local capability token, mount private credentials into agents, or register commands outside a task's permitted scope.
+The engine code is MIT-licensed ([LICENSE](LICENSE)); third-party code and artwork retain their applicable licenses ([notices](THIRD_PARTY_NOTICES.md)). The engine core is adapted from the MIT-licensed codex-router working tree, with source hashes in [upstream provenance](docs/upstream-provenance.json). No affiliation or endorsement by OpenAI, Anthropic, RTK, Unsloth or Argon Bridge is implied.
 
-## License And Attribution
+I build HELIX because I want capable models to spend more of their time solving problems and less of it rediscovering their own work. A year of experiments went into this release. Some worked. Many didn't. The failures stay in the record.
 
-Engine code is MIT; see [LICENSE](LICENSE) and [third-party notices](THIRD_PARTY_NOTICES.md). The separately licensed harness SVG mark retains AGPL-3.0; its source and license are included. See [visual credits](docs/ASSETS.md). The engine core is adapted from the MIT-licensed codex-router working tree, with imported source hashes in [provenance](docs/upstream-provenance.json). Upstream attribution does not imply that its unrelated workspace changes were audited.
-
-The supplied interface reference informed neutral surfaces, sidebar proportions and restrained controls. HELIX does not copy that application's branding or chat functionality and is not affiliated with OpenAI, Anthropic, RTK or Argon Bridge.
+If the project is useful, [buy me a coffee](https://buymeacoffee.com/superhelix7). It helps sustain the work.
