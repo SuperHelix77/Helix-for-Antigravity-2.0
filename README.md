@@ -6,7 +6,13 @@
 
 **Make the model think about the problem. Not the same tool output for the twentieth time.**
 
-[Latest release](https://github.com/SuperHelix77/HELIX-1.0/releases/latest) · [Install](docs/INSTALL.md) · [Architecture](docs/ARCHITECTURE.md) · [Benchmarks](docs/BENCHMARKS.md) · [Modules](docs/MODULES.md) · [Support the project](https://buymeacoffee.com/superhelix7)
+<p align="center">
+  <a href="https://buymeacoffee.com/superhelix7">
+    <img src="https://img.shields.io/badge/BUY%20ME%20A%20COFFEE-SUPPORT%20HELIX-F5C542?style=for-the-badge&logo=buymeacoffee&logoColor=172027&labelColor=172027" alt="Buy me a coffee — support HELIX">
+  </a>
+</p>
+
+[Latest release](https://github.com/SuperHelix77/HELIX-1.0/releases/latest) · [Install](docs/INSTALL.md) · [Architecture](docs/ARCHITECTURE.md) · [Benchmarks](docs/BENCHMARKS.md) · [Modules](docs/MODULES.md)
 
 I spent a year getting here. It started with small token-saving tricks: tighter prompts, tool-output filtering, RTK. Those helped, but they didn't solve the underlying problem. Coding agents kept rereading old evidence, reconstructing decisions they had already made, and asking expensive models to coordinate work a deterministic program could do.
 
