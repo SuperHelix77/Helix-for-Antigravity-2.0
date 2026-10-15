@@ -23,7 +23,8 @@ export function createOpenAIProxy({directory, upstream, fetchImpl = fetch, event
       if (!req.headers.authorization) throw new Error('The client must supply its own OpenAI authorization; HELIX never discovers credentials');
       const controller = new AbortController(); controllers.add(controller);
       const timer = setTimeout(() => controller.abort(), 1200000);
-      res.once('close', () => { if (!res.writableEnded) controller.abort(); });
+      const onClose = () => { if (!res.writableEnded) controller.abort(); };
+      res.once('close', onClose);
       const headers = {'content-type': 'application/json', accept: 'text/event-stream'};
       for (const key of ['authorization', 'chatgpt-account-id', 'openai-organization', 'session_id', 'conversation_id',
         'x-codex-turn-metadata', 'x-openai-internal-codex-responses-lite', 'originator', 'user-agent']) if (typeof req.headers[key] === 'string') headers[key] = req.headers[key];
@@ -34,7 +35,9 @@ export function createOpenAIProxy({directory, upstream, fetchImpl = fetch, event
       try {
         shaped = compact ? {payload, stats: {enabled: false}} : optimizer.shape(payload, {session: req.headers.session_id || req.headers.conversation_id, signal: controller.signal});
         const outgoing = {...shaped.payload};
-        delete outgoing.max_tool_calls;
+        // Native Codex/Lite reject this API-only parameter. Preserve explicit
+        // built-in tool budgets on the ordinary official API route.
+        if (upstream === 'https://chatgpt.com/backend-api/codex' || headers['x-openai-internal-codex-responses-lite']) delete outgoing.max_tool_calls;
         if (headers['x-openai-internal-codex-responses-lite']) outgoing.parallel_tool_calls = false;
         bytesBefore = Buffer.byteLength(JSON.stringify(payload)); bytesAfter = Buffer.byteLength(JSON.stringify(outgoing));
         counters.model_calls++; sent = true; modelState?.start(id, payload.model);
@@ -57,8 +60,9 @@ export function createOpenAIProxy({directory, upstream, fetchImpl = fetch, event
           if (!res.write(chunk)) await new Promise((resolve, reject) => {
             const stop = () => { cleanup(); reject(new Error('Client disconnected')); };
             const ready = () => { cleanup(); resolve(); };
-            const cleanup = () => { res.off('drain', ready); res.off('close', stop); };
-            res.once('drain', ready); res.once('close', stop);
+            const cleanup = () => { res.off('drain', ready); res.off('close', stop); controller.signal.removeEventListener('abort', stop); };
+            res.once('drain', ready); res.once('close', stop); controller.signal.addEventListener('abort', stop, {once: true});
+            if (controller.signal.aborted) stop();
           });
           if (oversizedEvent) continue;
           stream += decoder.decode(chunk, {stream: true});
@@ -72,7 +76,7 @@ export function createOpenAIProxy({directory, upstream, fetchImpl = fetch, event
         }
         res.end();
       } finally {
-        clearTimeout(timer); controllers.delete(controller);
+        clearTimeout(timer); controllers.delete(controller); res.off('close', onClose);
         modelState?.finish(id, finished && status >= 200 && status < 300 ? 'complete' : failed || status < 200 || status >= 300 ? 'failed' : 'unknown');
         if (sent && Number.isSafeInteger(usage?.input_tokens) && usage.input_tokens >= 0 && Number.isSafeInteger(usage?.output_tokens) && usage.output_tokens >= 0) {
           counters.known_input += usage.input_tokens; counters.known_output += usage.output_tokens;

@@ -36,3 +36,34 @@ export async function ensureService(directory = STATE_DIR) {
   }
   throw new Error('HELIX did not become healthy. Inspect the owned lock; an unknown old process is never killed automatically.');
 }
+
+export async function watchModel(onState, {directory = STATE_DIR, signal} = {}) {
+  while (!signal?.aborted) {
+    try {
+      const info = endpoint(directory);
+      const response = await fetch(info.url + '/model/events', {headers: {authorization: `Bearer ${info.token}`}, signal});
+      if (!response.ok || !response.headers.get('content-type')?.includes('text/event-stream')) throw new Error('Model event feed unavailable');
+      const decoder = new TextDecoder(); let pending = '';
+      for await (const chunk of response.body) {
+        pending += decoder.decode(chunk, {stream: true});
+        if (pending.length > 65536) throw new Error('Model event frame exceeds limit');
+        let end;
+        while ((end = pending.indexOf('\n\n')) !== -1) {
+          const frame = pending.slice(0, end); pending = pending.slice(end + 2);
+          const line = frame.split('\n').find(value => value.startsWith('data: '));
+          if (!line) continue;
+          const value = JSON.parse(line.slice(6));
+          if (!value || typeof value.state !== 'string' || typeof value.observed !== 'boolean') throw new Error('Invalid model event');
+          onState(value);
+        }
+      }
+    } catch { if (signal?.aborted) break; }
+    if (!signal?.aborted) {
+      onState({state: 'unknown', observed: false, source: 'none', model: null, updated_at: null, detail: 'Live model event connection interrupted'});
+      await new Promise(resolve => {
+        const done = () => { clearTimeout(timer); signal?.removeEventListener('abort', done); resolve(); };
+        const timer = setTimeout(done, 1000); signal?.addEventListener('abort', done, {once: true});
+      });
+    }
+  }
+}

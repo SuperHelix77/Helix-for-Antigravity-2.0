@@ -17,6 +17,7 @@ import {
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { StringDecoder } from "node:string_decoder";
 
 const DEFAULT_KILL_GRACE_MS = 250;
 const DEFAULT_MAX_OUTPUT_BYTES = 2 * 1024 * 1024;
@@ -797,6 +798,8 @@ export function runProcessTree(
     throw ownerSignalError(ownerSignalInProgress);
   }
   const remaining = remainingOperationMs(deadline, signal);
+  const stdoutDecoder = new StringDecoder(encoding);
+  const stderrDecoder = new StringDecoder(encoding);
   const childSignalBudget = contractedOwnerSignalBudget(env, { childMayOwnProcessTrees });
   const coordinator = prepareOwnerSignalCoordinator(env, { create: childMayOwnProcessTrees });
   const childEnvironment = childSignalBudget === undefined
@@ -960,8 +963,8 @@ export function runProcessTree(
         }
         return;
       }
-      if (name === "stdout") stdout += chunk.toString(encoding);
-      else stderr += chunk.toString(encoding);
+      if (name === "stdout") stdout += stdoutDecoder.write(chunk);
+      else stderr += stderrDecoder.write(chunk);
     };
     if (relayInherited && !discardOutput) {
       const input = process.stdin;
@@ -1021,6 +1024,8 @@ export function runProcessTree(
             finish(reject, terminalError);
             return;
           }
+          stdout += stdoutDecoder.end();
+          stderr += stderrDecoder.end();
           finish(resolve, {
             status,
             signal: childSignal,

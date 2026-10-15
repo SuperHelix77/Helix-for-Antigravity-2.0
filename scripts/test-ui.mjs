@@ -3,26 +3,33 @@ import fs from 'node:fs/promises';
 import {existsSync} from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {build, createServer, preview} from 'vite';
+import {execFileSync} from 'node:child_process';
+import {createServer, preview} from 'vite';
 import {chromium} from 'playwright';
 import {playback, modelPhases} from '../ui/playback.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const assets = path.join(root, 'docs/assets');
 await fs.mkdir(assets, {recursive: true});
-const server = await createServer({root, mode: 'monitor', server: {host: '127.0.0.1', port: 0}});
+// Test inputs are immutable; native watching can stall on macOS parent paths.
+const server = await createServer({root, mode: 'monitor', server: {host: '127.0.0.1', port: 0},
+  plugins: [{name: 'helix-immutable-ui-test', configResolved(config) { config.server.watch = null; }}]});
+assert.equal(server.config.server.watch, null, 'Automated UI checks must not create native watchers');
 let browser, releaseServer;
 const errors = [];
 try {
   await server.listen();
+  console.log('UI check: local development server ready');
   const url = `http://127.0.0.1:${server.httpServer.address().port}`;
   const channel = process.env.HELIX_UI_BROWSER_CHANNEL || (process.platform === 'darwin' && existsSync('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome') ? 'chrome' : undefined);
-  browser = await chromium.launch({headless: true, channel});
+  browser = await chromium.launch({headless: true, channel, timeout: 30000});
+  console.log('UI check: isolated headless browser ready');
   const page = await browser.newPage({viewport: {width: 1440, height: 1080}, reducedMotion: 'reduce'});
   page.on('pageerror', error => errors.push(error.message));
   await page.goto(`${url}/?demo=1`);
   await page.getByRole('heading', {name: 'Engine overview'}).waitFor();
   await page.getByText('DEMO / PLAYBACK', {exact: true}).first().waitFor();
+  console.log('UI check: playback loaded');
   assert.equal(await page.getByText('Synthetic fixture. No live engine, model calls, or benchmark results.').count(), 1);
   assert.equal(await page.evaluate(() => document.documentElement.dataset.theme), 'dark');
   await page.evaluate(() => document.fonts.ready);
@@ -87,6 +94,7 @@ try {
   assert.equal(await offline.getByText('DEMO / PLAYBACK', {exact: true}).count(), 0);
   await offline.screenshot({path: path.join(assets, 'monitor-offline.png'), fullPage: true});
   await offline.close();
+  console.log('UI check: responsive playback and offline states passed');
 
   const loading = await browser.newPage();
   await loading.addInitScript(() => { window.helix = {snapshot: () => new Promise(() => {})}; });
@@ -123,6 +131,7 @@ try {
       connectClaudeMem: async () => { window.testCalls.connections++; return {status: 'Public Claude-Mem connected'}; },
       diagnostics: async () => { window.testCalls.diagnostics++; return {checks: [{id: 'public-core', label: 'Local core connection', status: 'ok', detail: 'Public core reachable', remedy: null}], checked_at: Date.now(), model_calls: 0}; },
       restartCore: async () => { window.testCalls.restarts++; return {status: 'Public restart completed'}; },
+      onModelState: listener => { window.testModelListener = listener; return () => { window.testModelListener = null; }; },
     };
   }, {snapshot: empty, benchmark: aggregate});
   await connected.goto(url);
@@ -135,6 +144,11 @@ try {
     await connected.getByRole('button', {name: 'Refresh snapshot'}).click();
     await connected.waitForFunction(value => document.querySelector('.model-section .badge')?.textContent === value, model.state);
     assert.equal(await connected.getByRole('status', {name: 'Observed reasoning'}).getAttribute('data-active'), String(model.state === 'reasoning'), `Reasoning lamp during ${model.state}`);
+  }
+  for (const phase of ['reasoning', 'generating', 'idle']) {
+    await connected.evaluate(value => window.testModelListener({state: value, observed: true, model: 'Public native fixture', source: 'codex-native', updated_at: Date.now(), detail: 'Synthetic native phase event'}), phase);
+    await connected.waitForFunction(value => document.querySelector('.model-section .badge')?.textContent === value, phase, {timeout: 1000});
+    assert.equal(await connected.getByRole('status', {name: 'Observed reasoning'}).getAttribute('data-active'), String(phase === 'reasoning'));
   }
   await connected.evaluate(() => { window.testSnapshot.model_state = {...window.testSnapshot.model_state, state: 'reasoning', observed: false}; });
   await connected.getByRole('button', {name: 'Refresh snapshot'}).click();
@@ -227,9 +241,13 @@ try {
   await connected.waitForTimeout(2200);
   assert.equal(await connected.evaluate(() => window.testCalls.benchmark), inactiveReads, 'Hidden benchmark view must not poll');
 
-  await build({root, mode: 'production', logLevel: 'error'});
+  // The dev server sets NODE_ENV. Isolate production compilation so React's
+  // development transform cannot embed absolute source filenames in release JS.
+  execFileSync(process.execPath, [path.join(root, 'node_modules/vite/bin/vite.js'), 'build', '--mode', 'production', '--logLevel', 'error'],
+    {cwd: root, env: {...process.env, NODE_ENV: 'production'}, stdio: 'pipe', timeout: 60000});
   const files = await fs.readdir(path.join(root, 'dist/assets'));
   const releaseJS = (await Promise.all(files.filter(file => file.endsWith('.js')).map(file => fs.readFile(path.join(root, 'dist/assets', file), 'utf8')))).join('\n');
+  assert.equal(/jsxDEV|jsx-dev-runtime|react\.development|\/Users\/[A-Za-z0-9._-]+\//.test(releaseJS), false, 'Release JS must exclude development transforms and personal source paths');
   assert.equal(releaseJS.includes('Development benchmark monitor'), false, 'Release bundle must exclude benchmark component');
   assert.equal(releaseJS.includes('Vanilla (historical)'), false, 'Release bundle must exclude benchmark aggregate UI');
   assert.equal(releaseJS.includes('Development run observation'), false, 'Release bundle must exclude benchmark overview strip');

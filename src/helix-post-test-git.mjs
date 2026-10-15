@@ -5,6 +5,7 @@ const operations=[
   {id:'check',argv:['git','-c','core.fsmonitor=false','diff','--check','--no-ext-diff','--no-textconv','HEAD','--']},
   {id:'status',argv:['git','-c','core.fsmonitor=false','status','--porcelain=v1','-z']},
   {id:'diff',argv:['git','-c','core.fsmonitor=false','diff','--binary','--no-ext-diff','--no-textconv','HEAD','--']},
+  {id:'head-final',argv:['git','-c','core.fsmonitor=false','rev-parse','HEAD']},
 ];
 
 // Caller declares this read-only chain in its trial policy. It observes current
@@ -22,7 +23,8 @@ export async function postTestGit({engine,execute,currentTask,task,expectedHead,
     if(currentTask()!==task)return finish('Active task changed; no further inspection');
     const left=maxElapsedMs-(Date.now()-began);if(left<=0)return finish('Inspection elapsed budget reached');
     let result;
-    try{result=await execute({id:op.id,argv:[...op.argv],timeout_ms:Math.min(left,5000)},signal);}
+    const argv=op.argv.map(arg=>['check','diff'].includes(op.id)&&arg==='HEAD'?expectedHead:arg);
+    try{result=await execute({id:op.id,argv,timeout_ms:Math.min(left,5000)},signal);}
     catch{return finish('Inspection executor failed; model review required, no retry');}
     if(typeof result?.stdout!=='string'||typeof result?.stderr!=='string')return finish('Unknown inspection result; model review required');
     const out=Buffer.isBuffer(result.stdout_raw)?result.stdout_raw:Buffer.from(result.stdout);
@@ -35,7 +37,7 @@ export async function postTestGit({engine,execute,currentTask,task,expectedHead,
     if(currentTask()!==task)return finish('Active task changed; no further inspection');
     if(!Number.isInteger(row.exit_code)||row.signal||row.capped)return finish('Inspection completion unknown or capped; model review required');
     if(row.exit_code!==0)return finish('Inspection failed; model review required, no retry');
-    if(op.id==='head'&&result.stdout.trim()!==expectedHead)return finish('Repository HEAD changed; no downstream inspection');
+    if(op.id.startsWith('head')&&result.stdout.trim()!==expectedHead)return finish('Repository HEAD changed; inspection is historical, no downstream inspection');
   }
   return finish(null);
 }

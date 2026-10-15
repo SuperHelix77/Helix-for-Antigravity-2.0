@@ -1,6 +1,6 @@
 // Public synthetic fixture. Never returned by the local service or labelled live.
 export const playback = {
-  schema: 'helix.monitor.v1', version: '1.0.0', status: 'online', core: 'online',
+  schema: 'helix.monitor.v1', version: '1.0.1', status: 'online', core: 'online',
   model_state: {state: 'tool', model: 'Synthetic fixture model', observed: true, source: 'openai-proxy', updated_at: 1792023000000, detail: 'Synthetic tool activity. No live model connection.'},
   rtk: {enabled: false, available: false},
   memory: {status: 'deterministic', notes: 12, claude_bridge: false},

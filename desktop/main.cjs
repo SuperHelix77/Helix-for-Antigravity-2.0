@@ -70,6 +70,9 @@ else app.whenReady().then(async () => {
   window.webContents.session.on('will-download', event => event.preventDefault());
   window.once('ready-to-show', () => window.show());
   await window.loadURL(url);
+  const modelFeed = new AbortController();
+  void connection.watchModel(value => { if (!window.isDestroyed()) window.webContents.send('helix:model-state', value); }, {directory: home, signal: modelFeed.signal});
+  window.once('closed', () => modelFeed.abort());
   app.on('second-instance', () => { if (window.isMinimized()) window.restore(); window.focus(); });
 }).catch(error => { console.error(error.message); app.quit(); });
 app.on('window-all-closed', () => app.quit());

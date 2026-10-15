@@ -43,6 +43,10 @@ function useSnapshot() {
     poll();
     return () => { disposed = true; clearTimeout(timer); };
   }, [paused, refresh]);
+  useEffect(() => {
+    if (demo || paused || typeof window.helix?.onModelState !== 'function') return;
+    return window.helix.onModelState(model => setSnapshot(previous => previous ? {...previous, model_state: model} : previous));
+  }, [paused]);
   return {snapshot, state, paused, setPaused, received, refresh: () => setRefresh(n => n + 1)};
 }
 
@@ -86,7 +90,7 @@ function ModelState({snapshot, live}) {
   const available = live && model && model.source !== 'none';
   const phase = available ? model.state : 'unknown';
   const reasoning = phase === 'reasoning' && model.observed === true;
-  const phases = ['idle', 'waiting', 'reasoning', 'generating', 'tool', 'complete'];
+  const phases = ['idle', 'waiting', 'reasoning', 'generating', 'tool', model?.source === 'codex-native' ? 'compacting' : 'complete'];
   return <section className="model-section" aria-label="Model activity">
     <Heading title="Model activity" aside={<Badge tone={phase === 'failed' ? 'red' : phase === 'unknown' ? 'neutral' : 'green'}>{readable(phase)}</Badge>} />
     <div className="model-state-layout"><div className="model-phase"><div className="model-identity"><Layers3 size={20} /><strong>{model?.model || 'Model not reported'}</strong><span className="muted">{demo ? 'Synthetic observation' : available ? readable(model.source) : 'No current observation'}</span></div>
@@ -260,7 +264,7 @@ function App() {
     <a href="#main" className="skip-link">Skip to content</a>
     <aside className={`sidebar ${mobileNav ? 'mobile-open' : ''}`}><div className="brand"><span className="brand-icon brand-mark"><img src={helixMark} alt="" width="24" height="24" /></span><strong>HELIX<span>1.0</span></strong><IconButton label="Close navigation" className="mobile-close icon-button" onClick={() => setMobileNav(false)}><X size={19} /></IconButton></div><div className="workspace-label">ENGINE MONITOR</div>
       <nav aria-label="Primary">{sections.map(([id,label,Icon]) => <a key={id} href={`#${id}`} aria-current={section === id ? 'page' : undefined}><Icon size={18} /><span>{label}</span>{id === 'evidence' && snapshot?.counters.failed > 0 && <span className="nav-count">{number(snapshot.counters.failed)}</span>}{section === id && <ChevronRight size={15} className="nav-chevron" />}</a>)}</nav>
-      <div className="sidebar-footer"><div className="local-indicator"><span className={`small-dot ${connected ? 'green-dot' : ''}`} /><strong>{demo ? 'Playback fixture' : 'Local engine'}</strong><span className="numeric">{snapshot?.version || '1.0.0'}</span></div><div className="privacy-row"><LockKeyhole size={14} /><span>Raw session export <strong>{snapshot?.privacy?.raw_session_export === false ? 'off' : snapshot?.privacy?.raw_session_export === true ? 'on' : 'unknown'}</strong></span></div><div className="privacy-row"><ShieldCheck size={14} /><span>Background models <strong>{snapshot?.privacy?.background_llm === false ? 'off' : snapshot?.privacy?.background_llm === true ? 'on' : 'unknown'}</strong></span></div></div>
+      <div className="sidebar-footer"><div className="local-indicator"><span className={`small-dot ${connected ? 'green-dot' : ''}`} /><strong>{demo ? 'Playback fixture' : 'Local engine'}</strong><span className="numeric">{snapshot?.version || '1.0.1'}</span></div><div className="privacy-row"><LockKeyhole size={14} /><span>Raw session export <strong>{snapshot?.privacy?.raw_session_export === false ? 'off' : snapshot?.privacy?.raw_session_export === true ? 'on' : 'unknown'}</strong></span></div><div className="privacy-row"><ShieldCheck size={14} /><span>Background models <strong>{snapshot?.privacy?.background_llm === false ? 'off' : snapshot?.privacy?.background_llm === true ? 'on' : 'unknown'}</strong></span></div></div>
       <ThemeControl />
     </aside>
     {mobileNav && <button className="mobile-backdrop" aria-label="Close navigation" onClick={() => setMobileNav(false)} />}

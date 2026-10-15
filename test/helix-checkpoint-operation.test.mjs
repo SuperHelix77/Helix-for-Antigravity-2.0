@@ -75,6 +75,29 @@ test('preauthorized verification checkpoints only after a known successful exit'
     mcp__helix_context__goal:async()=>{checkpoints++;}},[{name:'mcp__helix_context__goal'}],()=>{},()=>{}),/cancellation/);
   assert.equal(checkpoints,0);
 });
+test('native verification cannot checkpoint contradictory, empty or truncated test evidence',async()=>{
+  const program=compileNativeOperation({...args,verify:{cmd:'public test'}},options);
+  for(const results of [[{exit_code:0,output:'# tests 2\n# pass 1\n# fail 1\n'}],
+    [{exit_code:0,output:'no tests ran in 0.01s\n'}], [{exit_code:0,output:'partial',truncated:true}],
+    [{session_id:7,output:'partial',truncated:true},{session_id:7,exit_code:0,output:'complete tail'}],
+    [{session_id:7,output:'# tests 2\n# fail '},{session_id:7,exit_code:0,output:'1\n'}]]){
+    const r=await execute(program,{results});
+    assert.equal(r.operations.some(o=>o[0]==='goal'),false);
+    assert.equal(r.observations.at(-1).status,'checkpoint_not_executed');
+  }
+  const r=await execute(program,{results:[{exit_code:0,output:'# tests 2\n# pass 2\n# fail 0\n'}]});
+  assert.equal(r.operations.filter(o=>o[0]==='goal').length,1);
+});
+test('typed MCP dispatch refuses missing or ambiguous registrations before any operation',async()=>{
+  for(const tool of ['goal','context']){
+    const program=compileNativeOperation({op:'mcp',tool,args:{action:'status'}});
+    for(const names of [[],[`mcp__helix_a__${tool}`,`mcp__helix_b__${tool}`]])
+      await assert.rejects(()=>execute(program,{names}),/Unique Helix MCP/);
+    const r=await execute(program,{names:[`mcp__helix_context__${tool}`]});
+    assert.equal(r.operations.length,1);
+    assert.deepEqual(r.operations[0][1],{action:'status'});
+  }
+});
 test('broker archives and restores the exact semantic checkpoint after restart without re-execution',t=>{
   const directory=fs.mkdtempSync(path.join(os.tmpdir(),'public-checkpoint-op-'));
   let engine=new GoalEngine({directory:path.join(directory,'goals')});

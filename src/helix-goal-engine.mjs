@@ -346,6 +346,7 @@ export class GoalEngine {
       this.verifyBindings(row, step);
       for (const cmd of [step.command, ...step.checks].filter(Boolean)) {
         controller.signal.throwIfAborted();
+        this.verifyBindings(row, step);
         const output = await this.runCommand(cmd, row, controller.signal);
         outputs.push(output);
         if (output.exit_code !== 0 || output.failure) throw new Error(output.failure ?? `Command exited ${output.exit_code}.`);

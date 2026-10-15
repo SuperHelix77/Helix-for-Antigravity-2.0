@@ -77,6 +77,24 @@ const encode = (bytes) => {
   catch { return { encoding: "base64", content: bytes.toString("base64") }; }
 };
 
+function verifyIndexContents(engine, root, counters) {
+  if (!Number.isSafeInteger(root.bytes) || root.bytes < 0 || !Number.isSafeInteger(root.lines) || root.lines < 0 || !Array.isArray(root.leaves)) throw new Error("Invalid line index root.");
+  const hash = createHash("sha256");
+  let offset = 0, line = 1;
+  for (const leaf of root.leaves) {
+    if (leaf.first !== line || leaf.offset !== offset || !Number.isSafeInteger(leaf.count) || leaf.count < 1 || !Number.isSafeInteger(leaf.bytes) || leaf.bytes < 1) throw new Error("Invalid line index layout.");
+    const meta = jsonObject(engine, leaf.leaf, counters), raw = exactObject(engine, meta.raw, counters);
+    const offsets = [0];
+    for (let i = 0; i < raw.length; i++) if (raw[i] === 10) offsets.push(i + 1);
+    if (offsets.at(-1) !== raw.length) offsets.push(raw.length);
+    if (meta.schema !== "helix.lines.leaf.v1" || meta.bytes !== raw.length || leaf.bytes !== raw.length ||
+        leaf.count !== offsets.length - 1 || !same(meta.offsets, offsets) ||
+        offset + raw.length < root.bytes && raw.at(-1) !== 10) throw new Error("Invalid line index leaf.");
+    hash.update(raw); offset += raw.length; line += leaf.count;
+  }
+  if (offset !== root.bytes || line - 1 !== root.lines || hash.digest("hex") !== root.source) throw new Error("Line index does not reconstruct its source.");
+}
+
 // Projection candidates are observations of the log, not proof that the task passed.
 function projectLog(bytes) {
   const lines = bytes.toString("utf8").split("\n");
@@ -243,6 +261,7 @@ export class HelixEvidence {
     if (!Number.isSafeInteger(cacheBytes) || cacheBytes < 0 || cacheBytes > 64 * 1024 * 1024) throw new Error("Evidence cache must be 0..64 MiB.");
     this.engine = engine;
     engine.evidenceCache = { limit: cacheBytes, bytes: 0, objects: new Map(), receipts: cacheBytes ? new Map() : undefined };
+    this.verifiedLegacyIndexes = new Map();
     this.counters = { binding_bytes_read: 0, binding_cache_hits: 0, evidence_bytes_read: 0, evidence_cache_hits: 0, receipt_verification_cache_hits: 0 };
     engine.evidenceCounters = this.counters;
     engine.db.exec(`CREATE TABLE IF NOT EXISTS helix_workflows(project TEXT,name TEXT,version TEXT,receipt TEXT NOT NULL,PRIMARY KEY(project,name,version));
@@ -344,6 +363,14 @@ export class HelixEvidence {
     const root = jsonObject(this.engine, index, this.counters);
     if (root.schema !== "helix.lines.v1" || root.source !== reference(source)) throw new Error("Index source mismatch.");
     if (!Array.isArray(ranges) || !ranges.length || ranges.length > 32 || !Number.isSafeInteger(budget) || budget < 4 || budget > 24000) throw new Error("Invalid range request.");
+    const registered = this.engine.db.prepare("SELECT receipt FROM helix_indexes WHERE source=?").get(source);
+    if (registered?.receipt !== index) {
+      // A content hash authenticates a root's bytes, not its claimed source.
+      // Historical unregistered indexes earn that binding by exact reconstruction.
+      if (this.verifiedLegacyIndexes.get(index) !== source) verifyIndexContents(this.engine, root, this.counters);
+      this.verifiedLegacyIndexes.delete(index); this.verifiedLegacyIndexes.set(index, source);
+      if (this.verifiedLegacyIndexes.size > 256) this.verifiedLegacyIndexes.delete(this.verifiedLegacyIndexes.keys().next().value);
+    }
     const cache = new Map(); let total = 0;
     return ranges.map(({ start, end }) => {
       if (!Number.isSafeInteger(start) || !Number.isSafeInteger(end) || start < 1 || end < start || end > root.lines) throw new Error("Line range out of bounds.");

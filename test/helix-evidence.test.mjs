@@ -103,6 +103,51 @@ test("empty source indexes to zero lines; corrupted selected leaf is rejected", 
   assert.throws(() => evidence.ranges({ index, source, ranges: [{ start: 1, end: 1 }] }), /integrity/);
 });
 
+test("unregistered indexes cannot relabel different archived bytes as an original source", (t) => {
+  const { engine, evidence } = fixture(t).open();
+  const source = engine.archive(Buffer.from("ORIGINAL\n")), raw = engine.archive(Buffer.from("FORGED\n"));
+  const leaf = engine.archive({ schema: "helix.lines.leaf.v1", raw, offsets: [0, 7], bytes: 7 });
+  const index = engine.archive({ schema: "helix.lines.v1", source, bytes: 7, lines: 1,
+    leaves: [{ first: 1, count: 1, offset: 0, bytes: 7, leaf }] });
+  assert.throws(() => evidence.ranges({ index, source, ranges: [{ start: 1, end: 1 }] }), /reconstruct its source/);
+  assert.equal(evidence.verifiedLegacyIndexes.size, 0);
+  const malformedLeaf = engine.archive({ schema: "helix.lines.leaf.v1", raw: source, offsets: [0, 3, 9], bytes: 9 });
+  const malformed = engine.archive({ schema: "helix.lines.v1", source, bytes: 9, lines: 2,
+    leaves: [{ first: 1, count: 2, offset: 0, bytes: 9, leaf: malformedLeaf }] });
+  assert.throws(() => evidence.ranges({ index: malformed, source, ranges: [{ start: 1, end: 1 }] }), /line index leaf/);
+});
+
+test("legacy indexes prove full reconstruction once per process and recheck after restart", (t) => {
+  const f = fixture(t); let { engine, evidence } = f.open();
+  const bytes = Buffer.from(Array.from({ length: 20000 }, (_, i) => `public historical line ${i}\r\n`).join("") + "unterminated \u00e7");
+  const source = engine.archive(bytes), index = evidence.index(source).index;
+  const root = engine.objectJSON(index), lastLeaf = engine.objectJSON(root.leaves.at(-1).leaf);
+  engine.db.prepare("DELETE FROM helix_indexes WHERE source=?").run(source);
+  engine.close(); ({ engine, evidence } = f.open());
+  const before = evidence.counters.evidence_bytes_read;
+  const [selected] = evidence.ranges({ index, source, ranges: [{ start: 1, end: 1 }] });
+  assert.equal(selected.content, "public historical line 0\r\n");
+  assert.ok(evidence.counters.evidence_bytes_read - before >= bytes.length, "Unregistered roots require full reconstruction");
+  const warm = evidence.counters.evidence_bytes_read;
+  evidence.ranges({ index, source, ranges: [{ start: 2, end: 2 }] });
+  assert.ok(evidence.counters.evidence_bytes_read - warm < bytes.length / 2, "The same proven root keeps selected-leaf reads cheap");
+  writeFileSync(path.join(engine.objects, lastLeaf.raw), "tampered unselected leaf");
+  engine.close(); ({ engine, evidence } = f.open());
+  assert.throws(() => evidence.ranges({ index, source, ranges: [{ start: 1, end: 1 }] }), /integrity/);
+});
+
+test("registered indexes retain cheap exact selected-leaf reads after restart", (t) => {
+  const f = fixture(t); let { engine, evidence } = f.open();
+  const bytes = Buffer.from("public registered line\n".repeat(20000));
+  const source = engine.archive(bytes), index = evidence.index(source).index;
+  engine.close(); ({ engine, evidence } = f.open());
+  assert.equal(evidence.ranges({ index, source, ranges: [{ start: 2, end: 2 }] })[0].content, "public registered line\n");
+  assert.ok(evidence.counters.evidence_bytes_read < bytes.length / 2);
+  const root = engine.objectJSON(index), leaf = engine.objectJSON(root.leaves[0].leaf);
+  writeFileSync(path.join(engine.objects, leaf.raw), "tampered selected leaf");
+  assert.throws(() => evidence.ranges({ index, source, ranges: [{ start: 2, end: 2 }] }), /integrity/);
+});
+
 test("workflow registration is immutable, does not execute, and repeated run after restart shows current frontier", async (t) => {
   const f = fixture(t); let { engine, evidence } = f.open(); writeFileSync(path.join(f.root, "input"), "fixed");
   const args = { project: f.project, name: "check", version: "1", bind: ["input"], steps: [command("one", "require('fs').appendFileSync('count','1');console.log('# pass 1')")] };

@@ -103,6 +103,40 @@ test("fixed input hashes invalidate a command before any execution", async (t) =
   assert.equal(existsSync(path.join(f.project, "bad")), false);
 });
 
+test("bound input drift between checks blocks the next command without replay", async (t) => {
+  const f = fixture(t); const engine = f.engine();
+  writeFileSync(path.join(f.project, "input"), "before");
+  const s = await plan(f, engine, [{
+    ...model("review", "input"), bind: ["input"], checks: [
+      { argv: argv("require('fs').writeFileSync('input','after')") },
+      { argv: argv("require('fs').writeFileSync('bad','ran')") },
+    ],
+  }]);
+  const args = { step: "review", review: "Accept only for the declared unchanged input." };
+  const a = await call(f, engine, s, "checkpoint", args);
+  assert.equal(a.state, "blocked"); assert.match(a.note, /Bound input changed/);
+  assert.equal(existsSync(path.join(f.project, "bad")), false);
+  assert.equal(receipt(engine, a.receipts[0]).outputs.length, 1);
+  assert.equal((await call(f, engine, s, "checkpoint", args)).replayed, true);
+  assert.equal(engine.db.prepare("SELECT count(*) AS n FROM events WHERE kind='command_started'").get().n, 1);
+});
+
+test("unchanged bindings permit every declared check and preserve their outputs", async (t) => {
+  const f = fixture(t); const engine = f.engine();
+  writeFileSync(path.join(f.project, "input"), "before");
+  const s = await plan(f, engine, [{
+    ...model("review", "input"), bind: ["input"], checks: [
+      { argv: argv("process.stdout.write('first')") },
+      { argv: argv("process.stdout.write('second')") },
+    ],
+  }]);
+  const a = await call(f, engine, s, "checkpoint", { step: "review", review: "Reviewed the exact input and both checks." });
+  assert.equal(a.state, "done");
+  const saved = receipt(engine, a.receipts[0]);
+  assert.deepEqual(saved.outputs.map(output => engine.read(output.stdout).content), ["first", "second"]);
+  assert.equal(readFileSync(path.join(f.project, "input"), "utf8"), "before");
+});
+
 test("exact evidence survives restart, UTF-8 chunk boundaries, binary bytes and tamper rejection", async (t) => {
   const f = fixture(t); let engine = f.engine();
   const original = Buffer.from("\ufeffprefix\r\n" + "abc\u00e7\u4e2d\ud83d\ude80".repeat(10000));

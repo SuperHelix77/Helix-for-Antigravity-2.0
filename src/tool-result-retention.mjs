@@ -30,17 +30,9 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 
 // How long a retained original is worth keeping, by default.
 //
-// Seven days, and the number is derived rather than round. Nothing ever reads
-// these bytes back into a turn: the receipt tells the model to repeat the tool
-// call, so a retained file's only reader is the operator, forensically, and
-// only while the session that produced it still matters. The caps say the same
-// thing about intent -- 32,768 files and 512 MiB against a 32 KiB compaction
-// floor is a bounded working set, not an archive. Seven days is also
-// the horizon this repository already treats as "recent enough to still act on"
-// in the two other places it keeps something around: the catalog's
-// AUTO_ANNOUNCE_WINDOW_MS and the vision host's SIZE_CACHE_TTL_MS are both
-// exactly a week. Anything shorter would delete a store mid-session; anything
-// longer keeps file contents and command output past every use they have.
+// This is an explicit expiry policy, not an exact-recovery guarantee forever.
+// Recovery-dependent writers select ttlMs: 0. Never replay a mutation merely
+// because its archived result has expired.
 //
 // The cap failure the TTL actually fixes: a store parked at its file or byte
 // limit stops accepting new results. With a TTL it drains itself a week later
@@ -104,6 +96,14 @@ function retentionEntryPath(root, name) {
   return target;
 }
 
+function retentionRootStat(root) {
+  const stat = lstatSync(root);
+  if (stat.isSymbolicLink() || stat.isDirectory() &&
+      ((stat.mode & 0o077) || typeof process.getuid === 'function' && stat.uid !== process.getuid()))
+    throw new Error('Retained-result directory must be owner-private and cannot be a symlink.');
+  return stat;
+}
+
 export function formatRetentionBytes(bytes) {
   if (bytes < 1024) return `${bytes} bytes`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KiB`;
@@ -157,6 +157,8 @@ export function retainedToolResultsUsage({
   };
   let listing;
   try {
+    const stat = retentionRootStat(root);
+    if (!stat.isDirectory()) return {...empty, exists: true, foreign: [path.basename(root)]};
     listing = readdirSync(root, { withFileTypes: true });
   } catch (error) {
     // A store that was never created is the normal state on an install that
@@ -307,8 +309,15 @@ export function expireRetainedToolResults({
 // One removal path for both commands: whatever a caller decided to remove, it
 // still leaves this module through the same containment check.
 function removeRetentionEntries(root, entries, summary) {
+  const bound = retentionRootStat(root);
   for (const entry of entries) {
+    const current = retentionRootStat(root);
+    if (!current.isDirectory() || current.dev !== bound.dev || current.ino !== bound.ino)
+      throw new Error('Retained-result directory changed during removal; no further deletion.');
     const target = retentionEntryPath(root, entry.name);
+    let stat;
+    try { stat = lstatSync(target); } catch (error) { if (error.code === 'ENOENT') continue; throw error; }
+    if (!stat.isFile() || stat.isSymbolicLink()) { summary.failed.push({name: entry.name, error: 'Retention entry type changed; not removed'}); continue; }
     if (summary.dryRun) {
       summary.removed += 1;
       summary.reclaimedBytes += entry.bytes;

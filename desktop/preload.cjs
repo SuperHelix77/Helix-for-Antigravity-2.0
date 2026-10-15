@@ -1,6 +1,12 @@
 const {contextBridge, ipcRenderer} = require('electron');
 contextBridge.exposeInMainWorld('helix', Object.freeze({
   snapshot: () => ipcRenderer.invoke('helix:snapshot'),
+  onModelState: listener => {
+    if (typeof listener !== 'function') throw new TypeError('Model state listener required');
+    const handler = (_event, value) => listener(value);
+    ipcRenderer.on('helix:model-state', handler);
+    return () => ipcRenderer.removeListener('helix:model-state', handler);
+  },
   ...(process.argv.includes('--helix-monitor') ? {
     benchmark: () => ipcRenderer.invoke('helix:benchmark'),
     chooseBenchmark: () => ipcRenderer.invoke('helix:choose-benchmark'),

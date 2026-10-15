@@ -1,5 +1,9 @@
 # Installation And Recovery
 
+For worker-independent inheritance of an existing local Claude-Mem store, see
+[Memory Inheritance](MEMORY-INHERITANCE.md). Preserve the original until import
+verification and client reconnection both succeed.
+
 ## One Service
 
 Run commands from the repository root. The source CLI requires Node.js 22.19 or newer. Electron embeds its own runtime. The supported source commands are:
@@ -59,7 +63,15 @@ Neither the v1 nor V3 solver benchmark ran an RTK executable. Do not attribute t
 
 ## Live App And Troubleshooting
 
-Overview shows observed model phase events only when the optional HTTP proxy carries the actual stream. Its reasoning panel does not light for mere waiting, tool activity, stale snapshots or an MCP-only connection. No private reasoning text is collected. Memory supports source/project selection, bounded search, pagination and exact note inspection.
+Overview can observe a selected local Codex chat without changing provider routing:
+
+```sh
+node bin/helix.mjs observe-codex ACTUAL_THREAD_ID
+```
+
+Inside a Codex runtime, omit the argument to use its `CODEX_THREAD_ID`. No thread is guessed. This selection persists locally; select a different chat explicitly when needed. The observer subscribes to the desktop's owner-private Unix socket, retains only phase metadata, and pushes changes to Electron. Reasoning, generation, tool work, compaction and idle are distinct. It neither starts a model request nor reads authentication. Native snapshots contain conversation data in transit; text is discarded during projection, never logged, archived or sent to the renderer. The internal desktop protocol is version-checked and bounded; disconnects or incompatible state show unknown. This local desktop integration is not a guarantee for every Codex version or operating system.
+
+The optional HTTP proxy can separately observe the stream it actually carries. The reasoning panel never lights for mere waiting, tool activity, a completed reasoning item, or an MCP-only connection. Memory supports source/project selection, bounded search, pagination and exact note inspection.
 
 Troubleshooting runs local, no-model diagnostics. Core restart requires explicit confirmation and is rejected while operations are active. It never starts a local model or edits authentication. The app's light/dark/system setting persists locally. The production build omits the benchmark screen.
 
@@ -69,7 +81,7 @@ This is explicit opt-in, not a global application patch. Start the service with 
 
 A compatible caller sends Responses HTTP requests to the service's local `/v1/responses` or `/v1/responses/compact`, with its own OpenAI `Authorization` header and the local capability in `x-helix-key`. A stable `session_id` or `conversation_id` is needed for request aging. Never print or publish those headers. HELIX does not discover client authentication or select a fallback model. Only explicitly selected `gpt-*` model identifiers and the two official HTTPS upstream bases are accepted; redirects are refused.
 
-The proxy preserves reasoning effort and output verbosity. It removes unsupported `max_tool_calls`, and sets `parallel_tool_calls=false` when the Lite header requires it. It does not provide a Responses WebSocket server. Native no-tools compaction behavior must remain with the client's supported transport; the offline benchmark probe is not a universal client compatibility claim.
+The proxy preserves reasoning effort and output verbosity. It removes unsupported `max_tool_calls` only on the native Codex or Lite route, and sets `parallel_tool_calls=false` when the Lite header requires it. The ordinary official API route preserves the caller's built-in-tool budget, as specified in the [Responses reference](https://developers.openai.com/api/reference/cli/resources/responses/methods/create). It does not provide a Responses WebSocket server. Native no-tools compaction behavior must remain with the client's supported transport; the offline benchmark probe is not a universal client compatibility claim.
 
 Without this opt-in, MCP remains useful but ordinary model traffic is unchanged. Merely opening the monitor does not route a client's model requests through HELIX.
 

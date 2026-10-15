@@ -144,7 +144,7 @@ async function dispatch(request) {
   if (id === undefined) return;
   if (method === "initialize") return reply(id, {
     protocolVersion: params.protocolVersion ?? "2024-11-05", capabilities: { tools: {}, resources: {} },
-    serverInfo: { name: "helix-context", version: "1.0.0" }, instructions,
+    serverInfo: { name: "helix-context", version: "1.0.1" }, instructions,
   });
   if (method === "ping") return reply(id, {});
   if (method === "tools/list") return reply(id, { tools });

@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import {spawnSync} from 'node:child_process';
 import {GoalEngine} from '../src/helix-goal-engine.mjs';
-import {verificationCommand, qualifyTestExit} from '../src/verification.mjs';
+import {verificationCommand, verificationBoundary, qualifyTestExit} from '../src/verification.mjs';
 import {compileNativeOperation} from '../src/helix-native-function-bridge.mjs';
 
 test('verification rejects masked shell exits before dispatch; argv is literal', () => {
@@ -33,4 +33,21 @@ test('typed checkpoint never dispatches a compound verifier or echoes injected s
   const binding = {task: '01', state: 'active', kind: 'model', busy: false, revision: 1, step: 'fix-01', scope: {project: '/public', session: 'current', goal: 'active'}};
   const code = compileNativeOperation({op: 'checkpoint', revision: 1, step: 'fix-01', review: 'Conditional review.', request_id: 'one', verify: {cmd: 'pytest; true'}}, {task: '01', checkpointBinding: () => binding});
   assert.ok(code.includes('checkpoint_not_executed')); assert.ok(!code.includes('tools.exec_command'));
+});
+test('verification guard scans complete observations and distinguishes known failure from acceptance', () => {
+  const success = {exit_code: 0, stdout: '# tests 2\n# pass 2\n# fail 0\n', stderr: ''};
+  assert.equal(verificationBoundary(success), null);
+  for (const output of ['# tests 2\n# fail 1\n', 'not ok 2 - regression\n', 'FAILED (failures=1)\n',
+    '=== 1 failed, 20 passed in 0.2s ===\n', 'collected 0 items\n', '# tests 0\n',
+    'passed 1\n'.repeat(100) + '# fail 1\n', JSON.stringify({schema: 'helix.tests.v1', complete: true, tests: [{status: 'fail'}]}),
+    JSON.stringify({schema: 'helix.tests.v1', complete: false, tests: [{status: 'pass'}]}),
+    JSON.stringify({schema: 'helix.tests.v1', complete: true, tests: [{status: 'skip'}]})])
+    assert.ok(verificationBoundary({exit_code: 0, output}), output);
+  for (const change of [{exit_code: 1}, {truncated: true}, {tooLarge: true}, {output_truncated: true}, {signal: 'SIGTERM'}, {boundary: 'unknown'}])
+    assert.ok(verificationBoundary({...success, ...change}));
+  assert.ok(verificationBoundary({exit_code: 0}));
+  // The native template must work without module imports or Node globals.
+  const portable = new Function('return (' + verificationBoundary.toString() + ')')();
+  assert.equal(portable(success), null);
+  assert.ok(portable({exit_code: 0, output: '# fail 1\n'}));
 });

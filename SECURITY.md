@@ -9,6 +9,8 @@ HELIX is a local development tool, not a hardened multi-user service or command 
 - Release mode exposes no benchmark IPC or view. Monitor mode reads a selected local directory; it does not start runs.
 - Local memory and goal execution do not call a model. Optional OpenAI traffic requires explicit startup configuration and caller-supplied authorization. No authentication discovery, third-party model fallback or automatic model retry is performed by that proxy.
 - The optional Claude-Mem database is opened read-only after explicit configuration. No observer or Ollama worker is started.
+- Explicit memory inheritance copies the complete selected database and auxiliary data into owner-private storage, with verification before activation. Historical jobs are data only. New writes use HELIX's overlay; originals and a shared Claude installation are not modified.
+- Optional native Codex monitoring follows only the selected local chat through an owner-private Unix socket. Internal protocol versions, frames, scope and revisions are checked. Conversation data may arrive in a snapshot, but only activity metadata is retained or sent to Electron. Text is not logged, archived or exported. An incompatible or disconnected feed is unknown, not proof of idle or reasoning.
 
 The same local account can access the service capability, execute tools and read state. HELIX does not protect that account's data from the account itself, a compromised agent, a malicious dependency or an administrator. POSIX permission checks are not a substitute for a Windows ACL audit.
 

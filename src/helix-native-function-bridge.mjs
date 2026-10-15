@@ -1,7 +1,7 @@
 import {bindCheckpointOperation,CheckpointOperationRejection} from './helix-checkpoint-operation.mjs';
 import {NativeOperationRejection} from './native-operation-rejection.mjs';
 import {patchEvidenceRequest} from './helix-patch-evidence.mjs';
-import {verificationCommand} from './verification.mjs';
+import {verificationCommand,verificationBoundary} from './verification.mjs';
 
 export function parseNativeOperationArguments(value){
   try{return {args:JSON.parse(value)};}
@@ -194,7 +194,8 @@ ${command}
 try{await verify();}catch(error){if(error!==stop)throw error;}
 for(const observation of observations)text(observation);
 const result=observations.at(-1);
-if(!result||result.exit_code!==0||result.boundary||result.signal){text({kind:'helix.model_boundary',status:'checkpoint_not_executed',reason:'Declared verification failed or its completion is unknown; model review required.'});exit();}
+const boundary=(${verificationBoundary.toString()})(result);
+if(boundary){text({kind:'helix.model_boundary',status:'checkpoint_not_executed',reason:boundary+'; model review required.'});exit();}
 ${checkpoint}`;
     }
     case 'process_wait':
@@ -205,10 +206,11 @@ ${checkpoint}`;
     case "command":{
       keys(args,["op","cmd","workdir"]);text(args.cmd,"command");if(args.workdir!==undefined)text(args.workdir,"workdir");
       return `let result=await tools.exec_command(${JSON.stringify({cmd:args.cmd,yield_time_ms:30000,...(args.workdir!==undefined?{workdir:args.workdir}:{})})});
-const chunks=[];const deadline=Date.now()+600000;let polls=0;
+const chunks=[];const deadline=Date.now()+600000;let polls=0;let incomplete=false;
 if(!result||typeof result!=='object'||typeof result.output!=='string'){text({boundary:'Unknown native command result; model review required',raw:result});exit();}
 const processId=result.session_id;
 while(result&&!result.signal&&typeof result.session_id==='number'&&(result.exit_code===undefined||result.exit_code===null)){
+  incomplete ||= !!(result.truncated||result.output_truncated||result.tooLarge);
   if(typeof result.output==='string')chunks.push(result.output);
   if(++polls>20||Date.now()>deadline){text({...result,output:chunks.join(''),boundary:'Command wait budget reached; review before further action'});exit();}
   try{result=await tools.write_stdin({session_id:result.session_id,chars:'',yield_time_ms:30000});}
@@ -217,7 +219,7 @@ while(result&&!result.signal&&typeof result.session_id==='number'&&(result.exit_
   if(typeof result.session_id==='number'&&result.session_id!==processId){text({...result,output:chunks.join('')+result.output,boundary:'Native process identity changed; model review required'});exit();}
 }
 if(typeof result?.output==='string')chunks.push(result.output);
-text({...result,output:chunks.join(''),polls,...(!Number.isSafeInteger(result.exit_code)?{boundary:'Native exit status unavailable; model review required'}:{})});`;
+text({...result,output:chunks.join(''),polls,...(incomplete?{truncated:true}:{}),...(!Number.isSafeInteger(result.exit_code)?{boundary:'Native exit status unavailable; model review required'}:{})});`;
     }
     case "patch":keys(args,["op","patch"]);return `text(await tools.apply_patch(${JSON.stringify(text(args.patch,"patch"))}));`;
     case "code":keys(args,["op","program","wait_for_completion"]);
@@ -226,7 +228,7 @@ text({...result,output:chunks.join(''),polls,...(!Number.isSafeInteger(result.ex
     case "mcp":{
       keys(args,["op","tool","args"]);
       if(!["goal","context"].includes(args.tool)||!args.args||typeof args.args!=="object"||Array.isArray(args.args))throw new NativeOperationRejection('invalid_mcp_selection',"Invalid Helix MCP selection");
-      return `const name=ALL_TOOLS.find(t=>t.name.includes('helix')&&t.name.endsWith(${JSON.stringify(`__${args.tool}`)}))?.name;\nif(!name)throw new Error('Helix MCP unavailable');\ntext(await tools[name](${JSON.stringify(args.args)}));`;
+      return `const matches=ALL_TOOLS.filter(t=>t.name.includes('helix')&&t.name.endsWith(${JSON.stringify(`__${args.tool}`)}));\nif(matches.length!==1)throw new Error('Unique Helix MCP required; no operation executed');\nconst name=matches[0].name;\ntext(await tools[name](${JSON.stringify(args.args)}));`;
     }
     default:throw new NativeOperationRejection('unsupported_operation',"Unknown typed operation; allowed: command, patch, code, mcp; checkpoint requires explicit controller binding");
   }

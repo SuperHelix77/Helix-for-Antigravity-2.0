@@ -5,12 +5,14 @@ import {randomBytes, randomUUID} from 'node:crypto';
 import {DatabaseSync} from 'node:sqlite';
 import {CoreClient} from './core-client.mjs';
 import {DeterministicMemory, lookupClaudeMem, claudeMemRead} from './memory.mjs';
-import {authorized, privateDirectory, privateJSON} from './local-state.mjs';
+import {authorized, privateDirectory, privateJSON, readPrivateJSON} from './local-state.mjs';
 import {benchmarkView} from './benchmark-view.mjs';
 import {BenchmarkObserver} from './benchmark-observer.mjs';
 import {createOpenAIProxy, officialUpstream} from './openai-proxy.mjs';
 import {RtkAdapter} from './rtk-adapter.mjs';
 import {ModelState} from './model-state.mjs';
+import {MemoryCompatibility, callMemoryCompatibility, memoryCompatibilityTools} from './memory-compat.mjs';
+import {NativeCodexActivity, nativeActivityScope} from './native-codex-activity.mjs';
 
 const json = (res, status, value) => { res.writeHead(status, {'content-type': 'application/json', 'cache-control': 'no-store'}); res.end(JSON.stringify(value)); };
 async function body(req, limit = 1024 * 1024) {
@@ -20,12 +22,14 @@ async function body(req, limit = 1024 * 1024) {
 }
 
 export async function createService({directory, port = 0, upstream = process.env.HELIX_OPENAI_BASE, fetchImpl, optimizerOptions,
+  nativeActivityFactory = changed => new NativeCodexActivity({changed}),
   coreFactory = (home, emit) => new CoreClient(home, emit)} = {}) {
   if (upstream) officialUpstream(upstream);
   directory = privateDirectory(directory);
   const lock = path.join(directory, 'service.lock');
   fs.mkdirSync(lock, {mode: 0o700});
-  let memory, core, proxy, server, endpointPublished = false;
+  let memory, core, proxy, server, nativeActivity, endpointPublished = false;
+  const modelSubscribers = new Set();
   try {
   const instance = randomUUID(), token = randomBytes(32).toString('hex'), started = Date.now();
   const events = [], active = new Map();
@@ -40,13 +44,29 @@ export async function createService({directory, port = 0, upstream = process.env
   }
   const counters = {operations: 0, failed: 0, model_calls: 0, memory_lookups: 0, rtk_filters: 0, known_input: 0, known_output: 0, unknown_usage: 0};
   const rtk = new RtkAdapter({directory});
-  const modelState = new ModelState();
+  const modelState = new ModelState(publishModelState);
+  function currentModelState() { return nativeActivity?.scope ? nativeActivity.snapshot() : modelState.snapshot([...active.values()]); }
+  function publishModelState() {
+    const frame = `event: model\ndata: ${JSON.stringify(currentModelState())}\n\n`;
+    for (const client of modelSubscribers) {
+      if (client.destroyed || client.writableEnded) { modelSubscribers.delete(client); continue; }
+      try { if (!client.write(frame)) { modelSubscribers.delete(client); client.end(); } }
+      catch { modelSubscribers.delete(client); client.destroy(); }
+    }
+  }
   const emit = event => { events.push({id: randomUUID(), at: Date.now(), ...event}); if (events.length > 200) events.shift(); };
+  const activityConfig = path.join(directory, 'native-activity.json');
+  nativeActivity = nativeActivityFactory(publishModelState);
+  if (fs.existsSync(activityConfig)) {
+    try { nativeActivity.bind(nativeActivityScope(readPrivateJSON(activityConfig))); }
+    catch { emit({kind: 'monitor', action: 'native-activity', status: 'unavailable'}); }
+  }
   memory = new DeterministicMemory(directory);
   core = coreFactory(directory, emit);
   proxy = upstream ? createOpenAIProxy({directory, upstream, fetchImpl, event: emit, counters, optimizerOptions, modelState}) : null;
   const bridgeConfig = path.join(directory, 'memory-bridge.json');
   function claudeFile() { return (fs.existsSync(bridgeConfig) ? JSON.parse(fs.readFileSync(bridgeConfig)).file : null) || process.env.HELIX_CLAUDE_MEM_DB || null; }
+  const compatibility = new MemoryCompatibility(memory, claudeFile);
   function memoryAction(action, args = {}) {
     const {source = 'helix', ...selected} = args;
     if (!['helix', 'claude-mem'].includes(source)) throw new Error('Known memory source required');
@@ -82,7 +102,11 @@ export async function createService({directory, port = 0, upstream = process.env
     let failed = false;
     try {
       let result;
-      if (params.name === 'memory') {
+      if (params.name?.startsWith('memory:')) {
+        const name = params.name.slice(7);
+        if (!memoryCompatibilityTools.some(tool => tool.name === name)) throw new Error('Unknown deterministic memory tool');
+        result = callMemoryCompatibility(compatibility, name, params.arguments || {}, params.caller_cwd);
+      } else if (params.name === 'memory') {
         const {action: operation, ...args} = params.arguments || {};
         let value;
         if (operation === 'put') {
@@ -130,10 +154,11 @@ export async function createService({directory, port = 0, upstream = process.env
   function snapshot() {
     let monitored = null;
     try { monitored = monitoredBenchmark()?.live || null; } catch { monitored = {status: 'unknown', phase: 'Monitor source unavailable'}; }
-    return {schema: 'helix.monitor.v1', instance, version: '1.0.0', status: closing ? 'stopping' : 'online', started,
+    return {schema: 'helix.monitor.v1', instance, version: '1.0.1', status: closing ? 'stopping' : 'online', started,
       monitored_benchmark: monitored,
-      rtk: rtk.status, model_state: modelState.snapshot([...active.values()]),
-      core: core.child ? 'online' : 'idle', memory: {status: 'deterministic', notes: memory.count(), claude_bridge: !!claudeFile()},
+      rtk: rtk.status, model_state: currentModelState(),
+      core: core.child ? 'online' : 'idle', memory: {status: 'deterministic', notes: memory.count(), claude_bridge: !!claudeFile(),
+        inherited: fs.existsSync(bridgeConfig) && !!JSON.parse(fs.readFileSync(bridgeConfig)).inheritance, legacy_worker_required: false},
       counters: {...counters}, active: [...active.values()], events: events.slice(-80).reverse(), goals: goals(),
       compaction: {mode: 'native default', threshold_override: null, forced_early: false, observed: 0},
       privacy: {raw_session_export: false, background_llm: false},
@@ -142,7 +167,7 @@ export async function createService({directory, port = 0, upstream = process.env
   function diagnostics() {
     let bridge = {id: 'claude-mem', label: 'Claude-Mem', status: 'warning', detail: 'No external database connected', remedy: 'Choose a local Claude-Mem database; it stays read-only.'};
     if (claudeFile()) {
-      try { claudeMemRead(claudeFile(), 'projects'); bridge = {...bridge, status: 'ok', detail: 'Read-only schema check passed', remedy: null}; }
+      try { claudeMemRead(claudeFile(), 'projects'); bridge = {...bridge, status: 'ok', detail: snapshot().memory.inherited ? 'Verified inherited database; read-only, legacy worker not required' : 'Read-only schema check passed', remedy: null}; }
       catch { bridge = {...bridge, status: 'error', detail: 'Configured database is unavailable or unsupported', remedy: 'Reconnect the intended local database; no worker or model is started.'}; }
     }
     return {checked_at: Date.now(), model_calls: 0, checks: [
@@ -150,7 +175,9 @@ export async function createService({directory, port = 0, upstream = process.env
       {id: 'core', label: 'Goal and evidence core', status: core.child ? 'ok' : 'warning', detail: core.child ? 'MCP core online' : 'Core starts on the first MCP operation', remedy: 'Restart core only if no operations are active.'},
       {id: 'memory', label: 'HELIX memory', status: 'ok', detail: `${memory.count()} literal notes; SQLite, no background model`, remedy: null}, bridge,
       {id: 'rtk', label: 'RTK', status: rtk.status.available && rtk.status.telemetry_confirmed_off ? 'ok' : 'warning', detail: rtk.status.available ? `Version ${rtk.status.version}; archive-first filtering` : 'RTK executable unavailable; native evidence remains usable', remedy: rtk.status.telemetry_confirmed_off ? null : 'Install RTK and disable its telemetry before using private log filtering.'},
-      {id: 'model', label: 'Model visibility', status: proxy ? 'ok' : 'warning', detail: proxy ? 'Configured OpenAI HTTP stream is observable' : 'MCP-only connection: client reasoning is not observable', remedy: 'Use the opt-in local Responses proxy for model phase events. No credentials are discovered.'},
+      {id: 'model', label: 'Model visibility', status: currentModelState().observed ? 'ok' : 'warning',
+        detail: nativeActivity.scope ? currentModelState().detail : proxy ? 'Configured OpenAI HTTP stream is observable' : 'No native chat or provider stream connected',
+        remedy: currentModelState().observed ? null : 'Select a local Codex chat with observe-codex. Native monitoring does not change routing or read credentials.'},
       {id: 'compaction', label: 'Context policy', status: 'ok', detail: 'Native defaults preserved; no forced early threshold', remedy: null},
     ]};
   }
@@ -169,8 +196,21 @@ export async function createService({directory, port = 0, upstream = process.env
         finally { active.delete(id); }
         return;
       }
-      if (req.method === 'GET' && req.url === '/health') return json(res, 200, {instance, version: '1.0.0', status: 'online'});
+      if (req.method === 'GET' && req.url === '/health') return json(res, 200, {instance, version: '1.0.1', status: 'online'});
       if (req.method === 'GET' && req.url === '/snapshot') return json(res, 200, snapshot());
+      if (req.method === 'POST' && req.url === '/model/native') {
+        const scope = nativeActivityScope(await body(req, 1024));
+        privateJSON(activityConfig, scope); nativeActivity.bind(scope);
+        return json(res, 200, {status: 'selected', source: 'codex-native', model_calls: 0});
+      }
+      if (req.method === 'GET' && req.url === '/model/events') {
+        res.writeHead(200, {'content-type': 'text/event-stream', 'cache-control': 'no-store', connection: 'keep-alive'});
+        res.write(`event: model\ndata: ${JSON.stringify(currentModelState())}\n\n`);
+        modelSubscribers.add(res);
+        const heartbeat = setInterval(() => { if (!res.write(': heartbeat\n\n')) res.end(); }, 15000); heartbeat.unref();
+        res.once('close', () => { clearInterval(heartbeat); modelSubscribers.delete(res); });
+        return;
+      }
       if (req.method === 'GET' && req.url === '/diagnostics') return json(res, 200, diagnostics());
       if (req.method === 'GET' && req.url === '/memory/projects') {
         const projects = memory.projects();
@@ -209,6 +249,8 @@ export async function createService({directory, port = 0, upstream = process.env
   async function close() {
     if (closing) return;
     closing = true;
+    nativeActivity.close();
+    for (const client of modelSubscribers) client.end(); modelSubscribers.clear();
     proxy?.abort();
     await core.close();
     memory.close();
@@ -218,6 +260,8 @@ export async function createService({directory, port = 0, upstream = process.env
   }
   return {endpoint, snapshot, rpc, close, server};
   } catch (error) {
+    nativeActivity?.close();
+    for (const client of modelSubscribers) client.end(); modelSubscribers.clear();
     proxy?.abort();
     await core?.close();
     try { memory?.close(); } catch {}

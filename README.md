@@ -10,6 +10,8 @@ It took a year of experiments to get here. HELIX started with a simple frustrati
 
 A local evidence, memory and deterministic Tool Flow engine for coding agents, with an Electron monitor.
 
+[Latest release](https://github.com/SuperHelix77/HELIX-1.0/releases/latest) | [1.0.1 patch notes](docs/RELEASE-1.0.1.md)
+
 HELIX keeps exact originals outside repeated context, returns compact evidence where appropriate, and executes already-authorized mechanical steps without asking a model to decide them again. It does not lower reasoning effort, force terse thinking, or promise unchanged task quality.
 
 ![HELIX release interface in dark mode](docs/assets/release-dark-desktop.png)
@@ -88,7 +90,7 @@ See [installation and recovery](docs/INSTALL.md) for configuration, optional Cla
 - An integrated memory browser and read-only Claude-Mem bridge, connected through an explicit local database picker or service environment setting. No automatic personal-memory discovery or copying.
 - RTK stdin filtering of already archived logs through `context rtk`. Original commands are never rerun; exact source handles remain available. Missing RTK, unverified telemetry-off state or unusable output falls back to retained native evidence.
 - An opt-in official-OpenAI Responses HTTP proxy with exact result retention. It does not replace a client's native WebSocket implementation or install itself as a global router.
-- A local Electron app with light, dark and system themes, memory browsing, exact note inspection and troubleshooting. Its reasoning indicator lights only on observed provider reasoning events; MCP-only clients correctly show reasoning as unobservable.
+- A local Electron app with light, dark and system themes, memory browsing, exact note inspection and troubleshooting. Native Codex chat monitoring is explicit, local and metadata-only; it does not require proxy routing. Its reasoning indicator lights only on observed active reasoning. An MCP-only connection without a native feed cannot expose client reasoning.
 
 Some primitives are available through MCP but are not enabled on every request automatically. In particular, the standalone proxy does not install the benchmark's full native operation broker. The benchmark's combined treatment is not evidence that each component independently saves tokens.
 

@@ -1,9 +1,11 @@
 export class ModelState {
-  constructor() { this.requests = new Map(); this.last = null; }
+  constructor(changed = () => {}) { this.requests = new Map(); this.last = null; this.changed = changed; }
   start(id, model) { this.set(id, 'waiting', model, 'Waiting for the configured provider'); }
   set(id, state, model, detail) {
+    const previous = this.requests.get(id);
     const value = {state, model, observed: true, source: 'openai-proxy', updated_at: Date.now(), detail};
     this.requests.set(id, value); this.last = value;
+    if (!previous || previous.state !== state || previous.model !== model) { try { this.changed(); } catch {} }
   }
   event(id, record) {
     const old = this.requests.get(id); if (!old) return;
@@ -18,6 +20,7 @@ export class ModelState {
     const state = typeof success === 'string' ? success : success ? 'complete' : 'failed';
     this.last = {...old, state, updated_at: Date.now(), detail: state === 'complete' ? 'Provider response completed' : state === 'unknown' ? 'Response ended without a completed status; ongoing provider state is unobservable' : 'Request failed, was cancelled or ended incomplete'};
     this.requests.delete(id);
+    try { this.changed(); } catch {}
   }
   snapshot(active = []) {
     const requests = [...this.requests.values()];

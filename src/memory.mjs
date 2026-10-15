@@ -22,7 +22,7 @@ export class DeterministicMemory {
     catch (error) { this.db.close(); throw error; }
   }
   put({project, task, title, body, kind = 'fact'}) {
-    if (![project, task].every(v => text(v, 256)) || !text(title, 200) || !text(body, 24000) ||
+    if (![project, task].every(v => text(v, 256)) || !text(title, 200) || !text(body, 50000) ||
         !['fact', 'decision', 'rejected', 'settled', 'constraint'].includes(kind)) throw new Error('Explicit project/task, title and literal memory body required');
     const id = randomUUID();
     this.db.prepare('INSERT INTO notes VALUES(?,?,?,?,?,?,?)').run(id, project, task, title, body, kind, Date.now());
@@ -70,8 +70,9 @@ export function claudeMemRead(file, action, args = {}) {
     if (!text(args.project, 256)) throw new Error('Explicit Claude-Mem project required');
     if (action === 'read') {
       if (!/^\d+$/.test(String(args.id)) || !Number.isSafeInteger(Number(args.id))) throw new Error('Valid Claude-Mem id required');
-      const row = db.prepare('SELECT id,title,narrative FROM observations WHERE project=? AND id=?').get(args.project, Number(args.id));
-      return row ? {id: String(row.id), project: args.project, title: row.title, body: row.narrative, source: 'claude-mem', authority: 'historical evidence only'} : null;
+      const row = db.prepare('SELECT * FROM observations WHERE project=? AND id=?').get(args.project, Number(args.id));
+      const details = row && ['text', 'facts', 'concepts', 'files_read', 'files_modified'].filter(key => row[key] && row[key] !== '[]').map(key => `${key}: ${row[key]}`);
+      return row ? {id: String(row.id), project: args.project, title: row.title, body: [row.subtitle, row.narrative, ...details].filter(Boolean).join('\n\n'), record: row, source: 'claude-mem', authority: 'historical evidence only'} : null;
     }
     const {limit = 20, cursor = 0} = args;
     if (action !== 'browse' || !Number.isInteger(limit) || limit < 1 || limit > 50 || !Number.isSafeInteger(cursor) || cursor < 0) throw new Error('Bounded Claude-Mem page required');
@@ -88,8 +89,8 @@ export function lookupClaudeMem(file, {project, query, limit = 5}) {
   try {
     const columns = db.prepare('PRAGMA table_info(observations)').all().map(r => r.name);
     if (!['id', 'project', 'title', 'narrative'].every(k => columns.includes(k))) throw new Error('Unsupported Claude-Mem schema; no guessed query');
-    const literal = `%${query.replace(/[\\%_]/g, '\\$&')}%`;
-    return db.prepare("SELECT id,title,narrative FROM observations WHERE project=? AND (title LIKE ? ESCAPE '\\' OR narrative LIKE ? ESCAPE '\\') ORDER BY id DESC LIMIT ?")
-      .all(project, literal, literal, limit).map(r => ({id: r.id, title: r.title, body: r.narrative?.slice(0, 640), source: 'claude-mem', authority: 'historical evidence only'}));
+    const literal = `%${query.replace(/[\\%_]/g, '\\$&')}%`, selected = ['title', 'narrative', 'text', 'facts'].filter(key => columns.includes(key));
+    return db.prepare(`SELECT * FROM observations WHERE project=? AND (${selected.map(key => `${key} LIKE ? ESCAPE '\\'`).join(' OR ')}) ORDER BY id DESC LIMIT ?`)
+      .all(project, ...selected.map(() => literal), limit).map(r => ({id: r.id, title: r.title, body: (r.narrative || r.text || r.facts || '').slice(0, 640), source: 'claude-mem', authority: 'historical evidence only'}));
   } finally { db.close(); }
 }

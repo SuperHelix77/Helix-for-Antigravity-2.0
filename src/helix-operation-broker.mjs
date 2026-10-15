@@ -46,7 +46,12 @@ export class HelixOperationBroker {
       if(typeof item.call_id!=="string"||!item.call_id||ids.has(item.call_id)||this.row(item.call_id))
         throw new Error("Repeated or ambiguous dispatch; never replay a mutation");
       ids.add(item.call_id);
-      if(this.authorize(structuredClone({scope:this.scope,task,call:item}))!==true)
+      const authorized=this.authorize(structuredClone({scope:this.scope,task,call:item}));
+      if(authorized&&typeof authorized.then==='function'){
+        Promise.resolve(authorized).catch(()=>{});
+        throw new Error("Synchronous operation authorization required");
+      }
+      if(authorized!==true)
         throw new Error("Current task does not authorize this operation");
       const wire=this.bridge.toNative(item,{task});
       const args=item.type==="custom_tool_call"&&item.input?.startsWith("// HELIX_JSON\n")?parseNativeOperationArguments(item.input.slice("// HELIX_JSON\n".length)).args:
@@ -103,6 +108,7 @@ export class HelixOperationBroker {
         throw new Error("Dispatch scope archive mismatch");
       const wire={...entry.item};
       if(!nativeCallMatches(wire,saved.wire)||!result||result.index<=entry.index||
+        result.item.type!==(saved.wire.type==='function_call'?'function_call_output':'custom_tool_call_output')||
         (typeof result.item.output!=="string"&&!Array.isArray(result.item.output))||
         (result.item.status!==undefined&&result.item.status!=="completed"))throw new Error("Dispatch/result binding changed");
       const observedCell=cellState(result.item.output);
@@ -150,7 +156,12 @@ export class HelixOperationBroker {
         if(packet.epoch!==epoch)throw new Error("Execution epoch changed; stale cells cannot be resumed");
         if(rows.length>=maxWaits)throw new Error("Deterministic wait budget reached; review required");
         if(waiting&&waiting.epoch!==epoch)throw new Error("Execution epoch changed; stale cells cannot be resumed");
-        if(authorizeContinuation(structuredClone({scope:this.scope,task:row.task,parent_id:row.call_id,cell_id:cell,epoch}))!==true)
+        const authorized=authorizeContinuation(structuredClone({scope:this.scope,task:row.task,parent_id:row.call_id,cell_id:cell,epoch}));
+        if(authorized&&typeof authorized.then==='function'){
+          Promise.resolve(authorized).catch(()=>{});
+          throw new Error("Synchronous continuation authorization required");
+        }
+        if(authorized!==true)
           throw new Error("Current operation does not authorize further waiting");
         const wait_id="call_helix_wait_"+randomUUID().replaceAll("-","");
         const call={type:"function_call",id:"fc_"+wait_id,name:"wait",call_id:wait_id,

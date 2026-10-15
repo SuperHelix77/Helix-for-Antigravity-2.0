@@ -23,7 +23,18 @@ for (const file of [...new Set(files)].sort()) {
   ];
   for (const [label, pattern] of rules) if (pattern.test(text)) findings.push(`${file}: ${label}`);
 }
+let generatedFiles = 0;
+if (fs.existsSync('dist')) for (const relative of fs.readdirSync('dist', {recursive: true})) {
+  if (!/\.js$/.test(relative)) continue;
+  const file = path.join('dist', relative), stat = fs.lstatSync(file);
+  if (!stat.isFile() || stat.isSymbolicLink()) { findings.push(`${file}: unsafe generated file`); continue; }
+  generatedFiles++;
+  const text = fs.readFileSync(file, 'utf8');
+  if (/jsxDEV|jsx-dev-runtime|react\.development/.test(text)) findings.push(`${file}: development transform in release build`);
+  if (/\/Users\/[a-zA-Z0-9._-]+\/|[A-Za-z]:\\\\Users\\\\[^\\]+\\\\/.test(text)) findings.push(`${file}: personal absolute path in generated build`);
+}
 if (findings.length) { for (const issue of findings) console.error(issue); process.exitCode = 1; }
 else console.log(JSON.stringify({schema: 'helix.privacy-scan.v1', status: 'pass', scanned_files: sources.length,
+  generated_js_scanned: generatedFiles,
   source_set_sha256: createHash('sha256').update(JSON.stringify(sources)).digest('hex'),
   scope: 'Mechanical current release file scan. Requires separate semantic/privacy/license review; not a universal guarantee.'}));

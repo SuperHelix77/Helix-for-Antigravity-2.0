@@ -62,6 +62,41 @@ test("authorization and cancelled preparation do not reserve or dispatch anythin
   const f=fixture(t),broker=f.make(),signal=AbortSignal.abort();assert.throws(()=>broker.prepare(response,{task:"issue-02"}),/authorize/);
   assert.throws(()=>broker.prepare(response,{task:"issue-01",signal}));assert.equal(broker.row(call.call_id),undefined);
 });
+test('async authorization is rejected synchronously and its rejection is consumed without reserving work',async t=>{
+  const f=fixture(t);
+  for(const authorize of [async()=>true,async()=>false,async()=>{throw new Error('synthetic authority unavailable');}]){
+    const broker=f.make('async-authority',authorize);
+    assert.throws(()=>broker.prepare(response,{task:'issue-01'}),/authoriz/i);
+    assert.equal(broker.row(call.call_id),undefined);
+  }
+  // Node's test runner treats a leaked rejection as a test failure.
+  await new Promise(resolve=>setImmediate(resolve));
+});
+test('raw dispatch requires its native result type before acknowledgement and accepts the matching result',t=>{
+  const f=fixture(t),broker=f.make();
+  for(const [type,expected,wrong] of [['custom_tool_call','custom_tool_call_output','function_call_output'],
+    ['function_call','function_call_output','custom_tool_call_output']]){
+    const original=type==='custom_tool_call'?{...call,call_id:'raw_custom',input:'text("public")'}:
+      {type,name:'ordinary_tool',call_id:'raw_function',arguments:'{}'};
+    const p=broker.prepare({...response,output:[original]},{task:'issue-01'});broker.issued(p.call_ids);
+    const wire=p.response.output[0];
+    assert.throws(()=>broker.restore([wire,{type:wrong,call_id:original.call_id,output:'public'}]),/binding changed/);
+    assert.equal(broker.row(original.call_id).phase,'issued');
+    const output={type:expected,call_id:original.call_id,output:'public'};
+    assert.deepEqual(broker.restore([wire,output]),[original,output]);
+    assert.equal(broker.row(original.call_id).phase,'acknowledged');
+  }
+});
+test('async wait continuation authority cannot create a wait or leak its rejection',async t=>{
+  const f=fixture(t),broker=f.make(),epoch='synthetic-epoch';
+  const p=broker.prepare(response,{task:'issue-01',epoch});broker.issued(p.call_ids);
+  const input=[...p.response.output,{type:'custom_tool_call_output',call_id:call.call_id,output:'Script running with cell ID PUBLIC_CELL\n'}];
+  for(const authorizeContinuation of [async()=>true,async()=>false,async()=>{throw new Error('synthetic continuation unavailable');}]){
+    assert.throws(()=>broker.beforeInference(input,{epoch,authorizeContinuation}),/authoriz/i);
+    assert.equal(broker.engine.db.prepare('SELECT count(*) AS n FROM helix_native_waits').get().n,0);
+  }
+  await new Promise(resolve=>setImmediate(resolve));
+});
 test('declared upstream overload ends as a typed failure, never a generic incomplete stream or executable dispatch',async t=>{
   const f=fixture(t),broker=f.make(),sink=new Sink();let captured;
   const failed={...response,status:'failed',usage:null,error:{code:'server_is_overloaded',message:'Our servers are currently overloaded.'}};

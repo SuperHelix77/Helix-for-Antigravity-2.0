@@ -81,7 +81,7 @@ export function panelUrl(port, secret) {
 }
 
 export function authenticatedRoute(pathname, expectedSecret) {
-  if (typeof pathname !== "string") return undefined;
+  if (typeof pathname !== "string" || !validCallerSecret(expectedSecret)) return undefined;
   const prefix = `${CALLER_PATH_PREFIX}/`;
   if (!pathname.startsWith(prefix)) return undefined;
   const remainder = pathname.slice(prefix.length);

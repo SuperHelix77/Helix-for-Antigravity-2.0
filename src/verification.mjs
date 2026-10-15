@@ -17,14 +17,43 @@ export function verificationCommand(value) {
   return {cmd: value.cmd, ...(value.workdir === undefined ? {} : {workdir: value.workdir})};
 }
 
+// Self-contained so the native execution template uses this exact same guard.
+// Recognized contradictions block acceptance; absence of one is not semantic PASS.
+export function verificationBoundary(result) {
+  if (!result || result.exit_code !== 0 || result.signal || result.boundary)
+    return 'Declared verification failed or its completion is unknown';
+  if (result.tooLarge || result.truncated || result.output_truncated)
+    return 'Verification output is incomplete';
+  const outputs = typeof result.output === 'string' ? [result.output]
+    : typeof result.stdout === 'string' && typeof result.stderr === 'string' ? [result.stdout, result.stderr] : null;
+  if (!outputs) return 'Verification output is unavailable';
+  for (const output of outputs) {
+    if (/^\s*not ok(?:\s|$)|^\s*FAILED(?:\s+\(|\s+\S+::)/m.test(output))
+      return 'Reported test failures contradict successful shell exit';
+    for (const line of output.split('\n')) {
+      if (/\b(?:no tests ran|collected 0 items)\b/i.test(line) ||
+          /^\s*(?:#\s*|\u2139\s*)?tests\s*[:=]?\s+0\s*$/i.test(line)) return 'No tests executed';
+      if (/^\s*(?:#\s*|\u2716\s*)?(?:fail(?:ed|ures)?|errors?|cancelled)\s*[:=]?\s+[1-9]\d*\b/i.test(line) ||
+          /\b[1-9]\d*\s+(?:failed|failures?|errors?|cancelled)\b/i.test(line))
+        return 'Reported test failures contradict successful shell exit';
+    }
+    let report;
+    try { report = JSON.parse(output); } catch { continue; }
+    if (report?.schema !== 'helix.tests.v1') continue;
+    if (report.complete !== true || !Array.isArray(report.tests) ||
+        report.tests.some(item => !['pass', 'fail', 'error', 'skip'].includes(item?.status)))
+      return 'Verification report is incomplete';
+    if (!report.tests.some(item => item.status !== 'skip')) return 'No tests executed';
+    if (report.tests.some(item => ['fail', 'error'].includes(item.status)))
+      return 'Reported test failures contradict successful shell exit';
+  }
+  return null;
+}
+
 export function qualifyTestExit(engine, result) {
   const stdout = engine.archive(Buffer.from(result.stdout)), stderr = engine.archive(Buffer.from(result.stderr));
   const receipt = createCompactReceipt(engine, {stdout, stderr, exit_code: result.exit_code, signal: result.signal ?? null, failure: result.tooLarge ? 'output capped' : null});
-  const packet = engine.objectJSON(receipt);
-  const counts = [...packet.stdout.counts, ...packet.stderr.counts];
-  const failures = counts.filter(row => ['failed', 'fail', 'error', 'errors', 'cancelled'].includes(row.label) && row.value > 0);
-  const empty = /(?:^|\n).*\b(?:no tests ran|collected 0 items)\b/.test(result.stdout + '\n' + result.stderr);
-  const boundary = failures.length ? 'Reported test failures contradict successful shell exit' : empty ? 'No tests executed' : null;
+  const boundary = verificationBoundary(result);
   return {...result, ...(result.exit_code === 0 && boundary ? {verification_exit_code: 78, verification_boundary: boundary} : {}),
     verification_receipt: receipt, semantic_success: null};
 }
