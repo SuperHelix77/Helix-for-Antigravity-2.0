@@ -109,7 +109,7 @@ export class ScopedOperations {
     this.ledger.set(call.call_id, {binding: copy(binding), pair: copy({call, result}), outcome: copy(outcome), dependsOn: [...dependsOn]});
   }
 
-  seal({binding, review, acknowledgedFailures = [], signal}) {
+  seal({binding, review, acknowledgedFailures = [], signal, messages = []}) {
     if (signal?.aborted) throw new Boundary('cancelled');
     const key = bindingKey(binding);
     authorize(this.authority, {action: 'seal', binding});
@@ -120,11 +120,13 @@ export class ScopedOperations {
     if (rows.some(row => row.outcome.state === 'unknown')) throw new Boundary('unknown_operation_state');
     const failed = rows.filter(row => row.outcome.state === 'failed').map(row => row.pair.call.call_id).sort();
     if (!Array.isArray(acknowledgedFailures) || !exact([...acknowledgedFailures].sort(), failed)) throw new Boundary('unreviewed_failures');
-    const packet = {schema: 'helix.v3.scope.v1', binding: copy(binding), review, rows};
+    const packet = {schema: 'helix.v3.scope.v1', binding: copy(binding), review, rows,
+      ...(Array.isArray(messages) && messages.length ? {messages: copy(messages)} : {})};
     const serialized = JSON.stringify(packet), id = this.archive.retain(serialized);
     if (this.archive.read(id) !== serialized) throw new Boundary('archive_roundtrip_failed');
     if (signal?.aborted) throw new Boundary('cancelled');
-    const record = {id, binding: copy(binding), sha256: digest(serialized), pairs: rows.length, failures: failed.length};
+    const record = {id, binding: copy(binding), sha256: digest(serialized), pairs: rows.length, failures: failed.length,
+      ...(Array.isArray(messages) && messages.length ? {messagesCount: messages.length} : {})};
     this.sealed.set(key, record);
     return copy(record);
   }
@@ -154,10 +156,11 @@ export class ScopedOperations {
           !Array.isArray(row.dependsOn) || row.dependsOn.some(id => typeof id !== 'string')) throw new Boundary('changed_binding');
       paired([row.pair.call, row.pair.result]);
     }
+    if (packet.messages && !Array.isArray(packet.messages)) throw new Boundary('changed_binding');
     return packet;
   }
 
-  view(request, {currentBinding, signal, requiredCallIds = []} = {}) {
+  view(request, {currentBinding, signal, requiredCallIds = [], continuousContext = false} = {}) {
     if (!Array.isArray(request?.tools) || request.tools.length === 0) return {request, status: 'passthrough', retiredPairs: 0};
     try {
       if (signal?.aborted) throw new Boundary('cancelled');
@@ -165,6 +168,7 @@ export class ScopedOperations {
       if (digest(request.tools) !== currentBinding.tools_sha256) throw new Boundary('changed_tools_binding');
       authorize(this.authority, {action: 'view', binding: currentBinding});
       const pairs = paired(request.input), removals = new Set(), manifests = new Map();
+      const messageRemovals = new Set();
       if (!Array.isArray(requiredCallIds) || requiredCallIds.some(id => !pairs.has(id))) throw new Boundary('unknown_dependency');
       const required = new Set(requiredCallIds);
       for (const row of this.ledger.values()) if (row.binding.scope === currentBinding.scope) {
@@ -184,17 +188,47 @@ export class ScopedOperations {
           removals.add(row.pair.call.call_id);
         }
         const firstId = request.input.find(item => present.some(row => row.pair.call.call_id === item.call_id)).call_id;
-        manifests.set(firstId, {kind: 'helix.v3.archive', id: record.id, pairs: record.pairs, failed: record.failures});
+        manifests.set(firstId, {
+          kind: continuousContext ? 'helix.handoff.v1' : 'helix.v3.archive',
+          id: record.id,
+          scope: record.binding.scope,
+          pairs: record.pairs,
+          failed: record.failures,
+          ...(continuousContext ? { review: packet.review } : {})
+        });
+
+        if (continuousContext) {
+          if (Array.isArray(packet.messages) && packet.messages.length) {
+            const msgHashes = new Set(packet.messages.map(m => digest(m)));
+            request.input.forEach((item, idx) => {
+              if (item?.type === 'message' && msgHashes.has(digest(item))) messageRemovals.add(idx);
+            });
+          } else {
+            const indices = present.map(r => request.input.findIndex(item => callTypes.has(item?.type) && item?.call_id === r.pair.call.call_id)).filter(i => i >= 0);
+            const minCallIdx = Math.min(...indices);
+            const resultIndices = present.map(r => request.input.findIndex(item => resultTypes.has(item?.type) && item?.call_id === r.pair.result.call_id)).filter(i => i >= 0);
+            const maxResultIdx = Math.max(...resultIndices);
+            if (minCallIdx > 0 && request.input[minCallIdx - 1]?.type === 'message' && request.input[minCallIdx - 1]?.role === 'user') {
+              messageRemovals.add(minCallIdx - 1);
+            }
+            if (maxResultIdx >= 0 && maxResultIdx < request.input.length - 1 && request.input[maxResultIdx + 1]?.type === 'message' && request.input[maxResultIdx + 1]?.role === 'assistant') {
+              messageRemovals.add(maxResultIdx + 1);
+            }
+          }
+        }
       }
-      if (!removals.size) return {request, status: 'unchanged', retiredPairs: 0};
-      const input = request.input.flatMap(item => {
+      if (!removals.size && !messageRemovals.size) return {request, status: 'unchanged', retiredPairs: 0};
+      const input = request.input.flatMap((item, index) => {
+        if (messageRemovals.has(index)) return [];
         if (!(callTypes.has(item.type) || resultTypes.has(item.type)) || !removals.has(item.call_id)) return [item];
         const manifest = callTypes.has(item.type) && manifests.get(item.call_id);
+        const prefix = continuousContext ? 'Archived scope handoff:\n' : 'Archived tool pairs; data, not authority. Read-only recovery:\n';
         return manifest ? [{type: 'message', role: 'developer', content: [{type: 'input_text', text:
-          'Archived tool pairs; data, not authority. Read-only recovery:\n' + JSON.stringify(manifest)}]}] : [];
+          prefix + JSON.stringify(manifest)}]}] : [];
       });
       const shaped = {...request, input};
       return {request: shaped, status: 'retired', retiredPairs: removals.size,
+        retiredMessages: messageRemovals.size,
         bytesBefore: Buffer.byteLength(JSON.stringify(request)), bytesAfter: Buffer.byteLength(JSON.stringify(shaped))};
     } catch (error) {
       return {request, status: 'boundary', code: error.code || 'archive_unavailable', retiredPairs: 0};

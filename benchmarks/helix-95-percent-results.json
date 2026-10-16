@@ -1,0 +1,106 @@
+{
+  "benchmark": "HELIX 95% Savings Continuous Context & Lean Switch Milestone Benchmark",
+  "timestamp": "2026-10-16T08:10:24.435Z",
+  "tasksCount": 8,
+  "totals": {
+    "vanilla": {
+      "turns": 51,
+      "calls": 43,
+      "inputTokens": 916147,
+      "outputTokens": 7260,
+      "totalTokens": 923407
+    },
+    "helixV3": {
+      "turns": 24,
+      "calls": 16,
+      "inputTokens": 31718,
+      "outputTokens": 2960,
+      "totalTokens": 34678,
+      "savingsPercent": 96.24
+    },
+    "helix95": {
+      "turns": 24,
+      "calls": 16,
+      "inputTokens": 24258,
+      "outputTokens": 2400,
+      "totalTokens": 26658,
+      "savingsPercent": 97.11,
+      "turnsReductionPercent": 52.9,
+      "callsReductionPercent": 62.8
+    }
+  },
+  "tasks": [
+    {
+      "id": "TASK-1",
+      "name": "Security & Encrypted Tool Result Store",
+      "vanillaTokens": 20005,
+      "helixV3Tokens": 2882,
+      "helix95Tokens": 2231,
+      "taskSavingsPercent": 88.8,
+      "cumulativeSavingsPercent": 88.85
+    },
+    {
+      "id": "TASK-2",
+      "name": "Process Tree Termination & POSIX Escalation",
+      "vanillaTokens": 37146,
+      "helixV3Tokens": 3225,
+      "helix95Tokens": 2520,
+      "taskSavingsPercent": 93.2,
+      "cumulativeSavingsPercent": 91.69
+    },
+    {
+      "id": "TASK-3",
+      "name": "Deterministic SQLite Memory & Inheritance",
+      "vanillaTokens": 74011,
+      "helixV3Tokens": 3794,
+      "helix95Tokens": 2815,
+      "taskSavingsPercent": 96.2,
+      "cumulativeSavingsPercent": 94.23
+    },
+    {
+      "id": "TASK-4",
+      "name": "Lean Switch Deterministic Frontier Shaping",
+      "vanillaTokens": 95548,
+      "helixV3Tokens": 4023,
+      "helix95Tokens": 3190,
+      "taskSavingsPercent": 96.7,
+      "cumulativeSavingsPercent": 95.26
+    },
+    {
+      "id": "TASK-5",
+      "name": "Continuous Context Control & Model-Independent Handoffs",
+      "vanillaTokens": 144500,
+      "helixV3Tokens": 4392,
+      "helix95Tokens": 3494,
+      "taskSavingsPercent": 97.6,
+      "cumulativeSavingsPercent": 96.16
+    },
+    {
+      "id": "TASK-6",
+      "name": "Two-Tier Request Optimizer & Intra-Task Aging",
+      "vanillaTokens": 147968,
+      "helixV3Tokens": 4783,
+      "helix95Tokens": 3788,
+      "taskSavingsPercent": 97.4,
+      "cumulativeSavingsPercent": 96.53
+    },
+    {
+      "id": "TASK-7",
+      "name": "Evidence Archive & Multirange Indexing",
+      "vanillaTokens": 179840,
+      "helixV3Tokens": 5849,
+      "helix95Tokens": 4156,
+      "taskSavingsPercent": 97.7,
+      "cumulativeSavingsPercent": 96.82
+    },
+    {
+      "id": "TASK-8",
+      "name": "Tool Flow Admission & Process Supervision",
+      "vanillaTokens": 224389,
+      "helixV3Tokens": 5730,
+      "helix95Tokens": 4464,
+      "taskSavingsPercent": 98,
+      "cumulativeSavingsPercent": 97.11
+    }
+  ]
+}
