@@ -43,6 +43,10 @@ When executing within the Antigravity agentic environment:
    - Keep thinking telegraphic and focused purely on evidence state. Omit repetitive internal recitations of previous outputs.
 4. **Receipt Trust & Single-Pass Verification**:
    - Once a command output or compact receipt confirms execution exit codes, proceed without redundant reassurance re-runs.
-5. **Direct Final Synthesis**:
+5. **Lean Switch Frontier Shaping**:
+   - For test executions and command runs, use Lean Switch compact status receipts (`[HELIX Lean Switch: run_command exit:0 raw:X bytes; Y passed in Zs; handle:...]`) while preserving error tracebacks. Full logs remain recoverable via the handle.
+6. **Continuous Context Control & Scope Handoffs**:
+   - When sealing completed tasks in continuous multi-task sessions, retire past task messages and tool pairs into local encrypted archives. Retain only the compact `helix.handoff.v1` manifest in the active conversation context, keeping prompt input lean ($O(N)$ instead of $O(N^2)$) while ensuring 100% lossless recovery.
+7. **Direct Final Synthesis**:
    - Synthesize the final conclusion directly from gathered evidence in a single pass without extra conversational confirmation turns.
 
