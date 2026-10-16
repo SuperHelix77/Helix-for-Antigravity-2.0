@@ -29,3 +29,20 @@ Router evidence operations: `context receipt` verifies partial typed log project
 Reuse verified displayed mechanical facts for their stated bindings. Do not reread raw logs or rerun identical checks solely for reassurance. Use `context attest` with the step receipt and current project/session when declared-file freshness is needed; it performs no command execution. Changed bindings, conflicting evidence, missing relevant details or required independent verification trigger targeted rechecking. Unbound receipts describe historical execution only. Keep semantic review; receipt PASS is not task correctness.
 
 After router compaction, use its recovery handle with `context history` for exact zero-based records/chunks or literal match offsets. Recover truncated current requirements before acting; retrieve other omitted evidence only when relevant. Credential-bearing records stay local. Use lookup_mem for related decisions as needed, never as an automatic task queue. Recent-tail string IDs refer to the same source-table records, not new evidence. Archive integrity establishes historical bytes, not semantic correctness or current state.
+
+## Antigravity Agent Fine-Tuning: Minimizing Turns, Calls, and Input Tokens
+
+When executing within the Antigravity agentic environment:
+1. **Decisive Multi-File & Range Batching**:
+   - Inspect files in purposeful, complete target spans (200–600 lines) or leverage `context` `batch_inspect` / parallel tool calls in the same turn.
+   - Avoid fragmented micro-views (e.g., reading 50 lines 10 times across 10 turns).
+2. **Unified Command Execution**:
+   - Group related test files or CLI commands into a unified invocation (e.g., `node --test test/file1.test.mjs test/file2.test.mjs`).
+   - Do not serialize commands across separate turns when they can be run together or in parallel.
+3. **Chain-of-Draft Reasoning**:
+   - Keep thinking telegraphic and focused purely on evidence state. Omit repetitive internal recitations of previous outputs.
+4. **Receipt Trust & Single-Pass Verification**:
+   - Once a command output or compact receipt confirms execution exit codes, proceed without redundant reassurance re-runs.
+5. **Direct Final Synthesis**:
+   - Synthesize the final conclusion directly from gathered evidence in a single pass without extra conversational confirmation turns.
+

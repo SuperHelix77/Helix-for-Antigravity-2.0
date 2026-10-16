@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import readline from "node:readline";
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync, existsSync, statSync } from "node:fs";
 import { createHash } from "node:crypto";
 import os from "node:os";
 import path from "node:path";
@@ -54,13 +54,14 @@ const tools = [
     description: "Local evidence, not semantic authority. Read actions: doctor {action} only; raw {action,receipt,offset?,limit?} restores a 64-hex evidence hash or a 43-character encrypted program handle in this MCP's program store; receipt {action,receipt,budget?} verifies a partial log; delta {action,before,after} compares compact receipts of complete helix.tests.v1 reports; index {action,source}; ranges {action,index,ranges,budget?}. Do not add project/session to these reads. Tool-result aging handles belong to a separate store, read through control. attest checks bound inputs in project+session without execution. register/run pin/select command workflows; edit applies unique literals under a source hash. Keep normal answers and judgment; commands cannot bypass client restrictions.",
     inputSchema: {
       type: "object", properties: {
-        action: { enum: ["policy", "doctor", "raw", "history", "receipt", "delta", "attest", "index", "ranges", "register", "run", "edit", "flow_register", "flow_run"] }, receipt: string,
+        action: { enum: ["policy", "doctor", "raw", "history", "receipt", "delta", "attest", "index", "ranges", "register", "run", "edit", "flow_register", "flow_run", "batch_inspect"] }, receipt: string,
         before: string, after: string,
         item: { type: "integer", minimum: 0 },
         query: { type: "string", description: "Optional literal search in an archived context item; returns exact byte offsets, not semantic conclusions." },
         offset: { type: "integer", minimum: 0 }, limit: { type: "integer", minimum: 4, maximum: 24000 },
         budget: { type: "integer", minimum: 4, maximum: 24000 }, source: string, index: string,
         ranges: { type: "array", maxItems: 32, items: { type: "object", properties: { start: { type: "integer" }, end: { type: "integer" } }, required: ["start", "end"], additionalProperties: false } },
+        files: { type: "array", maxItems: 16, items: { type: "object", properties: { path: { type: "string" }, start: { type: "integer" }, end: { type: "integer" } }, required: ["path"], additionalProperties: false } },
         project: string, session: string, request_id: string, workflow: string, name: string, version: string,
         steps: { type: "array", items: stepSchema }, bind: { type: "array", items: string },
         flow: string,
@@ -96,6 +97,7 @@ async function context(args, options) {
     register: ["project", "name", "version", "steps", "bind"],
     run: ["project", "session", "request_id", "workflow"], edit: ["project", "file", "expected_sha256", "edits", "request_id"],
     flow_register: ["project", "name", "version", "nodes", "bind", "max_operations", "max_elapsed_ms"], flow_run: ["project", "session", "request_id", "flow"],
+    batch_inspect: ["project", "files"],
   };
   if (!args || !actionKeys[args.action]) throw new Error(`Invalid context action. Allowed: ${Object.keys(actionKeys).join(", ")}.`);
   if (Object.keys(args).some((key) => key !== "action" && !actionKeys[args.action].includes(key))) {
@@ -103,6 +105,21 @@ async function context(args, options) {
   }
   if (args.action === "policy") return policy();
   if (args.action === "doctor") return "Helix Context MCP ready. Goal store: local SQLite. Execution: deterministic, explicitly planned argv. Model/Ollama calls: none. Normal final output and reasoning settings preserved. Native app tool discovery requires MCP reload.";
+  if (args.action === "batch_inspect") {
+    if (!args.project || !Array.isArray(args.files) || !args.files.length) throw new Error("batch_inspect requires project and files array.");
+    const results = [];
+    for (const item of args.files) {
+      const fullPath = path.resolve(args.project, item.path);
+      if (!existsSync(fullPath) || !statSync(fullPath).isFile()) throw new Error(`File unavailable: ${item.path}`);
+      const content = readFileSync(fullPath, "utf8");
+      const lines = content.split("\n");
+      const start = Math.max(1, item.start || 1);
+      const end = Math.min(lines.length, item.end || lines.length);
+      const slice = lines.slice(start - 1, end).join("\n");
+      results.push(`--- FILE: ${item.path} (lines ${start}-${end}/${lines.length}) ---\n${slice}`);
+    }
+    return results.join("\n\n");
+  }
   if (args.action === "raw") {
     const result = /^[A-Za-z0-9_-]{43}$/.test(args.receipt??"")
       ? readToolCallOriginal(args.receipt,{...args,directory:programDirectory}) : engine.read(args.receipt, args);

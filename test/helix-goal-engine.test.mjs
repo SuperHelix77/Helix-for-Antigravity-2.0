@@ -263,7 +263,7 @@ test("owner crash refuses recovery while an orphan runs; later recovers its part
   process.kill(-pid, "SIGKILL");
   while (true) {
     try { process.kill(-pid, 0); await new Promise((resolve) => setTimeout(resolve, 5)); }
-    catch (error) { if (error.code === "ESRCH") break; throw error; }
+    catch (error) { if (error.code === "ESRCH" || error.code === "EPERM") break; throw error; }
   }
   const recovered = await call(f, engine, running, "steer", { operation: "recover", review: "Owned orphan terminated; inspected the partial effects.", request_id: "recover-after-stop" });
   assert.equal(recovered.state, "blocked"); assert.equal(recovered.progress, "0/1");

@@ -4,18 +4,24 @@ import {CacheStableAging} from './cache-stable-aging.mjs';
 import {retainToolResult, readRetainedToolResult} from './tool-result-store.mjs';
 
 export class RequestOptimizer {
-  constructor(directory, {retain, recover, scopedOperations, scopeContext} = {}) {
+  constructor(directory, {retain, recover, scopedOperations, scopeContext, cacheStable} = {}) {
     if ((scopedOperations !== undefined || scopeContext !== undefined) &&
         (typeof scopedOperations?.view !== 'function' || typeof scopeContext !== 'function')) throw new Error('Explicit scoped operations and current controller context required');
     this.directory = path.join(directory, 'programs');
     this.sessions = new Map();
     this.scopedOperations = scopedOperations;
     this.scopeContext = scopeContext;
+    this.cacheStable = cacheStable;
     this.retain = retain || (text => retainToolResult(text, {directory: this.directory, ttlMs: 0}));
     this.recover = recover || (handle => readRetainedToolResult(handle, {directory: this.directory}));
   }
   shape(payload, {session, provider = 'openai', signal} = {}) {
-    if (provider !== 'openai' || !/^gpt-[a-zA-Z0-9._-]+$/.test(payload?.model || '') ||
+    const isSupportedProvider = ['openai', 'gemini', 'antigravity'].includes(provider);
+    const isSupportedModel = /^gpt-[a-zA-Z0-9._-]+$/.test(payload?.model || '') ||
+      /^gemini-[a-zA-Z0-9._-]+$/.test(payload?.model || '') ||
+      /^claude-[a-zA-Z0-9._-]+$/.test(payload?.model || '') ||
+      payload?.model === 'antigravity';
+    if (!isSupportedProvider || !isSupportedModel ||
         typeof session !== 'string' || !session || session.length > 512 || !Array.isArray(payload.input) ||
         !Array.isArray(payload.tools) || payload.tools.length === 0) return {payload, stats: {enabled: false}};
     if (this.scopedOperations) {
@@ -40,7 +46,8 @@ export class RequestOptimizer {
     let policy = this.sessions.get(key);
     if (!policy) {
       if (this.sessions.size >= 128) this.sessions.delete(this.sessions.keys().next().value);
-      policy = new CacheStableAging(); this.sessions.set(key, policy);
+      policy = new CacheStableAging(this.cacheStable || { minSavedBytes: 1024, minResults: 2 });
+      this.sessions.set(key, policy);
     }
     const result = policy.shape(payload.input, {enabled: true, preserveSecurityEvidence: true,
       deduplicateExactResults: true, compactReceipts: true, minBytes: 256, frontierMaxBytes: 32768,

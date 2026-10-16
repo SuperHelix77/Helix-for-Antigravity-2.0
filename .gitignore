@@ -3,6 +3,7 @@ dist/
 dist-monitor/
 release/
 .helix/
+helix_state/
 .tastemaker/
 experiments/
 .env

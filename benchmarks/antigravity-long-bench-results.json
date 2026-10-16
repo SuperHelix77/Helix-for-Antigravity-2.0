@@ -1,0 +1,125 @@
+{
+  "benchmark": "HELIX Multi-Task Long Benchmark (Antigravity Fine-Tuning)",
+  "timestamp": "2026-10-16T05:40:15.820Z",
+  "tasksCount": 4,
+  "totals": {
+    "vanilla": {
+      "turns": 28,
+      "calls": 24,
+      "inputTokens": 101950,
+      "outputTokens": 4800,
+      "totalTokens": 106750
+    },
+    "helix": {
+      "turns": 8,
+      "calls": 8,
+      "inputTokens": 10274,
+      "outputTokens": 1720,
+      "totalTokens": 11994
+    },
+    "savings": {
+      "totalTokenSavingsPercent": 88.8,
+      "inputTokenSavingsPercent": 89.9,
+      "turnsReductionPercent": 71.4,
+      "callsReductionPercent": 66.7
+    }
+  },
+  "tasks": [
+    {
+      "id": "TASK-1",
+      "name": "Security Audit: Retention & Encryption at Rest",
+      "vanilla": {
+        "turns": 8,
+        "calls": 7,
+        "inputTokens": 24519,
+        "outputTokens": 1320,
+        "totalTokens": 25839
+      },
+      "helix": {
+        "turns": 2,
+        "calls": 2,
+        "inputTokens": 2572,
+        "outputTokens": 430,
+        "totalTokens": 3002
+      },
+      "reductions": {
+        "tokenSavingsPercent": 88.4,
+        "inputSavingsPercent": 89.5,
+        "turnsReductionPercent": 75,
+        "callsReductionPercent": 71.4
+      }
+    },
+    {
+      "id": "TASK-2",
+      "name": "Process Tree Termination & POSIX Escalation",
+      "vanilla": {
+        "turns": 6,
+        "calls": 5,
+        "inputTokens": 13764,
+        "outputTokens": 1080,
+        "totalTokens": 14844
+      },
+      "helix": {
+        "turns": 2,
+        "calls": 2,
+        "inputTokens": 2564,
+        "outputTokens": 430,
+        "totalTokens": 2994
+      },
+      "reductions": {
+        "tokenSavingsPercent": 79.8,
+        "inputSavingsPercent": 81.4,
+        "turnsReductionPercent": 66.7,
+        "callsReductionPercent": 60
+      }
+    },
+    {
+      "id": "TASK-3",
+      "name": "Memory Integrity & Claude-Mem Isolation",
+      "vanilla": {
+        "turns": 9,
+        "calls": 8,
+        "inputTokens": 54758,
+        "outputTokens": 1440,
+        "totalTokens": 56198
+      },
+      "helix": {
+        "turns": 2,
+        "calls": 2,
+        "inputTokens": 2561,
+        "outputTokens": 430,
+        "totalTokens": 2991
+      },
+      "reductions": {
+        "tokenSavingsPercent": 94.7,
+        "inputSavingsPercent": 95.3,
+        "turnsReductionPercent": 77.8,
+        "callsReductionPercent": 75
+      }
+    },
+    {
+      "id": "TASK-4",
+      "name": "Request Optimizer & Cache-Stable Aging for Gemini/Antigravity",
+      "vanilla": {
+        "turns": 5,
+        "calls": 4,
+        "inputTokens": 8909,
+        "outputTokens": 960,
+        "totalTokens": 9869
+      },
+      "helix": {
+        "turns": 2,
+        "calls": 2,
+        "inputTokens": 2577,
+        "outputTokens": 430,
+        "totalTokens": 3007
+      },
+      "reductions": {
+        "tokenSavingsPercent": 69.5,
+        "inputSavingsPercent": 71.1,
+        "turnsReductionPercent": 60,
+        "callsReductionPercent": 50
+      }
+    }
+  ]
+}
