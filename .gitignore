@@ -16,3 +16,9 @@ experiments/
 test-results/
 .DS_Store
 coverage/
+harness/
+vault/
+benchmarks/new50-1turn/
+benchmarks/tasks-1-22-grades.json
+benchmarks/pilot-results.json
+benchmarks/grader-audit-receipts.json

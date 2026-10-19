@@ -58,8 +58,10 @@ The newer memory, RTK and desktop integrations have local tests; they are **not*
 | --- | --- |
 | **Goal engine** | Tracks the current task, ordered steps, scope, revision, acceptance and cancellation. Old goals never silently become new instructions. |
 | **Tool Flow** | Executes bounded, already-authorized mechanical sequences. Ambiguity returns to model judgment instead of being guessed away. |
+| **Lean Switch** | Condenses massive command and test outputs into verified compact status receipts while archiving 100% of exact originals for on-demand recovery. |
+| **Continuous Context Control** | Encrypts and seals past task scopes upon completion (`helix.handoff.v1`), eliminating context cache bloat across multi-task sessions. |
 | **Evidence archive** | Keeps exact tool outputs and generated programs recoverable while returning compact, typed receipts when appropriate. |
-| **Context** | Retires eligible historical material, indexes references and retrieves originals on demand. Retention is not proof of semantic equivalence. |
+| **Context & Two-Tier Aging** | Combines scoped retirement with intra-task aging, index references, and retrieves originals on demand without loss of intelligence. |
 | **Memory** | Stores explicit project/task notes in deterministic local SQLite. Search and note round trips do not require an LLM observer. |
 | **Claude-Mem bridge** | Optional read-only lookup of an explicitly selected legacy store. It does not silently import private memories or start a background model. |
 | **RTK integration** | Filters archived output through RTK where configured, without rerunning original commands. Unavailable or unsafe paths fall back to retained evidence. |
@@ -104,6 +106,23 @@ codex mcp list
 ```
 
 Reload the client's tools. The adapter exposes `goal`, `context` and `memory` over the same local service. Other compatible clients can use the same stdio entrypoint. The optional Responses proxy is documented in [INSTALL.md](docs/INSTALL.md); it is not a global router and does not replace a client's native WebSocket stack.
+
+### Connect Google Antigravity
+
+HELIX integrates natively into Google Antigravity as both a plugin and an MCP server:
+
+```sh
+# 1. Symlink CLI to Antigravity binary directory
+ln -sf "$PWD/bin/helix.mjs" ~/.gemini/antigravity/bin/helix
+
+# 2. Check engine daemon status
+helix status
+
+# 3. Start background engine daemon if stopped
+helix start
+```
+
+Antigravity automatically discovers HELIX tools (`goal`, `context`, `memory`) via `~/.gemini/antigravity/mcp/helix/` and activates the `/helixcontext` skill from `~/.gemini/config/plugins/helix/`.
 
 ## See what the engine is doing
 

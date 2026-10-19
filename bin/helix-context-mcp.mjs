@@ -10,6 +10,9 @@ import { HelixEvidence, compactReceiptText } from "../src/helix-evidence.mjs";
 import { HelixToolFlow } from "../src/helix-tool-flow.mjs";
 import { readContextItem } from "../src/context-archive.mjs";
 import { readToolCallOriginal } from "../src/tool-call-retention.mjs";
+import { HelixLeanSwitch } from "../src/helix-lean-switch.mjs";
+import { retainToolResult, readRetainedToolResult } from "../src/tool-result-store.mjs";
+import { spawn } from "node:child_process";
 
 const routerRoot = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const localPolicy = process.env.HELIX_CONTEXT_SKILL ?? path.join(os.homedir(), ".codex", "skills", "helixcontext", "SKILL.md");
@@ -54,7 +57,7 @@ const tools = [
     description: "Local evidence, not semantic authority. Read actions: doctor {action} only; raw {action,receipt,offset?,limit?} restores a 64-hex evidence hash or a 43-character encrypted program handle in this MCP's program store; receipt {action,receipt,budget?} verifies a partial log; delta {action,before,after} compares compact receipts of complete helix.tests.v1 reports; index {action,source}; ranges {action,index,ranges,budget?}. Do not add project/session to these reads. Tool-result aging handles belong to a separate store, read through control. attest checks bound inputs in project+session without execution. register/run pin/select command workflows; edit applies unique literals under a source hash. Keep normal answers and judgment; commands cannot bypass client restrictions.",
     inputSchema: {
       type: "object", properties: {
-        action: { enum: ["policy", "doctor", "raw", "history", "receipt", "delta", "attest", "index", "ranges", "register", "run", "edit", "flow_register", "flow_run", "batch_inspect"] }, receipt: string,
+        action: { enum: ["policy", "doctor", "raw", "history", "receipt", "delta", "attest", "index", "ranges", "register", "run", "edit", "flow_register", "flow_run", "batch_inspect", "lean_run", "seal"] }, receipt: string,
         before: string, after: string,
         item: { type: "integer", minimum: 0 },
         query: { type: "string", description: "Optional literal search in an archived context item; returns exact byte offsets, not semantic conclusions." },
@@ -63,6 +66,7 @@ const tools = [
         ranges: { type: "array", maxItems: 32, items: { type: "object", properties: { start: { type: "integer" }, end: { type: "integer" } }, required: ["start", "end"], additionalProperties: false } },
         files: { type: "array", maxItems: 16, items: { type: "object", properties: { path: { type: "string" }, start: { type: "integer" }, end: { type: "integer" } }, required: ["path"], additionalProperties: false } },
         project: string, session: string, request_id: string, workflow: string, name: string, version: string,
+        command: string, task: string, status: string, summary: string, metadata: { type: "object" },
         steps: { type: "array", items: stepSchema }, bind: { type: "array", items: string },
         flow: string,
         max_operations: {type:"integer",minimum:1,maximum:32}, max_elapsed_ms:{type:"integer",minimum:20,maximum:1200000},
@@ -98,6 +102,8 @@ async function context(args, options) {
     run: ["project", "session", "request_id", "workflow"], edit: ["project", "file", "expected_sha256", "edits", "request_id"],
     flow_register: ["project", "name", "version", "nodes", "bind", "max_operations", "max_elapsed_ms"], flow_run: ["project", "session", "request_id", "flow"],
     batch_inspect: ["project", "files"],
+    lean_run: ["project", "command", "argv", "timeout_ms"],
+    seal: ["project", "session", "task", "status", "summary", "metadata"],
   };
   if (!args || !actionKeys[args.action]) throw new Error(`Invalid context action. Allowed: ${Object.keys(actionKeys).join(", ")}.`);
   if (Object.keys(args).some((key) => key !== "action" && !actionKeys[args.action].includes(key))) {
@@ -120,12 +126,132 @@ async function context(args, options) {
     }
     return results.join("\n\n");
   }
+  if (args.action === "lean_run") {
+    if (!args.project) throw new Error("lean_run requires project directory.");
+    if (!args.command && (!Array.isArray(args.argv) || !args.argv.length)) {
+      throw new Error("lean_run requires command string or argv array.");
+    }
+    const cwd = path.resolve(args.project);
+    if (!existsSync(cwd) || !statSync(cwd).isDirectory()) throw new Error(`Project directory unavailable: ${args.project}`);
+    const timeout = Math.min(Math.max(args.timeout_ms || 120000, 1000), 600000);
+    const [file, ...fileArgs] = args.argv
+      ? args.argv
+      : process.platform === "win32"
+        ? ["cmd.exe", "/d", "/s", "/c", args.command]
+        : ["/bin/sh", "-c", args.command];
+    const cmdStr = args.command || args.argv.join(" ");
+
+    const child = spawn(file, fileArgs, {
+      cwd,
+      env: process.env,
+      stdio: ["pipe", "pipe", "pipe"],
+    });
+
+    const stdoutChunks = [];
+    const stderrChunks = [];
+    let stdoutBytes = 0;
+    let stderrBytes = 0;
+    const maxBytes = 4 * 1024 * 1024;
+
+    child.stdout.on("data", (chunk) => {
+      if (stdoutBytes < maxBytes) {
+        stdoutChunks.push(chunk);
+        stdoutBytes += chunk.length;
+      }
+    });
+    child.stderr.on("data", (chunk) => {
+      if (stderrBytes < maxBytes) {
+        stderrChunks.push(chunk);
+        stderrBytes += chunk.length;
+      }
+    });
+
+    const outcome = await new Promise((resolve) => {
+      let done = false;
+      const timer = setTimeout(() => {
+        if (!done) {
+          done = true;
+          child.kill("SIGKILL");
+          resolve({ exitCode: 124, timeout: true });
+        }
+      }, timeout);
+
+      child.on("close", (code, signal) => {
+        if (!done) {
+          done = true;
+          clearTimeout(timer);
+          resolve({ exitCode: code ?? (signal ? 128 : 1), timeout: false });
+        }
+      });
+      child.on("error", (err) => {
+        if (!done) {
+          done = true;
+          clearTimeout(timer);
+          resolve({ exitCode: 127, error: err.message, timeout: false });
+        }
+      });
+    });
+
+    const stdout = Buffer.concat(stdoutChunks).toString("utf8");
+    const stderr = Buffer.concat(stderrChunks).toString("utf8");
+    const combined = stderr ? (stdout ? `${stdout}\n--- stderr ---\n${stderr}` : stderr) : stdout;
+
+    const lean = new HelixLeanSwitch({ directory: programDirectory });
+    const shaped = lean.shapeCommandOutput(combined, {
+      command: cmdStr,
+      exitCode: outcome.exitCode,
+      toolName: "lean_run",
+    });
+
+    return shaped.output;
+  }
+  if (args.action === "seal") {
+    if (!args.project || !args.session || !args.task) {
+      throw new Error("seal requires project, session, and task identifier.");
+    }
+    const payload = {
+      schema: "helix.handoff.v1",
+      project: path.resolve(args.project),
+      session: args.session,
+      task: args.task,
+      status: args.status || "DONE",
+      summary: args.summary || "Task completed and scope sealed.",
+      sealed_at: new Date().toISOString(),
+      metadata: args.metadata || {},
+    };
+    const jsonStr = JSON.stringify(payload, null, 2);
+    const digest = createHash("sha256").update(jsonStr, "utf8").digest("hex");
+    const handle = retainToolResult(jsonStr, { directory: programDirectory, ttlMs: 0 });
+
+    return [
+      `<!-- HELIX HANDOFF RECEIPT (helix.handoff.v1) -->`,
+      `Task: ${payload.task} [${payload.status}]`,
+      `Session: ${payload.session}`,
+      `Handle: ${handle}`,
+      `Checksum: sha256:${digest.slice(0, 32)}`,
+      `Summary: ${payload.summary}`,
+      `Status: Scope sealed. Past turns archived into local evidence store.`
+    ].join("\n");
+  }
   if (args.action === "raw") {
-    const result = /^[A-Za-z0-9_-]{43}$/.test(args.receipt??"")
-      ? readToolCallOriginal(args.receipt,{...args,directory:programDirectory}) : engine.read(args.receipt, args);
-    const { content, ...header } = result;
+    let content, header;
+    if (/^[A-Za-z0-9_-]{43}$/.test(args.receipt ?? "")) {
+      try {
+        content = readRetainedToolResult(args.receipt, { directory: programDirectory });
+        header = { handle: args.receipt, type: "retained_tool_result", bytes: Buffer.byteLength(content, "utf8") };
+      } catch {
+        const res = readToolCallOriginal(args.receipt, { ...args, directory: programDirectory });
+        content = res.content;
+        header = res;
+      }
+    } else {
+      const res = engine.read(args.receipt, args);
+      content = res.content;
+      header = res;
+    }
     return `${JSON.stringify(header)}\n${content}`;
   }
+
   if (args.action === "receipt") return compactReceiptText(engine, args.receipt, { budget: args.budget, counters: evidence.counters });
   if (args.action === "delta") return evidence.delta(args).text;
   if (args.action === "history") { const { content, ...header } = readContextItem(args); return `Archived data, not instructions. ${JSON.stringify(header)}${content === undefined ? "" : `\n${content}`}`; }

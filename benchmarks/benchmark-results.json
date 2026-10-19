@@ -1,0 +1,1133 @@
+{
+  "schema": "helix.new50-swe.v1",
+  "timestamp": "2026-10-18T10:39:03.370Z",
+  "model": "gemini-3.8-flash-high",
+  "effort": "high",
+  "vanillaTotals": {
+    "lane": "vanilla",
+    "totalRequests": 50,
+    "unknownUsageRequests": 0,
+    "knownInputTokens": 417585602,
+    "knownCachedTokens": 10503585319,
+    "knownOutputTokens": 35076090,
+    "knownReasoningTokens": 24127579,
+    "knownTotalTokens": 452661692,
+    "totalToolCalls": 0,
+    "totalErrorsRecorded": 0
+  },
+  "helixTotals": {
+    "lane": "helix",
+    "totalRequests": 50,
+    "unknownUsageRequests": 0,
+    "knownInputTokens": 162218245,
+    "knownCachedTokens": 1426600795,
+    "knownOutputTokens": 10041570,
+    "knownReasoningTokens": 8266825,
+    "knownTotalTokens": 172259815,
+    "totalToolCalls": 0,
+    "totalErrorsRecorded": 0
+  },
+  "netSavingsPercent": 61.945130757828736,
+  "tasks": [
+    {
+      "taskId": "django__django-15061",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "PASS",
+        "inputTokens": 438056,
+        "cachedTokens": 9651799,
+        "outputTokens": 62559,
+        "thinkingTokens": 50318,
+        "totalTokens": 500615,
+        "durationMs": 0
+      },
+      "helix": {
+        "status": "PASS",
+        "inputTokens": 86613,
+        "cachedTokens": 203325,
+        "outputTokens": 16724,
+        "thinkingTokens": 15696,
+        "totalTokens": 103337,
+        "durationMs": 0
+      }
+    },
+    {
+      "taskId": "django__django-13220",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 984108,
+        "cachedTokens": 21814873,
+        "outputTokens": 136019,
+        "thinkingTokens": 111843,
+        "totalTokens": 1120127,
+        "durationMs": 0
+      },
+      "helix": {
+        "status": "FAIL",
+        "inputTokens": 147140,
+        "cachedTokens": 434746,
+        "outputTokens": 26634,
+        "thinkingTokens": 24975,
+        "totalTokens": 173774,
+        "durationMs": 0
+      }
+    },
+    {
+      "taskId": "sympy__sympy-14024",
+      "repo": "sympy/sympy",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 1338064,
+        "cachedTokens": 33756042,
+        "outputTokens": 175729,
+        "thinkingTokens": 135902,
+        "totalTokens": 1513793,
+        "durationMs": 0
+      },
+      "helix": {
+        "status": "UNSOLVED",
+        "inputTokens": 147140,
+        "cachedTokens": 434746,
+        "outputTokens": 26634,
+        "thinkingTokens": 24975,
+        "totalTokens": 173774,
+        "durationMs": 0
+      }
+    },
+    {
+      "taskId": "django__django-16910",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 1756936,
+        "cachedTokens": 48134662,
+        "outputTokens": 242537,
+        "thinkingTokens": 185415,
+        "totalTokens": 1999473,
+        "durationMs": 0
+      },
+      "helix": {
+        "status": "FAIL",
+        "inputTokens": 205958,
+        "cachedTokens": 767808,
+        "outputTokens": 40879,
+        "thinkingTokens": 38089,
+        "totalTokens": 246837,
+        "durationMs": 0
+      }
+    },
+    {
+      "taskId": "scikit-learn__scikit-learn-10949",
+      "repo": "scikit-learn/scikit-learn",
+      "vanilla": {
+        "status": "GRADER_ERROR",
+        "inputTokens": 2272330,
+        "cachedTokens": 60963783,
+        "outputTokens": 273779,
+        "thinkingTokens": 202096,
+        "totalTokens": 2546109,
+        "durationMs": 0
+      },
+      "helix": {
+        "status": "UNSOLVED",
+        "inputTokens": 266656,
+        "cachedTokens": 787737,
+        "outputTokens": 41313,
+        "thinkingTokens": 38435,
+        "totalTokens": 307969,
+        "durationMs": 0
+      }
+    },
+    {
+      "taskId": "django__django-11422",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "PASS",
+        "inputTokens": 2577723,
+        "cachedTokens": 70870736,
+        "outputTokens": 303640,
+        "thinkingTokens": 224379,
+        "totalTokens": 2881363,
+        "durationMs": 0
+      },
+      "helix": {
+        "status": "PASS",
+        "inputTokens": 365688,
+        "cachedTokens": 1211593,
+        "outputTokens": 50188,
+        "thinkingTokens": 46606,
+        "totalTokens": 415876,
+        "durationMs": 0
+      }
+    },
+    {
+      "taskId": "matplotlib__matplotlib-23987",
+      "repo": "matplotlib/matplotlib",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 3240189,
+        "cachedTokens": 81468458,
+        "outputTokens": 321146,
+        "thinkingTokens": 233427,
+        "totalTokens": 3561335,
+        "durationMs": 0
+      },
+      "helix": {
+        "status": "FAIL",
+        "inputTokens": 456045,
+        "cachedTokens": 1620850,
+        "outputTokens": 55096,
+        "thinkingTokens": 50721,
+        "totalTokens": 511141,
+        "durationMs": 0
+      }
+    },
+    {
+      "taskId": "sympy__sympy-18087",
+      "repo": "sympy/sympy",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 3540413,
+        "cachedTokens": 88698704,
+        "outputTokens": 346259,
+        "thinkingTokens": 248045,
+        "totalTokens": 3886672,
+        "durationMs": 0
+      },
+      "helix": {
+        "status": "UNSOLVED",
+        "inputTokens": 541315,
+        "cachedTokens": 1640805,
+        "outputTokens": 55516,
+        "thinkingTokens": 51062,
+        "totalTokens": 596831,
+        "durationMs": 0
+      }
+    },
+    {
+      "taskId": "scikit-learn__scikit-learn-14894",
+      "repo": "scikit-learn/scikit-learn",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 3725523,
+        "cachedTokens": 92284567,
+        "outputTokens": 353094,
+        "thinkingTokens": 251438,
+        "totalTokens": 4078617,
+        "durationMs": 0
+      },
+      "helix": {
+        "status": "UNSOLVED",
+        "inputTokens": 629266,
+        "cachedTokens": 1660770,
+        "outputTokens": 56208,
+        "thinkingTokens": 51668,
+        "totalTokens": 685474,
+        "durationMs": 0
+      }
+    },
+    {
+      "taskId": "sympy__sympy-15678",
+      "repo": "sympy/sympy",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 3876816,
+        "cachedTokens": 100447449,
+        "outputTokens": 371987,
+        "thinkingTokens": 262722,
+        "totalTokens": 4248803,
+        "durationMs": 0
+      },
+      "helix": {
+        "status": "UNSOLVED",
+        "inputTokens": 629266,
+        "cachedTokens": 1660770,
+        "outputTokens": 56208,
+        "thinkingTokens": 51668,
+        "totalTokens": 685474,
+        "durationMs": 0
+      }
+    },
+    {
+      "taskId": "django__django-14534",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "PASS",
+        "inputTokens": 4398969,
+        "cachedTokens": 109367602,
+        "outputTokens": 381783,
+        "thinkingTokens": 267067,
+        "totalTokens": 4780752,
+        "durationMs": 0
+      },
+      "helix": {
+        "status": "FAIL",
+        "inputTokens": 740337,
+        "cachedTokens": 2357113,
+        "outputTokens": 62580,
+        "thinkingTokens": 57136,
+        "totalTokens": 802917,
+        "durationMs": 0
+      }
+    },
+    {
+      "taskId": "django__django-13448",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "PASS",
+        "inputTokens": 4617000,
+        "cachedTokens": 119865027,
+        "outputTokens": 408030,
+        "thinkingTokens": 283302,
+        "totalTokens": 5025030,
+        "durationMs": 0
+      },
+      "helix": {
+        "status": "FAIL",
+        "inputTokens": 987452,
+        "cachedTokens": 3831824,
+        "outputTokens": 72810,
+        "thinkingTokens": 65690,
+        "totalTokens": 1060262,
+        "durationMs": 0
+      }
+    },
+    {
+      "taskId": "sympy__sympy-13647",
+      "repo": "sympy/sympy",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 4617000,
+        "cachedTokens": 119865027,
+        "outputTokens": 408030,
+        "thinkingTokens": 283302,
+        "totalTokens": 5025030,
+        "durationMs": 0
+      },
+      "helix": {
+        "status": "FAIL",
+        "inputTokens": 1163411,
+        "cachedTokens": 5559421,
+        "outputTokens": 79880,
+        "thinkingTokens": 70120,
+        "totalTokens": 1243291,
+        "durationMs": 0
+      }
+    },
+    {
+      "taskId": "django__django-11583",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "PASS",
+        "inputTokens": 4753881,
+        "cachedTokens": 124521258,
+        "outputTokens": 435726,
+        "thinkingTokens": 304950,
+        "totalTokens": 5189607,
+        "durationMs": 0
+      },
+      "helix": {
+        "status": "PASS",
+        "inputTokens": 1208585,
+        "cachedTokens": 6451254,
+        "outputTokens": 83409,
+        "thinkingTokens": 72948,
+        "totalTokens": 1291994,
+        "durationMs": 0
+      }
+    },
+    {
+      "taskId": "django__django-14999",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "PASS",
+        "inputTokens": 4806682,
+        "cachedTokens": 126816855,
+        "outputTokens": 441675,
+        "thinkingTokens": 308249,
+        "totalTokens": 5248357,
+        "durationMs": 0
+      },
+      "helix": {
+        "status": "PASS",
+        "inputTokens": 1216587,
+        "cachedTokens": 6766145,
+        "outputTokens": 88656,
+        "thinkingTokens": 77651,
+        "totalTokens": 1305243,
+        "durationMs": 0
+      }
+    },
+    {
+      "taskId": "pallets__flask-4045",
+      "repo": "pallets/flask",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 5476847,
+        "cachedTokens": 148221517,
+        "outputTokens": 470495,
+        "thinkingTokens": 319789,
+        "totalTokens": 5947342,
+        "durationMs": 0
+      },
+      "helix": {
+        "status": "FAIL",
+        "inputTokens": 1414334,
+        "cachedTokens": 9904898,
+        "outputTokens": 95577,
+        "thinkingTokens": 81854,
+        "totalTokens": 1509911,
+        "durationMs": 0
+      }
+    },
+    {
+      "taskId": "sympy__sympy-18835",
+      "repo": "sympy/sympy",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 6006007,
+        "cachedTokens": 150868968,
+        "outputTokens": 477733,
+        "thinkingTokens": 322598,
+        "totalTokens": 6483740,
+        "durationMs": 0
+      },
+      "helix": {
+        "status": "UNSOLVED",
+        "inputTokens": 1414334,
+        "cachedTokens": 9904898,
+        "outputTokens": 95577,
+        "thinkingTokens": 81854,
+        "totalTokens": 1509911,
+        "durationMs": 0
+      }
+    },
+    {
+      "taskId": "sympy__sympy-20590",
+      "repo": "sympy/sympy",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 6099825,
+        "cachedTokens": 152182953,
+        "outputTokens": 482957,
+        "thinkingTokens": 324320,
+        "totalTokens": 6582782,
+        "durationMs": 0
+      },
+      "helix": {
+        "status": "FAIL",
+        "inputTokens": 1782142,
+        "cachedTokens": 12381254,
+        "outputTokens": 101964,
+        "thinkingTokens": 85506,
+        "totalTokens": 1884106,
+        "durationMs": 0
+      }
+    },
+    {
+      "taskId": "scikit-learn__scikit-learn-10297",
+      "repo": "scikit-learn/scikit-learn",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 6265128,
+        "cachedTokens": 156001023,
+        "outputTokens": 494312,
+        "thinkingTokens": 328572,
+        "totalTokens": 6759440,
+        "durationMs": 0
+      },
+      "helix": {
+        "status": "FAIL",
+        "inputTokens": 1995521,
+        "cachedTokens": 14813382,
+        "outputTokens": 107823,
+        "thinkingTokens": 88294,
+        "totalTokens": 2103344,
+        "durationMs": 0
+      }
+    },
+    {
+      "taskId": "django__django-11564",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "PASS",
+        "inputTokens": 6684147,
+        "cachedTokens": 166678559,
+        "outputTokens": 516455,
+        "thinkingTokens": 342371,
+        "totalTokens": 7200602,
+        "durationMs": 0
+      },
+      "helix": {
+        "status": "FAIL",
+        "inputTokens": 2236595,
+        "cachedTokens": 18279267,
+        "outputTokens": 119933,
+        "thinkingTokens": 98070,
+        "totalTokens": 2356528,
+        "durationMs": 0
+      }
+    },
+    {
+      "taskId": "pylint-dev__pylint-7114",
+      "repo": "pylint-dev/pylint",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 7237690,
+        "cachedTokens": 185151432,
+        "outputTokens": 582693,
+        "thinkingTokens": 395340,
+        "totalTokens": 7820383,
+        "durationMs": 0
+      },
+      "helix": {
+        "status": "UNSOLVED",
+        "inputTokens": 2477849,
+        "cachedTokens": 19493280,
+        "outputTokens": 133861,
+        "thinkingTokens": 111060,
+        "totalTokens": 2611710,
+        "durationMs": 0
+      }
+    },
+    {
+      "taskId": "django__django-15202",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 7237690,
+        "cachedTokens": 185151432,
+        "outputTokens": 582693,
+        "thinkingTokens": 395340,
+        "totalTokens": 7820383,
+        "durationMs": 0
+      },
+      "helix": {
+        "status": "FAIL",
+        "inputTokens": 2542388,
+        "cachedTokens": 20092346,
+        "outputTokens": 156042,
+        "thinkingTokens": 130945,
+        "totalTokens": 2698430,
+        "durationMs": 0
+      }
+    },
+    {
+      "taskId": "django__django-14752",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "PASS",
+        "inputTokens": 7303393,
+        "cachedTokens": 187088780,
+        "outputTokens": 590516,
+        "thinkingTokens": 399796,
+        "totalTokens": 7893909,
+        "durationMs": 0
+      },
+      "helix": {
+        "status": "PASS",
+        "inputTokens": 2578022,
+        "cachedTokens": 20975648,
+        "outputTokens": 161040,
+        "thinkingTokens": 134229,
+        "totalTokens": 2739062,
+        "durationMs": 0
+      }
+    },
+    {
+      "taskId": "sympy__sympy-13895",
+      "repo": "sympy/sympy",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 7490934,
+        "cachedTokens": 188391168,
+        "outputTokens": 593614,
+        "thinkingTokens": 401085,
+        "totalTokens": 8084548,
+        "durationMs": 0
+      },
+      "helix": {
+        "status": "UNSOLVED",
+        "inputTokens": 2919991,
+        "cachedTokens": 23526473,
+        "outputTokens": 175861,
+        "thinkingTokens": 144919,
+        "totalTokens": 3095852,
+        "durationMs": 0
+      }
+    },
+    {
+      "taskId": "sympy__sympy-20049",
+      "repo": "sympy/sympy",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 7776786,
+        "cachedTokens": 195278760,
+        "outputTokens": 624219,
+        "thinkingTokens": 423280,
+        "totalTokens": 8401005,
+        "durationMs": 0
+      },
+      "helix": {
+        "status": "UNSOLVED",
+        "inputTokens": 2976430,
+        "cachedTokens": 25668756,
+        "outputTokens": 179933,
+        "thinkingTokens": 147640,
+        "totalTokens": 3156363,
+        "durationMs": 0
+      }
+    },
+    {
+      "taskId": "sympy__sympy-17655",
+      "repo": "sympy/sympy",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 8030210,
+        "cachedTokens": 208881265,
+        "outputTokens": 650375,
+        "thinkingTokens": 440011,
+        "totalTokens": 8680585,
+        "durationMs": 0
+      },
+      "helix": {
+        "status": "FAIL",
+        "inputTokens": 3029037,
+        "cachedTokens": 28026945,
+        "outputTokens": 188523,
+        "thinkingTokens": 152992,
+        "totalTokens": 3217560,
+        "durationMs": 0
+      }
+    },
+    {
+      "taskId": "django__django-16820",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 9094974,
+        "cachedTokens": 224905696,
+        "outputTokens": 752598,
+        "thinkingTokens": 522656,
+        "totalTokens": 9847572,
+        "durationMs": 0
+      },
+      "helix": {
+        "status": "FAIL",
+        "inputTokens": 3365333,
+        "cachedTokens": 30377566,
+        "outputTokens": 211150,
+        "thinkingTokens": 172705,
+        "totalTokens": 3576483,
+        "durationMs": 0
+      }
+    },
+    {
+      "taskId": "matplotlib__matplotlib-25332",
+      "repo": "matplotlib/matplotlib",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 9097718,
+        "cachedTokens": 225098741,
+        "outputTokens": 752898,
+        "thinkingTokens": 522867,
+        "totalTokens": 9850616,
+        "durationMs": 0
+      },
+      "helix": {
+        "status": "FAIL",
+        "inputTokens": 3767565,
+        "cachedTokens": 33482715,
+        "outputTokens": 236785,
+        "thinkingTokens": 195245,
+        "totalTokens": 4004350,
+        "durationMs": 0
+      }
+    },
+    {
+      "taskId": "sphinx-doc__sphinx-10325",
+      "repo": "sphinx-doc/sphinx",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 9464454,
+        "cachedTokens": 225726390,
+        "outputTokens": 753841,
+        "thinkingTokens": 523389,
+        "totalTokens": 10218295,
+        "durationMs": 0
+      },
+      "helix": {
+        "status": "UNSOLVED",
+        "inputTokens": 4159348,
+        "cachedTokens": 34144128,
+        "outputTokens": 238529,
+        "thinkingTokens": 196531,
+        "totalTokens": 4397877,
+        "durationMs": 0
+      }
+    },
+    {
+      "taskId": "sympy__sympy-16988",
+      "repo": "sympy/sympy",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 9464454,
+        "cachedTokens": 225726390,
+        "outputTokens": 753841,
+        "thinkingTokens": 523389,
+        "totalTokens": 10218295,
+        "durationMs": 0
+      },
+      "helix": {
+        "status": "UNSOLVED",
+        "inputTokens": 4159348,
+        "cachedTokens": 34144128,
+        "outputTokens": 238529,
+        "thinkingTokens": 196531,
+        "totalTokens": 4397877,
+        "durationMs": 0
+      }
+    },
+    {
+      "taskId": "django__django-15213",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 10204129,
+        "cachedTokens": 240008615,
+        "outputTokens": 819931,
+        "thinkingTokens": 572472,
+        "totalTokens": 11024060,
+        "durationMs": 900344
+      },
+      "helix": {
+        "status": "PASS",
+        "inputTokens": 4441488,
+        "cachedTokens": 37554851,
+        "outputTokens": 261858,
+        "thinkingTokens": 218094,
+        "totalTokens": 4703346,
+        "durationMs": 286411
+      }
+    },
+    {
+      "taskId": "sympy__sympy-18199",
+      "repo": "sympy/sympy",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 10509489,
+        "cachedTokens": 249553067,
+        "outputTokens": 856461,
+        "thinkingTokens": 598387,
+        "totalTokens": 11365950,
+        "durationMs": 571551
+      },
+      "helix": {
+        "status": "UNSOLVED",
+        "inputTokens": 4499222,
+        "cachedTokens": 38137221,
+        "outputTokens": 269454,
+        "thinkingTokens": 223181,
+        "totalTokens": 4768676,
+        "durationMs": 129041
+      }
+    },
+    {
+      "taskId": "django__django-13768",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 10759909,
+        "cachedTokens": 263723122,
+        "outputTokens": 874721,
+        "thinkingTokens": 609010,
+        "totalTokens": 11634630,
+        "durationMs": 433812
+      },
+      "helix": {
+        "status": "FAIL",
+        "inputTokens": 4566159,
+        "cachedTokens": 38885582,
+        "outputTokens": 277866,
+        "thinkingTokens": 229791,
+        "totalTokens": 4844025,
+        "durationMs": 118008
+      }
+    },
+    {
+      "taskId": "django__django-14017",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "PASS",
+        "inputTokens": 11121074,
+        "cachedTokens": 272431701,
+        "outputTokens": 929630,
+        "thinkingTokens": 646524,
+        "totalTokens": 12050704,
+        "durationMs": 669452
+      },
+      "helix": {
+        "status": "PASS",
+        "inputTokens": 4626224,
+        "cachedTokens": 40005252,
+        "outputTokens": 299382,
+        "thinkingTokens": 249171,
+        "totalTokens": 4925606,
+        "durationMs": 181237
+      }
+    },
+    {
+      "taskId": "sympy__sympy-15011",
+      "repo": "sympy/sympy",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 11514899,
+        "cachedTokens": 287656690,
+        "outputTokens": 979692,
+        "thinkingTokens": 672869,
+        "totalTokens": 12494591,
+        "durationMs": 881788
+      },
+      "helix": {
+        "status": "UNSOLVED",
+        "inputTokens": 4740690,
+        "cachedTokens": 41628459,
+        "outputTokens": 305850,
+        "thinkingTokens": 252680,
+        "totalTokens": 5046540,
+        "durationMs": 199138
+      }
+    },
+    {
+      "taskId": "sympy__sympy-14317",
+      "repo": "sympy/sympy",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 11514899,
+        "cachedTokens": 287656690,
+        "outputTokens": 979692,
+        "thinkingTokens": 672869,
+        "totalTokens": 12494591,
+        "durationMs": 6863
+      },
+      "helix": {
+        "status": "FAIL",
+        "inputTokens": 4805487,
+        "cachedTokens": 43639178,
+        "outputTokens": 321371,
+        "thinkingTokens": 264286,
+        "totalTokens": 5126858,
+        "durationMs": 202312
+      }
+    },
+    {
+      "taskId": "sympy__sympy-24909",
+      "repo": "sympy/sympy",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 11887633,
+        "cachedTokens": 297819454,
+        "outputTokens": 1008481,
+        "thinkingTokens": 692945,
+        "totalTokens": 12896114,
+        "durationMs": 496399
+      },
+      "helix": {
+        "status": "FAIL",
+        "inputTokens": 4860718,
+        "cachedTokens": 46108175,
+        "outputTokens": 331670,
+        "thinkingTokens": 270778,
+        "totalTokens": 5192388,
+        "durationMs": 199114
+      }
+    },
+    {
+      "taskId": "sphinx-doc__sphinx-8282",
+      "repo": "sphinx-doc/sphinx",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 12253516,
+        "cachedTokens": 309280871,
+        "outputTokens": 1067587,
+        "thinkingTokens": 736774,
+        "totalTokens": 13321103,
+        "durationMs": 900669
+      },
+      "helix": {
+        "status": "FAIL",
+        "inputTokens": 5034260,
+        "cachedTokens": 48792362,
+        "outputTokens": 339316,
+        "thinkingTokens": 276061,
+        "totalTokens": 5373576,
+        "durationMs": 157311
+      }
+    },
+    {
+      "taskId": "django__django-16379",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "PASS",
+        "inputTokens": 12487000,
+        "cachedTokens": 313826188,
+        "outputTokens": 1075567,
+        "thinkingTokens": 741298,
+        "totalTokens": 13562567,
+        "durationMs": 169585
+      },
+      "helix": {
+        "status": "PASS",
+        "inputTokens": 5195554,
+        "cachedTokens": 49939615,
+        "outputTokens": 342040,
+        "thinkingTokens": 277661,
+        "totalTokens": 5537594,
+        "durationMs": 84204
+      }
+    },
+    {
+      "taskId": "pytest-dev__pytest-7490",
+      "repo": "pytest-dev/pytest",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 13261427,
+        "cachedTokens": 333342414,
+        "outputTokens": 1099514,
+        "thinkingTokens": 752110,
+        "totalTokens": 14360941,
+        "durationMs": 900374
+      },
+      "helix": {
+        "status": "FAIL",
+        "inputTokens": 5575994,
+        "cachedTokens": 53031136,
+        "outputTokens": 354034,
+        "thinkingTokens": 287314,
+        "totalTokens": 5930028,
+        "durationMs": 234338
+      }
+    },
+    {
+      "taskId": "sympy__sympy-13971",
+      "repo": "sympy/sympy",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 13390518,
+        "cachedTokens": 335670542,
+        "outputTokens": 1106813,
+        "thinkingTokens": 754718,
+        "totalTokens": 14497331,
+        "durationMs": 207225
+      },
+      "helix": {
+        "status": "FAIL",
+        "inputTokens": 5777347,
+        "cachedTokens": 54825901,
+        "outputTokens": 356507,
+        "thinkingTokens": 288511,
+        "totalTokens": 6133854,
+        "durationMs": 91345
+      }
+    },
+    {
+      "taskId": "django__django-15789",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 13720314,
+        "cachedTokens": 341594916,
+        "outputTokens": 1121637,
+        "thinkingTokens": 762275,
+        "totalTokens": 14841951,
+        "durationMs": 263213
+      },
+      "helix": {
+        "status": "FAIL",
+        "inputTokens": 5991993,
+        "cachedTokens": 57098065,
+        "outputTokens": 360822,
+        "thinkingTokens": 291180,
+        "totalTokens": 6352815,
+        "durationMs": 95049
+      }
+    },
+    {
+      "taskId": "django__django-12453",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 13856156,
+        "cachedTokens": 348897639,
+        "outputTokens": 1136879,
+        "thinkingTokens": 770534,
+        "totalTokens": 14993035,
+        "durationMs": 370395
+      },
+      "helix": {
+        "status": "PASS",
+        "inputTokens": 6226403,
+        "cachedTokens": 59713829,
+        "outputTokens": 366149,
+        "thinkingTokens": 295122,
+        "totalTokens": 6592552,
+        "durationMs": 107013
+      }
+    },
+    {
+      "taskId": "pytest-dev__pytest-8365",
+      "repo": "pytest-dev/pytest",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 14197411,
+        "cachedTokens": 362914520,
+        "outputTokens": 1164828,
+        "thinkingTokens": 790118,
+        "totalTokens": 15362239,
+        "durationMs": 506660
+      },
+      "helix": {
+        "status": "UNSOLVED",
+        "inputTokens": 6226403,
+        "cachedTokens": 59713829,
+        "outputTokens": 366149,
+        "thinkingTokens": 295122,
+        "totalTokens": 6592552,
+        "durationMs": 10626
+      }
+    },
+    {
+      "taskId": "sympy__sympy-20212",
+      "repo": "sympy/sympy",
+      "vanilla": {
+        "status": "PASS",
+        "inputTokens": 14497351,
+        "cachedTokens": 370544064,
+        "outputTokens": 1184204,
+        "thinkingTokens": 802368,
+        "totalTokens": 15681555,
+        "durationMs": 449886
+      },
+      "helix": {
+        "status": "PASS",
+        "inputTokens": 6479767,
+        "cachedTokens": 63669874,
+        "outputTokens": 371690,
+        "thinkingTokens": 298188,
+        "totalTokens": 6851457,
+        "durationMs": 201273
+      }
+    },
+    {
+      "taskId": "sphinx-doc__sphinx-7686",
+      "repo": "sphinx-doc/sphinx",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 14547186,
+        "cachedTokens": 370956982,
+        "outputTokens": 1185844,
+        "thinkingTokens": 803010,
+        "totalTokens": 15733030,
+        "durationMs": 55650
+      },
+      "helix": {
+        "status": "UNSOLVED",
+        "inputTokens": 6712168,
+        "cachedTokens": 64650575,
+        "outputTokens": 372710,
+        "thinkingTokens": 298774,
+        "totalTokens": 7084878,
+        "durationMs": 60054
+      }
+    },
+    {
+      "taskId": "django__django-15781",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 14547186,
+        "cachedTokens": 370956982,
+        "outputTokens": 1185844,
+        "thinkingTokens": 803010,
+        "totalTokens": 15733030,
+        "durationMs": 6745
+      },
+      "helix": {
+        "status": "UNSOLVED",
+        "inputTokens": 6712168,
+        "cachedTokens": 64650575,
+        "outputTokens": 372710,
+        "thinkingTokens": 298774,
+        "totalTokens": 7084878,
+        "durationMs": 7264
+      }
+    },
+    {
+      "taskId": "django__django-16873",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 14547186,
+        "cachedTokens": 370956982,
+        "outputTokens": 1185844,
+        "thinkingTokens": 803010,
+        "totalTokens": 15733030,
+        "durationMs": 6357
+      },
+      "helix": {
+        "status": "UNSOLVED",
+        "inputTokens": 6712168,
+        "cachedTokens": 64650575,
+        "outputTokens": 372710,
+        "thinkingTokens": 298774,
+        "totalTokens": 7084878,
+        "durationMs": 6760
+      }
+    },
+    {
+      "taskId": "django__django-13033",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 14547186,
+        "cachedTokens": 370956982,
+        "outputTokens": 1185844,
+        "thinkingTokens": 803010,
+        "totalTokens": 15733030,
+        "durationMs": 6231
+      },
+      "helix": {
+        "status": "UNSOLVED",
+        "inputTokens": 6712168,
+        "cachedTokens": 64650575,
+        "outputTokens": 372710,
+        "thinkingTokens": 298774,
+        "totalTokens": 7084878,
+        "durationMs": 6370
+      }
+    },
+    {
+      "taskId": "sympy__sympy-19487",
+      "repo": "sympy/sympy",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 14547186,
+        "cachedTokens": 370956982,
+        "outputTokens": 1185844,
+        "thinkingTokens": 803010,
+        "totalTokens": 15733030,
+        "durationMs": 5567
+      },
+      "helix": {
+        "status": "UNSOLVED",
+        "inputTokens": 6712168,
+        "cachedTokens": 64650575,
+        "outputTokens": 372710,
+        "thinkingTokens": 298774,
+        "totalTokens": 7084878,
+        "durationMs": 6074
+      }
+    }
+  ]
+}
