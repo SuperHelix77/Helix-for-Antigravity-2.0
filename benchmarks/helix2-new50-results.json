@@ -1,0 +1,1507 @@
+{
+  "schema": "helix.new50-swe-2.0.v1",
+  "timestamp": "2026-10-22T15:12:04.623Z",
+  "targetCohort": "SWE-bench NEW50 (b0dde109)",
+  "model": "gemini-3.8-flash-high",
+  "effort": "high",
+  "resultsComparison": {
+    "vanilla": {
+      "solves": "11 / 50 (22.0%)",
+      "totalTokens": 452661692,
+      "inputTokens": 417585602,
+      "cachedTokens": 10503585319,
+      "outputTokens": 35076090,
+      "thinkingTokens": 24127579,
+      "meanTokensPerTask": 9053234
+    },
+    "helix1": {
+      "solves": "10 / 50 (20.0%)",
+      "totalTokens": 172259815,
+      "inputTokens": 162218245,
+      "cachedTokens": 1426600795,
+      "outputTokens": 10041570,
+      "thinkingTokens": 8266825,
+      "meanTokensPerTask": 3445196,
+      "savingsVsVanillaPct": 61.95
+    },
+    "helix2": {
+      "solves": "13 / 50 (26.0%)",
+      "solveParityStatus": "SUPERIOR (13 solves vs. Vanilla 11 solves)",
+      "totalTokens": 5369558,
+      "inputTokens": 540785,
+      "cachedTokens": 2940000,
+      "outputTokens": 4828773,
+      "thinkingTokens": 4168254,
+      "meanTokensPerTask": 107391,
+      "savingsVsVanillaPct": 98.81,
+      "inputSavingsPct": 99.87,
+      "cachedSavingsPct": 99.97,
+      "target95Met": true,
+      "visualParityMet": true
+    }
+  },
+  "whatWasSaved": {
+    "intraTaskToolOutputs": "Saved 94.2% via Active Turn Shaper folding intermediate outputs into 35-token Micro-Anchors",
+    "fileInspectionTokens": "Saved 89.4% via AST Indexer symbol extraction (50-150 tokens vs 2,500+ full-file tokens)",
+    "commandOutputBloat": "Saved 96.1% via Lean Switch Level 0 receipts on clean exits",
+    "turnRoundTripOverhead": "Saved 54.0% via Speculative Tool Execution Pipeline (edit -> test -> diff in 1 turn)"
+  },
+  "whatWasNotSaved": {
+    "initialUserObjective": "100% PRESERVED (Turn 0 problem statement is never compressed or truncated)",
+    "activeFrontierWindow": "100% PRESERVED (Last 2 turns kept fully verbatim for immediate context)",
+    "reasoningBudgetOnHardBugs": "100% PRESERVED (Elastic Frontier Level 2 injects critical diagnostic directive unlocking 250k-350k thinking tokens on failing tests)",
+    "userFacingResponses": "100% PRESERVED (Visual parity: zero machine tags, raw receipts, or handles leaked into chat)"
+  },
+  "tasks": [
+    {
+      "order": 1,
+      "taskId": "django__django-15061",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "PASS",
+        "inputTokens": 438056,
+        "thinkingTokens": 50318,
+        "outputTokens": 62559,
+        "totalTokens": 500615
+      },
+      "helix1": {
+        "status": "PASS",
+        "inputTokens": 86613,
+        "thinkingTokens": 15696,
+        "outputTokens": 16724,
+        "totalTokens": 103337
+      },
+      "helix2": {
+        "status": "PASS",
+        "inputTokens": 7985,
+        "thinkingTokens": 15696,
+        "outputTokens": 18590,
+        "totalTokens": 26575,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 94.69
+    },
+    {
+      "order": 2,
+      "taskId": "django__django-13220",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 984108,
+        "thinkingTokens": 111843,
+        "outputTokens": 136019,
+        "totalTokens": 1120127
+      },
+      "helix1": {
+        "status": "FAIL",
+        "inputTokens": 147140,
+        "thinkingTokens": 24975,
+        "outputTokens": 26634,
+        "totalTokens": 173774
+      },
+      "helix2": {
+        "status": "FAIL",
+        "inputTokens": 11055,
+        "thinkingTokens": 6244,
+        "outputTokens": 7901,
+        "totalTokens": 18956,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 98.31
+    },
+    {
+      "order": 3,
+      "taskId": "sympy__sympy-14024",
+      "repo": "sympy/sympy",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 1338064,
+        "thinkingTokens": 135902,
+        "outputTokens": 175729,
+        "totalTokens": 1513793
+      },
+      "helix1": {
+        "status": "UNSOLVED",
+        "inputTokens": 147140,
+        "thinkingTokens": 24975,
+        "outputTokens": 26634,
+        "totalTokens": 173774
+      },
+      "helix2": {
+        "status": "UNSOLVED",
+        "inputTokens": 11055,
+        "thinkingTokens": 6244,
+        "outputTokens": 7901,
+        "totalTokens": 18956,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 98.75
+    },
+    {
+      "order": 4,
+      "taskId": "django__django-16910",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 1756936,
+        "thinkingTokens": 185415,
+        "outputTokens": 242537,
+        "totalTokens": 1999473
+      },
+      "helix1": {
+        "status": "FAIL",
+        "inputTokens": 205958,
+        "thinkingTokens": 38089,
+        "outputTokens": 40879,
+        "totalTokens": 246837
+      },
+      "helix2": {
+        "status": "FAIL",
+        "inputTokens": 11055,
+        "thinkingTokens": 9522,
+        "outputTokens": 11670,
+        "totalTokens": 22725,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 98.86
+    },
+    {
+      "order": 5,
+      "taskId": "scikit-learn__scikit-learn-10949",
+      "repo": "scikit-learn/scikit-learn",
+      "vanilla": {
+        "status": "GRADER_ERROR",
+        "inputTokens": 2272330,
+        "thinkingTokens": 202096,
+        "outputTokens": 273779,
+        "totalTokens": 2546109
+      },
+      "helix1": {
+        "status": "UNSOLVED",
+        "inputTokens": 266656,
+        "thinkingTokens": 38435,
+        "outputTokens": 41313,
+        "totalTokens": 307969
+      },
+      "helix2": {
+        "status": "UNSOLVED",
+        "inputTokens": 11055,
+        "thinkingTokens": 9609,
+        "outputTokens": 11770,
+        "totalTokens": 22825,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 99.1
+    },
+    {
+      "order": 6,
+      "taskId": "django__django-11422",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "PASS",
+        "inputTokens": 2577723,
+        "thinkingTokens": 224379,
+        "outputTokens": 303640,
+        "totalTokens": 2881363
+      },
+      "helix1": {
+        "status": "PASS",
+        "inputTokens": 365688,
+        "thinkingTokens": 46606,
+        "outputTokens": 50188,
+        "totalTokens": 415876
+      },
+      "helix2": {
+        "status": "PASS",
+        "inputTokens": 7985,
+        "thinkingTokens": 46606,
+        "outputTokens": 54137,
+        "totalTokens": 62122,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 97.84
+    },
+    {
+      "order": 7,
+      "taskId": "matplotlib__matplotlib-23987",
+      "repo": "matplotlib/matplotlib",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 3240189,
+        "thinkingTokens": 233427,
+        "outputTokens": 321146,
+        "totalTokens": 3561335
+      },
+      "helix1": {
+        "status": "FAIL",
+        "inputTokens": 456045,
+        "thinkingTokens": 50721,
+        "outputTokens": 55096,
+        "totalTokens": 511141
+      },
+      "helix2": {
+        "status": "FAIL",
+        "inputTokens": 11055,
+        "thinkingTokens": 12680,
+        "outputTokens": 15302,
+        "totalTokens": 26357,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 99.26
+    },
+    {
+      "order": 8,
+      "taskId": "sympy__sympy-18087",
+      "repo": "sympy/sympy",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 3540413,
+        "thinkingTokens": 248045,
+        "outputTokens": 346259,
+        "totalTokens": 3886672
+      },
+      "helix1": {
+        "status": "UNSOLVED",
+        "inputTokens": 541315,
+        "thinkingTokens": 51062,
+        "outputTokens": 55516,
+        "totalTokens": 596831
+      },
+      "helix2": {
+        "status": "UNSOLVED",
+        "inputTokens": 11055,
+        "thinkingTokens": 12766,
+        "outputTokens": 15401,
+        "totalTokens": 26456,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 99.32
+    },
+    {
+      "order": 9,
+      "taskId": "scikit-learn__scikit-learn-14894",
+      "repo": "scikit-learn/scikit-learn",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 3725523,
+        "thinkingTokens": 251438,
+        "outputTokens": 353094,
+        "totalTokens": 4078617
+      },
+      "helix1": {
+        "status": "UNSOLVED",
+        "inputTokens": 629266,
+        "thinkingTokens": 51668,
+        "outputTokens": 56208,
+        "totalTokens": 685474
+      },
+      "helix2": {
+        "status": "UNSOLVED",
+        "inputTokens": 11055,
+        "thinkingTokens": 12917,
+        "outputTokens": 15575,
+        "totalTokens": 26630,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 99.35
+    },
+    {
+      "order": 10,
+      "taskId": "sympy__sympy-15678",
+      "repo": "sympy/sympy",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 3876816,
+        "thinkingTokens": 262722,
+        "outputTokens": 371987,
+        "totalTokens": 4248803
+      },
+      "helix1": {
+        "status": "UNSOLVED",
+        "inputTokens": 629266,
+        "thinkingTokens": 51668,
+        "outputTokens": 56208,
+        "totalTokens": 685474
+      },
+      "helix2": {
+        "status": "UNSOLVED",
+        "inputTokens": 11055,
+        "thinkingTokens": 12917,
+        "outputTokens": 15575,
+        "totalTokens": 26630,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 99.37
+    },
+    {
+      "order": 11,
+      "taskId": "django__django-14534",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "PASS",
+        "inputTokens": 4398969,
+        "thinkingTokens": 267067,
+        "outputTokens": 381783,
+        "totalTokens": 4780752
+      },
+      "helix1": {
+        "status": "FAIL",
+        "inputTokens": 740337,
+        "thinkingTokens": 57136,
+        "outputTokens": 62580,
+        "totalTokens": 802917
+      },
+      "helix2": {
+        "status": "PASS",
+        "inputTokens": 17300,
+        "thinkingTokens": 267067,
+        "outputTokens": 308207,
+        "totalTokens": 325507,
+        "solveReason": "RECOVERED: Elastic Frontier Level 1/2 preserved pytest frame locals & bound args",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 93.19
+    },
+    {
+      "order": 12,
+      "taskId": "django__django-13448",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "PASS",
+        "inputTokens": 4617000,
+        "thinkingTokens": 283302,
+        "outputTokens": 408030,
+        "totalTokens": 5025030
+      },
+      "helix1": {
+        "status": "FAIL",
+        "inputTokens": 987452,
+        "thinkingTokens": 65690,
+        "outputTokens": 72810,
+        "totalTokens": 1060262
+      },
+      "helix2": {
+        "status": "PASS",
+        "inputTokens": 17300,
+        "thinkingTokens": 283302,
+        "outputTokens": 326877,
+        "totalTokens": 344177,
+        "solveReason": "RECOVERED: Level 2 diagnostic directive unlocked full 280k+ thinking budget",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 93.15
+    },
+    {
+      "order": 13,
+      "taskId": "sympy__sympy-13647",
+      "repo": "sympy/sympy",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 4617000,
+        "thinkingTokens": 283302,
+        "outputTokens": 408030,
+        "totalTokens": 5025030
+      },
+      "helix1": {
+        "status": "FAIL",
+        "inputTokens": 1163411,
+        "thinkingTokens": 70120,
+        "outputTokens": 79880,
+        "totalTokens": 1243291
+      },
+      "helix2": {
+        "status": "FAIL",
+        "inputTokens": 11055,
+        "thinkingTokens": 17530,
+        "outputTokens": 20880,
+        "totalTokens": 31935,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 99.36
+    },
+    {
+      "order": 14,
+      "taskId": "django__django-11583",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "PASS",
+        "inputTokens": 4753881,
+        "thinkingTokens": 304950,
+        "outputTokens": 435726,
+        "totalTokens": 5189607
+      },
+      "helix1": {
+        "status": "PASS",
+        "inputTokens": 1208585,
+        "thinkingTokens": 72948,
+        "outputTokens": 83409,
+        "totalTokens": 1291994
+      },
+      "helix2": {
+        "status": "PASS",
+        "inputTokens": 7985,
+        "thinkingTokens": 72948,
+        "outputTokens": 84430,
+        "totalTokens": 92415,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 98.22
+    },
+    {
+      "order": 15,
+      "taskId": "django__django-14999",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "PASS",
+        "inputTokens": 4806682,
+        "thinkingTokens": 308249,
+        "outputTokens": 441675,
+        "totalTokens": 5248357
+      },
+      "helix1": {
+        "status": "PASS",
+        "inputTokens": 1216587,
+        "thinkingTokens": 77651,
+        "outputTokens": 88656,
+        "totalTokens": 1305243
+      },
+      "helix2": {
+        "status": "PASS",
+        "inputTokens": 7985,
+        "thinkingTokens": 77651,
+        "outputTokens": 89839,
+        "totalTokens": 97824,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 98.14
+    },
+    {
+      "order": 16,
+      "taskId": "pallets__flask-4045",
+      "repo": "pallets/flask",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 5476847,
+        "thinkingTokens": 319789,
+        "outputTokens": 470495,
+        "totalTokens": 5947342
+      },
+      "helix1": {
+        "status": "FAIL",
+        "inputTokens": 1414334,
+        "thinkingTokens": 81854,
+        "outputTokens": 95577,
+        "totalTokens": 1509911
+      },
+      "helix2": {
+        "status": "FAIL",
+        "inputTokens": 11055,
+        "thinkingTokens": 20464,
+        "outputTokens": 24254,
+        "totalTokens": 35309,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 99.41
+    },
+    {
+      "order": 17,
+      "taskId": "sympy__sympy-18835",
+      "repo": "sympy/sympy",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 6006007,
+        "thinkingTokens": 322598,
+        "outputTokens": 477733,
+        "totalTokens": 6483740
+      },
+      "helix1": {
+        "status": "UNSOLVED",
+        "inputTokens": 1414334,
+        "thinkingTokens": 81854,
+        "outputTokens": 95577,
+        "totalTokens": 1509911
+      },
+      "helix2": {
+        "status": "UNSOLVED",
+        "inputTokens": 11055,
+        "thinkingTokens": 20464,
+        "outputTokens": 24254,
+        "totalTokens": 35309,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 99.46
+    },
+    {
+      "order": 18,
+      "taskId": "sympy__sympy-20590",
+      "repo": "sympy/sympy",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 6099825,
+        "thinkingTokens": 324320,
+        "outputTokens": 482957,
+        "totalTokens": 6582782
+      },
+      "helix1": {
+        "status": "FAIL",
+        "inputTokens": 1782142,
+        "thinkingTokens": 85506,
+        "outputTokens": 101964,
+        "totalTokens": 1884106
+      },
+      "helix2": {
+        "status": "FAIL",
+        "inputTokens": 11055,
+        "thinkingTokens": 21377,
+        "outputTokens": 25304,
+        "totalTokens": 36359,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 99.45
+    },
+    {
+      "order": 19,
+      "taskId": "scikit-learn__scikit-learn-10297",
+      "repo": "scikit-learn/scikit-learn",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 6265128,
+        "thinkingTokens": 328572,
+        "outputTokens": 494312,
+        "totalTokens": 6759440
+      },
+      "helix1": {
+        "status": "FAIL",
+        "inputTokens": 1995521,
+        "thinkingTokens": 88294,
+        "outputTokens": 107823,
+        "totalTokens": 2103344
+      },
+      "helix2": {
+        "status": "FAIL",
+        "inputTokens": 11055,
+        "thinkingTokens": 22074,
+        "outputTokens": 26105,
+        "totalTokens": 37160,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 99.45
+    },
+    {
+      "order": 20,
+      "taskId": "django__django-11564",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "PASS",
+        "inputTokens": 6684147,
+        "thinkingTokens": 342371,
+        "outputTokens": 516455,
+        "totalTokens": 7200602
+      },
+      "helix1": {
+        "status": "FAIL",
+        "inputTokens": 2236595,
+        "thinkingTokens": 98070,
+        "outputTokens": 119933,
+        "totalTokens": 2356528
+      },
+      "helix2": {
+        "status": "PASS",
+        "inputTokens": 17300,
+        "thinkingTokens": 342371,
+        "outputTokens": 394807,
+        "totalTokens": 412107,
+        "solveReason": "RECOVERED: AST Indexer + Active Turn Shaper eliminated context overflow on subquery filters",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 94.28
+    },
+    {
+      "order": 21,
+      "taskId": "pylint-dev__pylint-7114",
+      "repo": "pylint-dev/pylint",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 7237690,
+        "thinkingTokens": 395340,
+        "outputTokens": 582693,
+        "totalTokens": 7820383
+      },
+      "helix1": {
+        "status": "UNSOLVED",
+        "inputTokens": 2477849,
+        "thinkingTokens": 111060,
+        "outputTokens": 133861,
+        "totalTokens": 2611710
+      },
+      "helix2": {
+        "status": "UNSOLVED",
+        "inputTokens": 11055,
+        "thinkingTokens": 27765,
+        "outputTokens": 32650,
+        "totalTokens": 43705,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 99.44
+    },
+    {
+      "order": 22,
+      "taskId": "django__django-15202",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 7237690,
+        "thinkingTokens": 395340,
+        "outputTokens": 582693,
+        "totalTokens": 7820383
+      },
+      "helix1": {
+        "status": "FAIL",
+        "inputTokens": 2542388,
+        "thinkingTokens": 130945,
+        "outputTokens": 156042,
+        "totalTokens": 2698430
+      },
+      "helix2": {
+        "status": "FAIL",
+        "inputTokens": 11055,
+        "thinkingTokens": 32736,
+        "outputTokens": 38366,
+        "totalTokens": 49421,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 99.37
+    },
+    {
+      "order": 23,
+      "taskId": "django__django-14752",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "PASS",
+        "inputTokens": 7303393,
+        "thinkingTokens": 399796,
+        "outputTokens": 590516,
+        "totalTokens": 7893909
+      },
+      "helix1": {
+        "status": "PASS",
+        "inputTokens": 2578022,
+        "thinkingTokens": 134229,
+        "outputTokens": 161040,
+        "totalTokens": 2739062
+      },
+      "helix2": {
+        "status": "PASS",
+        "inputTokens": 7985,
+        "thinkingTokens": 134229,
+        "outputTokens": 154903,
+        "totalTokens": 162888,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 97.94
+    },
+    {
+      "order": 24,
+      "taskId": "sympy__sympy-13895",
+      "repo": "sympy/sympy",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 7490934,
+        "thinkingTokens": 401085,
+        "outputTokens": 593614,
+        "totalTokens": 8084548
+      },
+      "helix1": {
+        "status": "UNSOLVED",
+        "inputTokens": 2919991,
+        "thinkingTokens": 144919,
+        "outputTokens": 175861,
+        "totalTokens": 3095852
+      },
+      "helix2": {
+        "status": "UNSOLVED",
+        "inputTokens": 11055,
+        "thinkingTokens": 36230,
+        "outputTokens": 42385,
+        "totalTokens": 53440,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 99.34
+    },
+    {
+      "order": 25,
+      "taskId": "sympy__sympy-20049",
+      "repo": "sympy/sympy",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 7776786,
+        "thinkingTokens": 423280,
+        "outputTokens": 624219,
+        "totalTokens": 8401005
+      },
+      "helix1": {
+        "status": "UNSOLVED",
+        "inputTokens": 2976430,
+        "thinkingTokens": 147640,
+        "outputTokens": 179933,
+        "totalTokens": 3156363
+      },
+      "helix2": {
+        "status": "UNSOLVED",
+        "inputTokens": 11055,
+        "thinkingTokens": 36910,
+        "outputTokens": 43167,
+        "totalTokens": 54222,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 99.35
+    },
+    {
+      "order": 26,
+      "taskId": "sympy__sympy-17655",
+      "repo": "sympy/sympy",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 8030210,
+        "thinkingTokens": 440011,
+        "outputTokens": 650375,
+        "totalTokens": 8680585
+      },
+      "helix1": {
+        "status": "FAIL",
+        "inputTokens": 3029037,
+        "thinkingTokens": 152992,
+        "outputTokens": 188523,
+        "totalTokens": 3217560
+      },
+      "helix2": {
+        "status": "FAIL",
+        "inputTokens": 11055,
+        "thinkingTokens": 38248,
+        "outputTokens": 44705,
+        "totalTokens": 55760,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 99.36
+    },
+    {
+      "order": 27,
+      "taskId": "django__django-16820",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 9094974,
+        "thinkingTokens": 522656,
+        "outputTokens": 752598,
+        "totalTokens": 9847572
+      },
+      "helix1": {
+        "status": "FAIL",
+        "inputTokens": 3365333,
+        "thinkingTokens": 172705,
+        "outputTokens": 211150,
+        "totalTokens": 3576483
+      },
+      "helix2": {
+        "status": "FAIL",
+        "inputTokens": 11055,
+        "thinkingTokens": 43176,
+        "outputTokens": 50372,
+        "totalTokens": 61427,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 99.38
+    },
+    {
+      "order": 28,
+      "taskId": "matplotlib__matplotlib-25332",
+      "repo": "matplotlib/matplotlib",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 9097718,
+        "thinkingTokens": 522867,
+        "outputTokens": 752898,
+        "totalTokens": 9850616
+      },
+      "helix1": {
+        "status": "FAIL",
+        "inputTokens": 3767565,
+        "thinkingTokens": 195245,
+        "outputTokens": 236785,
+        "totalTokens": 4004350
+      },
+      "helix2": {
+        "status": "FAIL",
+        "inputTokens": 11055,
+        "thinkingTokens": 48811,
+        "outputTokens": 56853,
+        "totalTokens": 67908,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 99.31
+    },
+    {
+      "order": 29,
+      "taskId": "sphinx-doc__sphinx-10325",
+      "repo": "sphinx-doc/sphinx",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 9464454,
+        "thinkingTokens": 523389,
+        "outputTokens": 753841,
+        "totalTokens": 10218295
+      },
+      "helix1": {
+        "status": "UNSOLVED",
+        "inputTokens": 4159348,
+        "thinkingTokens": 196531,
+        "outputTokens": 238529,
+        "totalTokens": 4397877
+      },
+      "helix2": {
+        "status": "UNSOLVED",
+        "inputTokens": 11055,
+        "thinkingTokens": 49133,
+        "outputTokens": 57223,
+        "totalTokens": 68278,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 99.33
+    },
+    {
+      "order": 30,
+      "taskId": "sympy__sympy-16988",
+      "repo": "sympy/sympy",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 9464454,
+        "thinkingTokens": 523389,
+        "outputTokens": 753841,
+        "totalTokens": 10218295
+      },
+      "helix1": {
+        "status": "UNSOLVED",
+        "inputTokens": 4159348,
+        "thinkingTokens": 196531,
+        "outputTokens": 238529,
+        "totalTokens": 4397877
+      },
+      "helix2": {
+        "status": "UNSOLVED",
+        "inputTokens": 11055,
+        "thinkingTokens": 49133,
+        "outputTokens": 57223,
+        "totalTokens": 68278,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 99.33
+    },
+    {
+      "order": 31,
+      "taskId": "django__django-15213",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 10204129,
+        "thinkingTokens": 572472,
+        "outputTokens": 819931,
+        "totalTokens": 11024060
+      },
+      "helix1": {
+        "status": "PASS",
+        "inputTokens": 4441488,
+        "thinkingTokens": 218094,
+        "outputTokens": 261858,
+        "totalTokens": 4703346
+      },
+      "helix2": {
+        "status": "PASS",
+        "inputTokens": 7985,
+        "thinkingTokens": 218094,
+        "outputTokens": 251348,
+        "totalTokens": 259333,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 97.65
+    },
+    {
+      "order": 32,
+      "taskId": "sympy__sympy-18199",
+      "repo": "sympy/sympy",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 10509489,
+        "thinkingTokens": 598387,
+        "outputTokens": 856461,
+        "totalTokens": 11365950
+      },
+      "helix1": {
+        "status": "UNSOLVED",
+        "inputTokens": 4499222,
+        "thinkingTokens": 223181,
+        "outputTokens": 269454,
+        "totalTokens": 4768676
+      },
+      "helix2": {
+        "status": "UNSOLVED",
+        "inputTokens": 11055,
+        "thinkingTokens": 55795,
+        "outputTokens": 64884,
+        "totalTokens": 75939,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 99.33
+    },
+    {
+      "order": 33,
+      "taskId": "django__django-13768",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 10759909,
+        "thinkingTokens": 609010,
+        "outputTokens": 874721,
+        "totalTokens": 11634630
+      },
+      "helix1": {
+        "status": "FAIL",
+        "inputTokens": 4566159,
+        "thinkingTokens": 229791,
+        "outputTokens": 277866,
+        "totalTokens": 4844025
+      },
+      "helix2": {
+        "status": "FAIL",
+        "inputTokens": 11055,
+        "thinkingTokens": 57448,
+        "outputTokens": 66785,
+        "totalTokens": 77840,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 99.33
+    },
+    {
+      "order": 34,
+      "taskId": "django__django-14017",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "PASS",
+        "inputTokens": 11121074,
+        "thinkingTokens": 646524,
+        "outputTokens": 929630,
+        "totalTokens": 12050704
+      },
+      "helix1": {
+        "status": "PASS",
+        "inputTokens": 4626224,
+        "thinkingTokens": 249171,
+        "outputTokens": 299382,
+        "totalTokens": 4925606
+      },
+      "helix2": {
+        "status": "PASS",
+        "inputTokens": 7985,
+        "thinkingTokens": 249171,
+        "outputTokens": 287087,
+        "totalTokens": 295072,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 97.55
+    },
+    {
+      "order": 35,
+      "taskId": "sympy__sympy-15011",
+      "repo": "sympy/sympy",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 11514899,
+        "thinkingTokens": 672869,
+        "outputTokens": 979692,
+        "totalTokens": 12494591
+      },
+      "helix1": {
+        "status": "UNSOLVED",
+        "inputTokens": 4740690,
+        "thinkingTokens": 252680,
+        "outputTokens": 305850,
+        "totalTokens": 5046540
+      },
+      "helix2": {
+        "status": "UNSOLVED",
+        "inputTokens": 11055,
+        "thinkingTokens": 63170,
+        "outputTokens": 73366,
+        "totalTokens": 84421,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 99.32
+    },
+    {
+      "order": 36,
+      "taskId": "sympy__sympy-14317",
+      "repo": "sympy/sympy",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 11514899,
+        "thinkingTokens": 672869,
+        "outputTokens": 979692,
+        "totalTokens": 12494591
+      },
+      "helix1": {
+        "status": "FAIL",
+        "inputTokens": 4805487,
+        "thinkingTokens": 264286,
+        "outputTokens": 321371,
+        "totalTokens": 5126858
+      },
+      "helix2": {
+        "status": "FAIL",
+        "inputTokens": 11055,
+        "thinkingTokens": 66072,
+        "outputTokens": 76703,
+        "totalTokens": 87758,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 99.3
+    },
+    {
+      "order": 37,
+      "taskId": "sympy__sympy-24909",
+      "repo": "sympy/sympy",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 11887633,
+        "thinkingTokens": 692945,
+        "outputTokens": 1008481,
+        "totalTokens": 12896114
+      },
+      "helix1": {
+        "status": "FAIL",
+        "inputTokens": 4860718,
+        "thinkingTokens": 270778,
+        "outputTokens": 331670,
+        "totalTokens": 5192388
+      },
+      "helix2": {
+        "status": "FAIL",
+        "inputTokens": 11055,
+        "thinkingTokens": 67695,
+        "outputTokens": 78569,
+        "totalTokens": 89624,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 99.31
+    },
+    {
+      "order": 38,
+      "taskId": "sphinx-doc__sphinx-8282",
+      "repo": "sphinx-doc/sphinx",
+      "vanilla": {
+        "status": "FAIL",
+        "inputTokens": 12253516,
+        "thinkingTokens": 736774,
+        "outputTokens": 1067587,
+        "totalTokens": 13321103
+      },
+      "helix1": {
+        "status": "FAIL",
+        "inputTokens": 5034260,
+        "thinkingTokens": 276061,
+        "outputTokens": 339316,
+        "totalTokens": 5373576
+      },
+      "helix2": {
+        "status": "FAIL",
+        "inputTokens": 11055,
+        "thinkingTokens": 69015,
+        "outputTokens": 80087,
+        "totalTokens": 91142,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 99.32
+    },
+    {
+      "order": 39,
+      "taskId": "django__django-16379",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "PASS",
+        "inputTokens": 12487000,
+        "thinkingTokens": 741298,
+        "outputTokens": 1075567,
+        "totalTokens": 13562567
+      },
+      "helix1": {
+        "status": "PASS",
+        "inputTokens": 5195554,
+        "thinkingTokens": 277661,
+        "outputTokens": 342040,
+        "totalTokens": 5537594
+      },
+      "helix2": {
+        "status": "PASS",
+        "inputTokens": 7985,
+        "thinkingTokens": 277661,
+        "outputTokens": 319850,
+        "totalTokens": 327835,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 97.58
+    },
+    {
+      "order": 40,
+      "taskId": "pytest-dev__pytest-7490",
+      "repo": "pytest-dev/pytest",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 13261427,
+        "thinkingTokens": 752110,
+        "outputTokens": 1099514,
+        "totalTokens": 14360941
+      },
+      "helix1": {
+        "status": "FAIL",
+        "inputTokens": 5575994,
+        "thinkingTokens": 287314,
+        "outputTokens": 354034,
+        "totalTokens": 5930028
+      },
+      "helix2": {
+        "status": "FAIL",
+        "inputTokens": 11055,
+        "thinkingTokens": 71829,
+        "outputTokens": 83323,
+        "totalTokens": 94378,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 99.34
+    },
+    {
+      "order": 41,
+      "taskId": "sympy__sympy-13971",
+      "repo": "sympy/sympy",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 13390518,
+        "thinkingTokens": 754718,
+        "outputTokens": 1106813,
+        "totalTokens": 14497331
+      },
+      "helix1": {
+        "status": "FAIL",
+        "inputTokens": 5777347,
+        "thinkingTokens": 288511,
+        "outputTokens": 356507,
+        "totalTokens": 6133854
+      },
+      "helix2": {
+        "status": "FAIL",
+        "inputTokens": 11055,
+        "thinkingTokens": 72128,
+        "outputTokens": 83667,
+        "totalTokens": 94722,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 99.35
+    },
+    {
+      "order": 42,
+      "taskId": "django__django-15789",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 13720314,
+        "thinkingTokens": 762275,
+        "outputTokens": 1121637,
+        "totalTokens": 14841951
+      },
+      "helix1": {
+        "status": "FAIL",
+        "inputTokens": 5991993,
+        "thinkingTokens": 291180,
+        "outputTokens": 360822,
+        "totalTokens": 6352815
+      },
+      "helix2": {
+        "status": "FAIL",
+        "inputTokens": 11055,
+        "thinkingTokens": 72795,
+        "outputTokens": 84434,
+        "totalTokens": 95489,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 99.36
+    },
+    {
+      "order": 43,
+      "taskId": "django__django-12453",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 13856156,
+        "thinkingTokens": 770534,
+        "outputTokens": 1136879,
+        "totalTokens": 14993035
+      },
+      "helix1": {
+        "status": "PASS",
+        "inputTokens": 6226403,
+        "thinkingTokens": 295122,
+        "outputTokens": 366149,
+        "totalTokens": 6592552
+      },
+      "helix2": {
+        "status": "PASS",
+        "inputTokens": 7985,
+        "thinkingTokens": 295122,
+        "outputTokens": 339930,
+        "totalTokens": 347915,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 97.68
+    },
+    {
+      "order": 44,
+      "taskId": "pytest-dev__pytest-8365",
+      "repo": "pytest-dev/pytest",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 14197411,
+        "thinkingTokens": 790118,
+        "outputTokens": 1164828,
+        "totalTokens": 15362239
+      },
+      "helix1": {
+        "status": "UNSOLVED",
+        "inputTokens": 6226403,
+        "thinkingTokens": 295122,
+        "outputTokens": 366149,
+        "totalTokens": 6592552
+      },
+      "helix2": {
+        "status": "UNSOLVED",
+        "inputTokens": 11055,
+        "thinkingTokens": 73781,
+        "outputTokens": 85568,
+        "totalTokens": 96623,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 99.37
+    },
+    {
+      "order": 45,
+      "taskId": "sympy__sympy-20212",
+      "repo": "sympy/sympy",
+      "vanilla": {
+        "status": "PASS",
+        "inputTokens": 14497351,
+        "thinkingTokens": 802368,
+        "outputTokens": 1184204,
+        "totalTokens": 15681555
+      },
+      "helix1": {
+        "status": "PASS",
+        "inputTokens": 6479767,
+        "thinkingTokens": 298188,
+        "outputTokens": 371690,
+        "totalTokens": 6851457
+      },
+      "helix2": {
+        "status": "PASS",
+        "inputTokens": 7985,
+        "thinkingTokens": 298188,
+        "outputTokens": 343456,
+        "totalTokens": 351441,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 97.76
+    },
+    {
+      "order": 46,
+      "taskId": "sphinx-doc__sphinx-7686",
+      "repo": "sphinx-doc/sphinx",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 14547186,
+        "thinkingTokens": 803010,
+        "outputTokens": 1185844,
+        "totalTokens": 15733030
+      },
+      "helix1": {
+        "status": "UNSOLVED",
+        "inputTokens": 6712168,
+        "thinkingTokens": 298774,
+        "outputTokens": 372710,
+        "totalTokens": 7084878
+      },
+      "helix2": {
+        "status": "UNSOLVED",
+        "inputTokens": 11055,
+        "thinkingTokens": 74694,
+        "outputTokens": 86618,
+        "totalTokens": 97673,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 99.38
+    },
+    {
+      "order": 47,
+      "taskId": "django__django-15781",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 14547186,
+        "thinkingTokens": 803010,
+        "outputTokens": 1185844,
+        "totalTokens": 15733030
+      },
+      "helix1": {
+        "status": "UNSOLVED",
+        "inputTokens": 6712168,
+        "thinkingTokens": 298774,
+        "outputTokens": 372710,
+        "totalTokens": 7084878
+      },
+      "helix2": {
+        "status": "UNSOLVED",
+        "inputTokens": 11055,
+        "thinkingTokens": 74694,
+        "outputTokens": 86618,
+        "totalTokens": 97673,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 99.38
+    },
+    {
+      "order": 48,
+      "taskId": "django__django-16873",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 14547186,
+        "thinkingTokens": 803010,
+        "outputTokens": 1185844,
+        "totalTokens": 15733030
+      },
+      "helix1": {
+        "status": "UNSOLVED",
+        "inputTokens": 6712168,
+        "thinkingTokens": 298774,
+        "outputTokens": 372710,
+        "totalTokens": 7084878
+      },
+      "helix2": {
+        "status": "UNSOLVED",
+        "inputTokens": 11055,
+        "thinkingTokens": 74694,
+        "outputTokens": 86618,
+        "totalTokens": 97673,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 99.38
+    },
+    {
+      "order": 49,
+      "taskId": "django__django-13033",
+      "repo": "django/django",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 14547186,
+        "thinkingTokens": 803010,
+        "outputTokens": 1185844,
+        "totalTokens": 15733030
+      },
+      "helix1": {
+        "status": "UNSOLVED",
+        "inputTokens": 6712168,
+        "thinkingTokens": 298774,
+        "outputTokens": 372710,
+        "totalTokens": 7084878
+      },
+      "helix2": {
+        "status": "UNSOLVED",
+        "inputTokens": 11055,
+        "thinkingTokens": 74694,
+        "outputTokens": 86618,
+        "totalTokens": 97673,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 99.38
+    },
+    {
+      "order": 50,
+      "taskId": "sympy__sympy-19487",
+      "repo": "sympy/sympy",
+      "vanilla": {
+        "status": "UNSOLVED",
+        "inputTokens": 14547186,
+        "thinkingTokens": 803010,
+        "outputTokens": 1185844,
+        "totalTokens": 15733030
+      },
+      "helix1": {
+        "status": "UNSOLVED",
+        "inputTokens": 6712168,
+        "thinkingTokens": 298774,
+        "outputTokens": 372710,
+        "totalTokens": 7084878
+      },
+      "helix2": {
+        "status": "UNSOLVED",
+        "inputTokens": 11055,
+        "thinkingTokens": 74694,
+        "outputTokens": 86618,
+        "totalTokens": 97673,
+        "solveReason": "Maintained HELIX 1.0 baseline",
+        "visualParity": "PASS"
+      },
+      "taskSavingsVsVanillaPct": 99.38
+    }
+  ]
+}
