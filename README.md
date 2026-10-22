@@ -70,55 +70,6 @@ Compared to the Codex edition of HELIX 1.0:
 
 ---
 
-## HELIX 2.0: Intelligence Parity & 95% Savings Architecture
-
-Detailed technical specification: [docs/HELIX-2.0-SPECIFICATION.md](docs/HELIX-2.0-SPECIFICATION.md) · Projections: [benchmarks/helix2-new50-projections.json](benchmarks/helix2-new50-projections.json)
-
-> [!NOTE] Evidence Classification Notice
-> - **OBSERVED:** Empirical benchmark results in this repository reflect HELIX 1.0 vs. Vanilla Antigravity on SWE-bench NEW50 (10/50 vs 11/50 solves; 61.95% net billable savings, 86.42% cached context reduction) backed by immutable logs in `benchmarks/benchmark-results.json`.
-> - **SIMULATED:** The HELIX 2.0 token models and recovery figures (13/50 solves, 95–98% savings) represent theoretical architectural projections modeled from verified module bounds (`benchmarks/helix2-new50-projections.json`).
-> - **UNVERIFIED:** Live empirical benchmark qualification of HELIX 2.0 on NEW50 is pending a frozen live execution run with Gemini 3.8 Flash High.
-
-HELIX 2.0 addresses the two critical frontiers identified during the SWE-bench NEW50 benchmark: **recovering the 3 lost solves** to achieve full intelligence parity, and **flattening intra-task token scaling** to break through the 95% total token reduction ceiling.
-
-```
-+-------------------------------------------------------------------------------+
-|                                 HELIX 2.0                                     |
-+-------------------------------------------------------------------------------+
-       |                                |                                |
-       v                                v                                v
-+--------------------+        +--------------------+        +--------------------+
-|  Pillar I:         |        |  Pillar II:        |        |  Pillar III:       |
-|  Elastic Frontier  |        |  Active Turn       |        |  AST Surgical      |
-|  (Adaptive Diag)   |        |  Shaper            |        |  Indexer           |
-+--------------------+        +--------------------+        +--------------------+
-  Level 0: Exit 0               Preserves Turn 0 &            Extracts exact
-  Level 1: 1st Fail             Active Window; folds          symbol definitions
-  Level 2: Repeat Fail          intermediate turns into       in 50-150 tokens
-  (Unlocks Thinking)            tamper-evident anchors        (MCP: ast_inspect)
-       |                                |                                |
-       +--------------------------------+--------------------------------+
-                                        |
-                                        v
-                       +--------------------------------+
-                       |  Pillar IV: Local Tool         |
-                       |  Execution Pipeline            |
-                       +--------------------------------+
-                       | Multi-step execution           |
-                       | (edit -> test -> git diff)     |
-                       | in 1 turn (MCP: pipeline)      |
-                       +--------------------------------+
-```
-
-1. **Elastic Diagnostic Frontier (`src/helix2-elastic-frontier.mjs`)**:
-   Eliminates premature pruning defects by dynamically escalating diagnostic resolution on repeated test failures. On Level 2 failures, preserves stack traces and frame locals while injecting critical reasoning triggers to ensure Gemini 3.8 Flash High allocates its full $250\text{k}-350\text{k}$ token thinking budget.
-2. **Active Turn Shaper (`src/helix2-turn-shaper.mjs`)**:
-   Flattens intra-task prompt accumulation from $O(K^2)$ down to $O(K)$. While preserving the initial user problem statement and recent active frontier turns, intermediate inspection and tool outputs are folded into lightweight, cryptographically verifiable Micro-Anchors (`[HELIX 2.0 Micro-Anchor: Turn #X ...]`) with 100% encrypted handle recovery.
-3. **AST Surgical Symbol Indexer (`src/helix2-ast-indexer.mjs` & MCP `ast_inspect`)**:
-   Uses structural indentation parsing for Python and brace-depth parsing for JS/TS to extract targeted classes and functions in 50–150 tokens instead of reading entire 3,000-line files.
-4. **Speculative Tool Execution Pipeline (`src/helix2-tool-pipeline.mjs` & MCP `pipeline`)**:
-   Executes deterministic edit-test-diff chains in a single client turn, halting execution immediately at the first failure boundary.
-
 ## What HELIX actually does
 
 | Module | Job |
