@@ -12,6 +12,8 @@ import { readContextItem } from "../src/context-archive.mjs";
 import { readToolCallOriginal } from "../src/tool-call-retention.mjs";
 import { HelixLeanSwitch } from "../src/helix-lean-switch.mjs";
 import { retainToolResult, readRetainedToolResult } from "../src/tool-result-store.mjs";
+import { Helix2AstIndexer } from "../src/helix2-ast-indexer.mjs";
+import { Helix2ToolPipeline } from "../src/helix2-tool-pipeline.mjs";
 import { spawn } from "node:child_process";
 
 const routerRoot = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -57,7 +59,7 @@ const tools = [
     description: "Local evidence, not semantic authority. Read actions: doctor {action} only; raw {action,receipt,offset?,limit?} restores a 64-hex evidence hash or a 43-character encrypted program handle in this MCP's program store; receipt {action,receipt,budget?} verifies a partial log; delta {action,before,after} compares compact receipts of complete helix.tests.v1 reports; index {action,source}; ranges {action,index,ranges,budget?}. Do not add project/session to these reads. Tool-result aging handles belong to a separate store, read through control. attest checks bound inputs in project+session without execution. register/run pin/select command workflows; edit applies unique literals under a source hash. Keep normal answers and judgment; commands cannot bypass client restrictions.",
     inputSchema: {
       type: "object", properties: {
-        action: { enum: ["policy", "doctor", "raw", "history", "receipt", "delta", "attest", "index", "ranges", "register", "run", "edit", "flow_register", "flow_run", "batch_inspect", "lean_run", "seal"] }, receipt: string,
+        action: { enum: ["policy", "doctor", "raw", "history", "receipt", "delta", "attest", "index", "ranges", "register", "run", "edit", "flow_register", "flow_run", "batch_inspect", "lean_run", "seal", "ast_inspect", "pipeline"] }, receipt: string,
         before: string, after: string,
         item: { type: "integer", minimum: 0 },
         query: { type: "string", description: "Optional literal search in an archived context item; returns exact byte offsets, not semantic conclusions." },
@@ -69,6 +71,8 @@ const tools = [
         command: string, task: string, status: string, summary: string, metadata: { type: "object" },
         steps: { type: "array", items: stepSchema }, bind: { type: "array", items: string },
         flow: string,
+        symbol: string,
+        operations: { type: "array", maxItems: 32, items: { type: "object" } },
         max_operations: {type:"integer",minimum:1,maximum:32}, max_elapsed_ms:{type:"integer",minimum:20,maximum:1200000},
         nodes: { type: "array", maxItems: 32, items: { type: "object", properties: {
           id: string, kind: {enum:["command","receipt","delta","index","ranges","branch","finish"]},
@@ -104,6 +108,8 @@ async function context(args, options) {
     batch_inspect: ["project", "files"],
     lean_run: ["project", "command", "argv", "timeout_ms"],
     seal: ["project", "session", "task", "status", "summary", "metadata"],
+    ast_inspect: ["project", "file", "symbol"],
+    pipeline: ["project", "operations", "task"],
   };
   if (!args || !actionKeys[args.action]) throw new Error(`Invalid context action. Allowed: ${Object.keys(actionKeys).join(", ")}.`);
   if (Object.keys(args).some((key) => key !== "action" && !actionKeys[args.action].includes(key))) {
@@ -232,6 +238,30 @@ async function context(args, options) {
       `Summary: ${payload.summary}`,
       `Status: Scope sealed. Past turns archived into local evidence store.`
     ].join("\n");
+  }
+  if (args.action === "ast_inspect") {
+    if (!args.project || !args.file || !args.symbol) {
+      throw new Error("ast_inspect requires project, file, and symbol.");
+    }
+    const fullPath = path.resolve(args.project, args.file);
+    const indexer = new Helix2AstIndexer();
+    const result = indexer.extractSymbol(fullPath, args.symbol);
+    if (!result) return `Symbol '${args.symbol}' not found in ${args.file}`;
+    return [
+      `<!-- HELIX 2.0 AST EXTRACTION: ${result.symbol} -->`,
+      `File: ${args.file} (lines ${result.startLine}-${result.endLine}, ${result.totalLines} lines)`,
+      `SHA256: ${result.sha256.slice(0, 32)}`,
+      `Code:`,
+      result.code
+    ].join("\n");
+  }
+  if (args.action === "pipeline") {
+    if (!args.project || !Array.isArray(args.operations) || !args.operations.length) {
+      throw new Error("pipeline requires project and operations array.");
+    }
+    const pipe = new Helix2ToolPipeline({ directory: programDirectory });
+    const result = await pipe.executePipeline(args.project, args.operations, { taskId: args.task || "mcp_pipeline", signal: options?.signal });
+    return result.summary;
   }
   if (args.action === "raw") {
     let content, header;

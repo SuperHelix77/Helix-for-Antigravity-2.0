@@ -107,4 +107,45 @@ test('MCP context lean_run and seal extensions round-trip correctly', async (t) 
   assert.ok(rawText.includes('helix.handoff.v1'));
   assert.ok(rawText.includes('test-task-1'));
   assert.ok(rawText.includes('Verified fix across test files'));
+
+  // 6. context action: ast_inspect
+  const astResult = await send('tools/call', {
+    name: 'context',
+    arguments: {
+      action: 'ast_inspect',
+      project: root,
+      file: 'src/helix2-ast-indexer.mjs',
+      symbol: 'Helix2AstIndexer'
+    }
+  });
+  const astText = astResult.content[0].text;
+  assert.ok(astText.includes('HELIX 2.0 AST EXTRACTION: Helix2AstIndexer'));
+  assert.ok(astText.includes('class Helix2AstIndexer'));
+
+  // 7. context action: pipeline
+  const pipeFile = path.join(tmpDir, 'pipe_test.txt');
+  fs.writeFileSync(pipeFile, 'Alpha Bravo\n', 'utf8');
+
+  const pipeResult = await send('tools/call', {
+    name: 'context',
+    arguments: {
+      action: 'pipeline',
+      project: tmpDir,
+      operations: [
+        {
+          kind: 'edit',
+          file: 'pipe_test.txt',
+          target: 'Alpha',
+          replacement: 'Omega'
+        },
+        {
+          kind: 'command',
+          command: `${process.platform === 'win32' ? 'type' : 'cat'} pipe_test.txt`
+        }
+      ]
+    }
+  });
+  const pipeText = pipeResult.content[0].text;
+  assert.ok(pipeText.includes('HELIX 2.0 Pipeline: 2 steps executed'));
+  assert.ok(pipeText.includes('status:SUCCESS'));
 });
