@@ -72,7 +72,12 @@ Compared to the Codex edition of HELIX 1.0:
 
 ## HELIX 2.0: Intelligence Parity & 95% Savings Architecture
 
-Detailed technical specification: [docs/HELIX-2.0-SPECIFICATION.md](docs/HELIX-2.0-SPECIFICATION.md)
+Detailed technical specification: [docs/HELIX-2.0-SPECIFICATION.md](docs/HELIX-2.0-SPECIFICATION.md) · Projections: [benchmarks/helix2-new50-projections.json](benchmarks/helix2-new50-projections.json)
+
+> [!NOTE] Evidence Classification Notice
+> - **OBSERVED:** Empirical benchmark results in this repository reflect HELIX 1.0 vs. Vanilla Antigravity on SWE-bench NEW50 (10/50 vs 11/50 solves; 61.95% net billable savings, 86.42% cached context reduction) backed by immutable logs in `benchmarks/benchmark-results.json`.
+> - **SIMULATED:** The HELIX 2.0 token models and recovery figures (13/50 solves, 95–98% savings) represent theoretical architectural projections modeled from verified module bounds (`benchmarks/helix2-new50-projections.json`).
+> - **UNVERIFIED:** Live empirical benchmark qualification of HELIX 2.0 on NEW50 is pending a frozen live execution run with Gemini 3.8 Flash High.
 
 HELIX 2.0 addresses the two critical frontiers identified during the SWE-bench NEW50 benchmark: **recovering the 3 lost solves** to achieve full intelligence parity, and **flattening intra-task token scaling** to break through the 95% total token reduction ceiling.
 

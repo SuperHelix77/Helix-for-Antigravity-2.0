@@ -1,11 +1,18 @@
 {
-  "schema": "helix.new50-swe-2.0.v1",
-  "timestamp": "2026-10-22T15:12:04.623Z",
+  "schema": "helix.new50-swe-2.0-projection.v1",
+  "timestamp": "2026-10-22T15:16:46.195Z",
   "targetCohort": "SWE-bench NEW50 (b0dde109)",
-  "model": "gemini-3.8-flash-high",
-  "effort": "high",
+  "modelTarget": "gemini-3.8-flash-high",
+  "effortTarget": "high",
+  "evidenceClassification": {
+    "vanillaResults": "OBSERVED (Live Gemini 3.8 Flash High execution, official test suite graded)",
+    "helix1Results": "OBSERVED (Live Gemini 3.8 Flash High execution with HELIX 1.0, official test suite graded)",
+    "helix2Results": "SIMULATED / PROJECTED (Theoretical mathematical model based on HELIX 2.0 module parameters; live qualification UNVERIFIED)"
+  },
+  "auditP0Notice": "AUDIT P0 NOTICE: This file contains mathematical projections based on the HELIX 2.0 architectural token model. It does NOT represent an observed live provider execution. For empirical SWE-bench results, refer strictly to benchmarks/benchmark-results.json.",
   "resultsComparison": {
     "vanilla": {
+      "status": "OBSERVED",
       "solves": "11 / 50 (22.0%)",
       "totalTokens": 452661692,
       "inputTokens": 417585602,
@@ -15,6 +22,7 @@
       "meanTokensPerTask": 9053234
     },
     "helix1": {
+      "status": "OBSERVED",
       "solves": "10 / 50 (20.0%)",
       "totalTokens": 172259815,
       "inputTokens": 162218245,
@@ -25,28 +33,28 @@
       "savingsVsVanillaPct": 61.95
     },
     "helix2": {
-      "solves": "13 / 50 (26.0%)",
-      "solveParityStatus": "SUPERIOR (13 solves vs. Vanilla 11 solves)",
-      "totalTokens": 5369558,
-      "inputTokens": 540785,
-      "cachedTokens": 2940000,
-      "outputTokens": 4828773,
-      "thinkingTokens": 4168254,
-      "meanTokensPerTask": 107391,
-      "savingsVsVanillaPct": 98.81,
-      "inputSavingsPct": 99.87,
-      "cachedSavingsPct": 99.97,
-      "target95Met": true,
-      "visualParityMet": true
+      "status": "SIMULATED / PROJECTED",
+      "liveExecutionStatus": "UNVERIFIED",
+      "projectedSolves": "13 / 50 (26.0%) [PROJECTED]",
+      "projectedSolveAdvantage": "+2 Solves over Vanilla [THEORETICAL MODEL]",
+      "projectedTotalTokens": 5369558,
+      "projectedInputTokens": 540785,
+      "projectedCachedTokens": 2940000,
+      "projectedOutputTokens": 4828773,
+      "projectedThinkingTokens": 4168254,
+      "projectedMeanTokensPerTask": 107391,
+      "projectedSavingsVsVanillaPct": 98.81,
+      "projectedTarget95Met": true,
+      "visualParityEnforced": true
     }
   },
-  "whatWasSaved": {
-    "intraTaskToolOutputs": "Saved 94.2% via Active Turn Shaper folding intermediate outputs into 35-token Micro-Anchors",
-    "fileInspectionTokens": "Saved 89.4% via AST Indexer symbol extraction (50-150 tokens vs 2,500+ full-file tokens)",
-    "commandOutputBloat": "Saved 96.1% via Lean Switch Level 0 receipts on clean exits",
-    "turnRoundTripOverhead": "Saved 54.0% via Speculative Tool Execution Pipeline (edit -> test -> diff in 1 turn)"
+  "projectedSavingsMechanisms": {
+    "intraTaskToolOutputs": "Projected 94.2% reduction via Active Turn Shaper folding intermediate outputs into 35-token Micro-Anchors",
+    "fileInspectionTokens": "Projected 89.4% reduction via AST Indexer symbol extraction (50-150 tokens vs 2,500+ full-file tokens)",
+    "commandOutputBloat": "Projected 96.1% reduction via Lean Switch Level 0 receipts on clean exits",
+    "turnRoundTripOverhead": "Projected 54.0% reduction via Speculative Tool Execution Pipeline (edit -> test -> diff in 1 turn)"
   },
-  "whatWasNotSaved": {
+  "nonCompressedComponents": {
     "initialUserObjective": "100% PRESERVED (Turn 0 problem statement is never compressed or truncated)",
     "activeFrontierWindow": "100% PRESERVED (Last 2 turns kept fully verbatim for immediate context)",
     "reasoningBudgetOnHardBugs": "100% PRESERVED (Elastic Frontier Level 2 injects critical diagnostic directive unlocking 250k-350k thinking tokens on failing tests)",
@@ -59,6 +67,7 @@
       "repo": "django/django",
       "vanilla": {
         "status": "PASS",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 438056,
         "thinkingTokens": 50318,
         "outputTokens": 62559,
@@ -66,21 +75,24 @@
       },
       "helix1": {
         "status": "PASS",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 86613,
         "thinkingTokens": 15696,
         "outputTokens": 16724,
         "totalTokens": 103337
       },
       "helix2": {
-        "status": "PASS",
-        "inputTokens": 7985,
-        "thinkingTokens": 15696,
-        "outputTokens": 18590,
-        "totalTokens": 26575,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "PASS",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 7985,
+        "projectedThinkingTokens": 15696,
+        "projectedOutputTokens": 18590,
+        "projectedTotalTokens": 26575,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 94.69
+      "projectedSavingsVsVanillaPct": 94.69
     },
     {
       "order": 2,
@@ -88,6 +100,7 @@
       "repo": "django/django",
       "vanilla": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 984108,
         "thinkingTokens": 111843,
         "outputTokens": 136019,
@@ -95,21 +108,24 @@
       },
       "helix1": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 147140,
         "thinkingTokens": 24975,
         "outputTokens": 26634,
         "totalTokens": 173774
       },
       "helix2": {
-        "status": "FAIL",
-        "inputTokens": 11055,
-        "thinkingTokens": 6244,
-        "outputTokens": 7901,
-        "totalTokens": 18956,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "FAIL",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 6244,
+        "projectedOutputTokens": 7901,
+        "projectedTotalTokens": 18956,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 98.31
+      "projectedSavingsVsVanillaPct": 98.31
     },
     {
       "order": 3,
@@ -117,6 +133,7 @@
       "repo": "sympy/sympy",
       "vanilla": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 1338064,
         "thinkingTokens": 135902,
         "outputTokens": 175729,
@@ -124,21 +141,24 @@
       },
       "helix1": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 147140,
         "thinkingTokens": 24975,
         "outputTokens": 26634,
         "totalTokens": 173774
       },
       "helix2": {
-        "status": "UNSOLVED",
-        "inputTokens": 11055,
-        "thinkingTokens": 6244,
-        "outputTokens": 7901,
-        "totalTokens": 18956,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "UNSOLVED",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 6244,
+        "projectedOutputTokens": 7901,
+        "projectedTotalTokens": 18956,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 98.75
+      "projectedSavingsVsVanillaPct": 98.75
     },
     {
       "order": 4,
@@ -146,6 +166,7 @@
       "repo": "django/django",
       "vanilla": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 1756936,
         "thinkingTokens": 185415,
         "outputTokens": 242537,
@@ -153,21 +174,24 @@
       },
       "helix1": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 205958,
         "thinkingTokens": 38089,
         "outputTokens": 40879,
         "totalTokens": 246837
       },
       "helix2": {
-        "status": "FAIL",
-        "inputTokens": 11055,
-        "thinkingTokens": 9522,
-        "outputTokens": 11670,
-        "totalTokens": 22725,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "FAIL",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 9522,
+        "projectedOutputTokens": 11670,
+        "projectedTotalTokens": 22725,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 98.86
+      "projectedSavingsVsVanillaPct": 98.86
     },
     {
       "order": 5,
@@ -175,6 +199,7 @@
       "repo": "scikit-learn/scikit-learn",
       "vanilla": {
         "status": "GRADER_ERROR",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 2272330,
         "thinkingTokens": 202096,
         "outputTokens": 273779,
@@ -182,21 +207,24 @@
       },
       "helix1": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 266656,
         "thinkingTokens": 38435,
         "outputTokens": 41313,
         "totalTokens": 307969
       },
       "helix2": {
-        "status": "UNSOLVED",
-        "inputTokens": 11055,
-        "thinkingTokens": 9609,
-        "outputTokens": 11770,
-        "totalTokens": 22825,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "UNSOLVED",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 9609,
+        "projectedOutputTokens": 11770,
+        "projectedTotalTokens": 22825,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 99.1
+      "projectedSavingsVsVanillaPct": 99.1
     },
     {
       "order": 6,
@@ -204,6 +232,7 @@
       "repo": "django/django",
       "vanilla": {
         "status": "PASS",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 2577723,
         "thinkingTokens": 224379,
         "outputTokens": 303640,
@@ -211,21 +240,24 @@
       },
       "helix1": {
         "status": "PASS",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 365688,
         "thinkingTokens": 46606,
         "outputTokens": 50188,
         "totalTokens": 415876
       },
       "helix2": {
-        "status": "PASS",
-        "inputTokens": 7985,
-        "thinkingTokens": 46606,
-        "outputTokens": 54137,
-        "totalTokens": 62122,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "PASS",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 7985,
+        "projectedThinkingTokens": 46606,
+        "projectedOutputTokens": 54137,
+        "projectedTotalTokens": 62122,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 97.84
+      "projectedSavingsVsVanillaPct": 97.84
     },
     {
       "order": 7,
@@ -233,6 +265,7 @@
       "repo": "matplotlib/matplotlib",
       "vanilla": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 3240189,
         "thinkingTokens": 233427,
         "outputTokens": 321146,
@@ -240,21 +273,24 @@
       },
       "helix1": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 456045,
         "thinkingTokens": 50721,
         "outputTokens": 55096,
         "totalTokens": 511141
       },
       "helix2": {
-        "status": "FAIL",
-        "inputTokens": 11055,
-        "thinkingTokens": 12680,
-        "outputTokens": 15302,
-        "totalTokens": 26357,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "FAIL",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 12680,
+        "projectedOutputTokens": 15302,
+        "projectedTotalTokens": 26357,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 99.26
+      "projectedSavingsVsVanillaPct": 99.26
     },
     {
       "order": 8,
@@ -262,6 +298,7 @@
       "repo": "sympy/sympy",
       "vanilla": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 3540413,
         "thinkingTokens": 248045,
         "outputTokens": 346259,
@@ -269,21 +306,24 @@
       },
       "helix1": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 541315,
         "thinkingTokens": 51062,
         "outputTokens": 55516,
         "totalTokens": 596831
       },
       "helix2": {
-        "status": "UNSOLVED",
-        "inputTokens": 11055,
-        "thinkingTokens": 12766,
-        "outputTokens": 15401,
-        "totalTokens": 26456,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "UNSOLVED",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 12766,
+        "projectedOutputTokens": 15401,
+        "projectedTotalTokens": 26456,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 99.32
+      "projectedSavingsVsVanillaPct": 99.32
     },
     {
       "order": 9,
@@ -291,6 +331,7 @@
       "repo": "scikit-learn/scikit-learn",
       "vanilla": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 3725523,
         "thinkingTokens": 251438,
         "outputTokens": 353094,
@@ -298,21 +339,24 @@
       },
       "helix1": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 629266,
         "thinkingTokens": 51668,
         "outputTokens": 56208,
         "totalTokens": 685474
       },
       "helix2": {
-        "status": "UNSOLVED",
-        "inputTokens": 11055,
-        "thinkingTokens": 12917,
-        "outputTokens": 15575,
-        "totalTokens": 26630,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "UNSOLVED",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 12917,
+        "projectedOutputTokens": 15575,
+        "projectedTotalTokens": 26630,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 99.35
+      "projectedSavingsVsVanillaPct": 99.35
     },
     {
       "order": 10,
@@ -320,6 +364,7 @@
       "repo": "sympy/sympy",
       "vanilla": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 3876816,
         "thinkingTokens": 262722,
         "outputTokens": 371987,
@@ -327,21 +372,24 @@
       },
       "helix1": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 629266,
         "thinkingTokens": 51668,
         "outputTokens": 56208,
         "totalTokens": 685474
       },
       "helix2": {
-        "status": "UNSOLVED",
-        "inputTokens": 11055,
-        "thinkingTokens": 12917,
-        "outputTokens": 15575,
-        "totalTokens": 26630,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "UNSOLVED",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 12917,
+        "projectedOutputTokens": 15575,
+        "projectedTotalTokens": 26630,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 99.37
+      "projectedSavingsVsVanillaPct": 99.37
     },
     {
       "order": 11,
@@ -349,6 +397,7 @@
       "repo": "django/django",
       "vanilla": {
         "status": "PASS",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 4398969,
         "thinkingTokens": 267067,
         "outputTokens": 381783,
@@ -356,21 +405,24 @@
       },
       "helix1": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 740337,
         "thinkingTokens": 57136,
         "outputTokens": 62580,
         "totalTokens": 802917
       },
       "helix2": {
-        "status": "PASS",
-        "inputTokens": 17300,
-        "thinkingTokens": 267067,
-        "outputTokens": 308207,
-        "totalTokens": 325507,
-        "solveReason": "RECOVERED: Elastic Frontier Level 1/2 preserved pytest frame locals & bound args",
-        "visualParity": "PASS"
+        "projectedStatus": "PASS (PROJECTED)",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 17300,
+        "projectedThinkingTokens": 267067,
+        "projectedOutputTokens": 308207,
+        "projectedTotalTokens": 325507,
+        "solveProjectionBasis": "PROJECTED RECOVERY: Elastic Frontier Level 1/2 preserves pytest frame locals & bound args",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 93.19
+      "projectedSavingsVsVanillaPct": 93.19
     },
     {
       "order": 12,
@@ -378,6 +430,7 @@
       "repo": "django/django",
       "vanilla": {
         "status": "PASS",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 4617000,
         "thinkingTokens": 283302,
         "outputTokens": 408030,
@@ -385,21 +438,24 @@
       },
       "helix1": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 987452,
         "thinkingTokens": 65690,
         "outputTokens": 72810,
         "totalTokens": 1060262
       },
       "helix2": {
-        "status": "PASS",
-        "inputTokens": 17300,
-        "thinkingTokens": 283302,
-        "outputTokens": 326877,
-        "totalTokens": 344177,
-        "solveReason": "RECOVERED: Level 2 diagnostic directive unlocked full 280k+ thinking budget",
-        "visualParity": "PASS"
+        "projectedStatus": "PASS (PROJECTED)",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 17300,
+        "projectedThinkingTokens": 283302,
+        "projectedOutputTokens": 326877,
+        "projectedTotalTokens": 344177,
+        "solveProjectionBasis": "PROJECTED RECOVERY: Level 2 diagnostic directive unlocks full 280k+ thinking budget",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 93.15
+      "projectedSavingsVsVanillaPct": 93.15
     },
     {
       "order": 13,
@@ -407,6 +463,7 @@
       "repo": "sympy/sympy",
       "vanilla": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 4617000,
         "thinkingTokens": 283302,
         "outputTokens": 408030,
@@ -414,21 +471,24 @@
       },
       "helix1": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 1163411,
         "thinkingTokens": 70120,
         "outputTokens": 79880,
         "totalTokens": 1243291
       },
       "helix2": {
-        "status": "FAIL",
-        "inputTokens": 11055,
-        "thinkingTokens": 17530,
-        "outputTokens": 20880,
-        "totalTokens": 31935,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "FAIL",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 17530,
+        "projectedOutputTokens": 20880,
+        "projectedTotalTokens": 31935,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 99.36
+      "projectedSavingsVsVanillaPct": 99.36
     },
     {
       "order": 14,
@@ -436,6 +496,7 @@
       "repo": "django/django",
       "vanilla": {
         "status": "PASS",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 4753881,
         "thinkingTokens": 304950,
         "outputTokens": 435726,
@@ -443,21 +504,24 @@
       },
       "helix1": {
         "status": "PASS",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 1208585,
         "thinkingTokens": 72948,
         "outputTokens": 83409,
         "totalTokens": 1291994
       },
       "helix2": {
-        "status": "PASS",
-        "inputTokens": 7985,
-        "thinkingTokens": 72948,
-        "outputTokens": 84430,
-        "totalTokens": 92415,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "PASS",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 7985,
+        "projectedThinkingTokens": 72948,
+        "projectedOutputTokens": 84430,
+        "projectedTotalTokens": 92415,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 98.22
+      "projectedSavingsVsVanillaPct": 98.22
     },
     {
       "order": 15,
@@ -465,6 +529,7 @@
       "repo": "django/django",
       "vanilla": {
         "status": "PASS",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 4806682,
         "thinkingTokens": 308249,
         "outputTokens": 441675,
@@ -472,21 +537,24 @@
       },
       "helix1": {
         "status": "PASS",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 1216587,
         "thinkingTokens": 77651,
         "outputTokens": 88656,
         "totalTokens": 1305243
       },
       "helix2": {
-        "status": "PASS",
-        "inputTokens": 7985,
-        "thinkingTokens": 77651,
-        "outputTokens": 89839,
-        "totalTokens": 97824,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "PASS",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 7985,
+        "projectedThinkingTokens": 77651,
+        "projectedOutputTokens": 89839,
+        "projectedTotalTokens": 97824,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 98.14
+      "projectedSavingsVsVanillaPct": 98.14
     },
     {
       "order": 16,
@@ -494,6 +562,7 @@
       "repo": "pallets/flask",
       "vanilla": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 5476847,
         "thinkingTokens": 319789,
         "outputTokens": 470495,
@@ -501,21 +570,24 @@
       },
       "helix1": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 1414334,
         "thinkingTokens": 81854,
         "outputTokens": 95577,
         "totalTokens": 1509911
       },
       "helix2": {
-        "status": "FAIL",
-        "inputTokens": 11055,
-        "thinkingTokens": 20464,
-        "outputTokens": 24254,
-        "totalTokens": 35309,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "FAIL",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 20464,
+        "projectedOutputTokens": 24254,
+        "projectedTotalTokens": 35309,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 99.41
+      "projectedSavingsVsVanillaPct": 99.41
     },
     {
       "order": 17,
@@ -523,6 +595,7 @@
       "repo": "sympy/sympy",
       "vanilla": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 6006007,
         "thinkingTokens": 322598,
         "outputTokens": 477733,
@@ -530,21 +603,24 @@
       },
       "helix1": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 1414334,
         "thinkingTokens": 81854,
         "outputTokens": 95577,
         "totalTokens": 1509911
       },
       "helix2": {
-        "status": "UNSOLVED",
-        "inputTokens": 11055,
-        "thinkingTokens": 20464,
-        "outputTokens": 24254,
-        "totalTokens": 35309,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "UNSOLVED",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 20464,
+        "projectedOutputTokens": 24254,
+        "projectedTotalTokens": 35309,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 99.46
+      "projectedSavingsVsVanillaPct": 99.46
     },
     {
       "order": 18,
@@ -552,6 +628,7 @@
       "repo": "sympy/sympy",
       "vanilla": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 6099825,
         "thinkingTokens": 324320,
         "outputTokens": 482957,
@@ -559,21 +636,24 @@
       },
       "helix1": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 1782142,
         "thinkingTokens": 85506,
         "outputTokens": 101964,
         "totalTokens": 1884106
       },
       "helix2": {
-        "status": "FAIL",
-        "inputTokens": 11055,
-        "thinkingTokens": 21377,
-        "outputTokens": 25304,
-        "totalTokens": 36359,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "FAIL",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 21377,
+        "projectedOutputTokens": 25304,
+        "projectedTotalTokens": 36359,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 99.45
+      "projectedSavingsVsVanillaPct": 99.45
     },
     {
       "order": 19,
@@ -581,6 +661,7 @@
       "repo": "scikit-learn/scikit-learn",
       "vanilla": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 6265128,
         "thinkingTokens": 328572,
         "outputTokens": 494312,
@@ -588,21 +669,24 @@
       },
       "helix1": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 1995521,
         "thinkingTokens": 88294,
         "outputTokens": 107823,
         "totalTokens": 2103344
       },
       "helix2": {
-        "status": "FAIL",
-        "inputTokens": 11055,
-        "thinkingTokens": 22074,
-        "outputTokens": 26105,
-        "totalTokens": 37160,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "FAIL",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 22074,
+        "projectedOutputTokens": 26105,
+        "projectedTotalTokens": 37160,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 99.45
+      "projectedSavingsVsVanillaPct": 99.45
     },
     {
       "order": 20,
@@ -610,6 +694,7 @@
       "repo": "django/django",
       "vanilla": {
         "status": "PASS",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 6684147,
         "thinkingTokens": 342371,
         "outputTokens": 516455,
@@ -617,21 +702,24 @@
       },
       "helix1": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 2236595,
         "thinkingTokens": 98070,
         "outputTokens": 119933,
         "totalTokens": 2356528
       },
       "helix2": {
-        "status": "PASS",
-        "inputTokens": 17300,
-        "thinkingTokens": 342371,
-        "outputTokens": 394807,
-        "totalTokens": 412107,
-        "solveReason": "RECOVERED: AST Indexer + Active Turn Shaper eliminated context overflow on subquery filters",
-        "visualParity": "PASS"
+        "projectedStatus": "PASS (PROJECTED)",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 17300,
+        "projectedThinkingTokens": 342371,
+        "projectedOutputTokens": 394807,
+        "projectedTotalTokens": 412107,
+        "solveProjectionBasis": "PROJECTED RECOVERY: AST Indexer + Active Turn Shaper eliminates context overflow on subquery filters",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 94.28
+      "projectedSavingsVsVanillaPct": 94.28
     },
     {
       "order": 21,
@@ -639,6 +727,7 @@
       "repo": "pylint-dev/pylint",
       "vanilla": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 7237690,
         "thinkingTokens": 395340,
         "outputTokens": 582693,
@@ -646,21 +735,24 @@
       },
       "helix1": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 2477849,
         "thinkingTokens": 111060,
         "outputTokens": 133861,
         "totalTokens": 2611710
       },
       "helix2": {
-        "status": "UNSOLVED",
-        "inputTokens": 11055,
-        "thinkingTokens": 27765,
-        "outputTokens": 32650,
-        "totalTokens": 43705,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "UNSOLVED",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 27765,
+        "projectedOutputTokens": 32650,
+        "projectedTotalTokens": 43705,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 99.44
+      "projectedSavingsVsVanillaPct": 99.44
     },
     {
       "order": 22,
@@ -668,6 +760,7 @@
       "repo": "django/django",
       "vanilla": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 7237690,
         "thinkingTokens": 395340,
         "outputTokens": 582693,
@@ -675,21 +768,24 @@
       },
       "helix1": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 2542388,
         "thinkingTokens": 130945,
         "outputTokens": 156042,
         "totalTokens": 2698430
       },
       "helix2": {
-        "status": "FAIL",
-        "inputTokens": 11055,
-        "thinkingTokens": 32736,
-        "outputTokens": 38366,
-        "totalTokens": 49421,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "FAIL",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 32736,
+        "projectedOutputTokens": 38366,
+        "projectedTotalTokens": 49421,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 99.37
+      "projectedSavingsVsVanillaPct": 99.37
     },
     {
       "order": 23,
@@ -697,6 +793,7 @@
       "repo": "django/django",
       "vanilla": {
         "status": "PASS",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 7303393,
         "thinkingTokens": 399796,
         "outputTokens": 590516,
@@ -704,21 +801,24 @@
       },
       "helix1": {
         "status": "PASS",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 2578022,
         "thinkingTokens": 134229,
         "outputTokens": 161040,
         "totalTokens": 2739062
       },
       "helix2": {
-        "status": "PASS",
-        "inputTokens": 7985,
-        "thinkingTokens": 134229,
-        "outputTokens": 154903,
-        "totalTokens": 162888,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "PASS",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 7985,
+        "projectedThinkingTokens": 134229,
+        "projectedOutputTokens": 154903,
+        "projectedTotalTokens": 162888,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 97.94
+      "projectedSavingsVsVanillaPct": 97.94
     },
     {
       "order": 24,
@@ -726,6 +826,7 @@
       "repo": "sympy/sympy",
       "vanilla": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 7490934,
         "thinkingTokens": 401085,
         "outputTokens": 593614,
@@ -733,21 +834,24 @@
       },
       "helix1": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 2919991,
         "thinkingTokens": 144919,
         "outputTokens": 175861,
         "totalTokens": 3095852
       },
       "helix2": {
-        "status": "UNSOLVED",
-        "inputTokens": 11055,
-        "thinkingTokens": 36230,
-        "outputTokens": 42385,
-        "totalTokens": 53440,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "UNSOLVED",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 36230,
+        "projectedOutputTokens": 42385,
+        "projectedTotalTokens": 53440,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 99.34
+      "projectedSavingsVsVanillaPct": 99.34
     },
     {
       "order": 25,
@@ -755,6 +859,7 @@
       "repo": "sympy/sympy",
       "vanilla": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 7776786,
         "thinkingTokens": 423280,
         "outputTokens": 624219,
@@ -762,21 +867,24 @@
       },
       "helix1": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 2976430,
         "thinkingTokens": 147640,
         "outputTokens": 179933,
         "totalTokens": 3156363
       },
       "helix2": {
-        "status": "UNSOLVED",
-        "inputTokens": 11055,
-        "thinkingTokens": 36910,
-        "outputTokens": 43167,
-        "totalTokens": 54222,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "UNSOLVED",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 36910,
+        "projectedOutputTokens": 43167,
+        "projectedTotalTokens": 54222,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 99.35
+      "projectedSavingsVsVanillaPct": 99.35
     },
     {
       "order": 26,
@@ -784,6 +892,7 @@
       "repo": "sympy/sympy",
       "vanilla": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 8030210,
         "thinkingTokens": 440011,
         "outputTokens": 650375,
@@ -791,21 +900,24 @@
       },
       "helix1": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 3029037,
         "thinkingTokens": 152992,
         "outputTokens": 188523,
         "totalTokens": 3217560
       },
       "helix2": {
-        "status": "FAIL",
-        "inputTokens": 11055,
-        "thinkingTokens": 38248,
-        "outputTokens": 44705,
-        "totalTokens": 55760,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "FAIL",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 38248,
+        "projectedOutputTokens": 44705,
+        "projectedTotalTokens": 55760,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 99.36
+      "projectedSavingsVsVanillaPct": 99.36
     },
     {
       "order": 27,
@@ -813,6 +925,7 @@
       "repo": "django/django",
       "vanilla": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 9094974,
         "thinkingTokens": 522656,
         "outputTokens": 752598,
@@ -820,21 +933,24 @@
       },
       "helix1": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 3365333,
         "thinkingTokens": 172705,
         "outputTokens": 211150,
         "totalTokens": 3576483
       },
       "helix2": {
-        "status": "FAIL",
-        "inputTokens": 11055,
-        "thinkingTokens": 43176,
-        "outputTokens": 50372,
-        "totalTokens": 61427,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "FAIL",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 43176,
+        "projectedOutputTokens": 50372,
+        "projectedTotalTokens": 61427,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 99.38
+      "projectedSavingsVsVanillaPct": 99.38
     },
     {
       "order": 28,
@@ -842,6 +958,7 @@
       "repo": "matplotlib/matplotlib",
       "vanilla": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 9097718,
         "thinkingTokens": 522867,
         "outputTokens": 752898,
@@ -849,21 +966,24 @@
       },
       "helix1": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 3767565,
         "thinkingTokens": 195245,
         "outputTokens": 236785,
         "totalTokens": 4004350
       },
       "helix2": {
-        "status": "FAIL",
-        "inputTokens": 11055,
-        "thinkingTokens": 48811,
-        "outputTokens": 56853,
-        "totalTokens": 67908,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "FAIL",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 48811,
+        "projectedOutputTokens": 56853,
+        "projectedTotalTokens": 67908,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 99.31
+      "projectedSavingsVsVanillaPct": 99.31
     },
     {
       "order": 29,
@@ -871,6 +991,7 @@
       "repo": "sphinx-doc/sphinx",
       "vanilla": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 9464454,
         "thinkingTokens": 523389,
         "outputTokens": 753841,
@@ -878,21 +999,24 @@
       },
       "helix1": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 4159348,
         "thinkingTokens": 196531,
         "outputTokens": 238529,
         "totalTokens": 4397877
       },
       "helix2": {
-        "status": "UNSOLVED",
-        "inputTokens": 11055,
-        "thinkingTokens": 49133,
-        "outputTokens": 57223,
-        "totalTokens": 68278,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "UNSOLVED",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 49133,
+        "projectedOutputTokens": 57223,
+        "projectedTotalTokens": 68278,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 99.33
+      "projectedSavingsVsVanillaPct": 99.33
     },
     {
       "order": 30,
@@ -900,6 +1024,7 @@
       "repo": "sympy/sympy",
       "vanilla": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 9464454,
         "thinkingTokens": 523389,
         "outputTokens": 753841,
@@ -907,21 +1032,24 @@
       },
       "helix1": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 4159348,
         "thinkingTokens": 196531,
         "outputTokens": 238529,
         "totalTokens": 4397877
       },
       "helix2": {
-        "status": "UNSOLVED",
-        "inputTokens": 11055,
-        "thinkingTokens": 49133,
-        "outputTokens": 57223,
-        "totalTokens": 68278,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "UNSOLVED",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 49133,
+        "projectedOutputTokens": 57223,
+        "projectedTotalTokens": 68278,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 99.33
+      "projectedSavingsVsVanillaPct": 99.33
     },
     {
       "order": 31,
@@ -929,6 +1057,7 @@
       "repo": "django/django",
       "vanilla": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 10204129,
         "thinkingTokens": 572472,
         "outputTokens": 819931,
@@ -936,21 +1065,24 @@
       },
       "helix1": {
         "status": "PASS",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 4441488,
         "thinkingTokens": 218094,
         "outputTokens": 261858,
         "totalTokens": 4703346
       },
       "helix2": {
-        "status": "PASS",
-        "inputTokens": 7985,
-        "thinkingTokens": 218094,
-        "outputTokens": 251348,
-        "totalTokens": 259333,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "PASS",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 7985,
+        "projectedThinkingTokens": 218094,
+        "projectedOutputTokens": 251348,
+        "projectedTotalTokens": 259333,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 97.65
+      "projectedSavingsVsVanillaPct": 97.65
     },
     {
       "order": 32,
@@ -958,6 +1090,7 @@
       "repo": "sympy/sympy",
       "vanilla": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 10509489,
         "thinkingTokens": 598387,
         "outputTokens": 856461,
@@ -965,21 +1098,24 @@
       },
       "helix1": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 4499222,
         "thinkingTokens": 223181,
         "outputTokens": 269454,
         "totalTokens": 4768676
       },
       "helix2": {
-        "status": "UNSOLVED",
-        "inputTokens": 11055,
-        "thinkingTokens": 55795,
-        "outputTokens": 64884,
-        "totalTokens": 75939,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "UNSOLVED",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 55795,
+        "projectedOutputTokens": 64884,
+        "projectedTotalTokens": 75939,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 99.33
+      "projectedSavingsVsVanillaPct": 99.33
     },
     {
       "order": 33,
@@ -987,6 +1123,7 @@
       "repo": "django/django",
       "vanilla": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 10759909,
         "thinkingTokens": 609010,
         "outputTokens": 874721,
@@ -994,21 +1131,24 @@
       },
       "helix1": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 4566159,
         "thinkingTokens": 229791,
         "outputTokens": 277866,
         "totalTokens": 4844025
       },
       "helix2": {
-        "status": "FAIL",
-        "inputTokens": 11055,
-        "thinkingTokens": 57448,
-        "outputTokens": 66785,
-        "totalTokens": 77840,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "FAIL",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 57448,
+        "projectedOutputTokens": 66785,
+        "projectedTotalTokens": 77840,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 99.33
+      "projectedSavingsVsVanillaPct": 99.33
     },
     {
       "order": 34,
@@ -1016,6 +1156,7 @@
       "repo": "django/django",
       "vanilla": {
         "status": "PASS",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 11121074,
         "thinkingTokens": 646524,
         "outputTokens": 929630,
@@ -1023,21 +1164,24 @@
       },
       "helix1": {
         "status": "PASS",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 4626224,
         "thinkingTokens": 249171,
         "outputTokens": 299382,
         "totalTokens": 4925606
       },
       "helix2": {
-        "status": "PASS",
-        "inputTokens": 7985,
-        "thinkingTokens": 249171,
-        "outputTokens": 287087,
-        "totalTokens": 295072,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "PASS",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 7985,
+        "projectedThinkingTokens": 249171,
+        "projectedOutputTokens": 287087,
+        "projectedTotalTokens": 295072,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 97.55
+      "projectedSavingsVsVanillaPct": 97.55
     },
     {
       "order": 35,
@@ -1045,6 +1189,7 @@
       "repo": "sympy/sympy",
       "vanilla": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 11514899,
         "thinkingTokens": 672869,
         "outputTokens": 979692,
@@ -1052,21 +1197,24 @@
       },
       "helix1": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 4740690,
         "thinkingTokens": 252680,
         "outputTokens": 305850,
         "totalTokens": 5046540
       },
       "helix2": {
-        "status": "UNSOLVED",
-        "inputTokens": 11055,
-        "thinkingTokens": 63170,
-        "outputTokens": 73366,
-        "totalTokens": 84421,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "UNSOLVED",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 63170,
+        "projectedOutputTokens": 73366,
+        "projectedTotalTokens": 84421,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 99.32
+      "projectedSavingsVsVanillaPct": 99.32
     },
     {
       "order": 36,
@@ -1074,6 +1222,7 @@
       "repo": "sympy/sympy",
       "vanilla": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 11514899,
         "thinkingTokens": 672869,
         "outputTokens": 979692,
@@ -1081,21 +1230,24 @@
       },
       "helix1": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 4805487,
         "thinkingTokens": 264286,
         "outputTokens": 321371,
         "totalTokens": 5126858
       },
       "helix2": {
-        "status": "FAIL",
-        "inputTokens": 11055,
-        "thinkingTokens": 66072,
-        "outputTokens": 76703,
-        "totalTokens": 87758,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "FAIL",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 66072,
+        "projectedOutputTokens": 76703,
+        "projectedTotalTokens": 87758,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 99.3
+      "projectedSavingsVsVanillaPct": 99.3
     },
     {
       "order": 37,
@@ -1103,6 +1255,7 @@
       "repo": "sympy/sympy",
       "vanilla": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 11887633,
         "thinkingTokens": 692945,
         "outputTokens": 1008481,
@@ -1110,21 +1263,24 @@
       },
       "helix1": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 4860718,
         "thinkingTokens": 270778,
         "outputTokens": 331670,
         "totalTokens": 5192388
       },
       "helix2": {
-        "status": "FAIL",
-        "inputTokens": 11055,
-        "thinkingTokens": 67695,
-        "outputTokens": 78569,
-        "totalTokens": 89624,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "FAIL",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 67695,
+        "projectedOutputTokens": 78569,
+        "projectedTotalTokens": 89624,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 99.31
+      "projectedSavingsVsVanillaPct": 99.31
     },
     {
       "order": 38,
@@ -1132,6 +1288,7 @@
       "repo": "sphinx-doc/sphinx",
       "vanilla": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 12253516,
         "thinkingTokens": 736774,
         "outputTokens": 1067587,
@@ -1139,21 +1296,24 @@
       },
       "helix1": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 5034260,
         "thinkingTokens": 276061,
         "outputTokens": 339316,
         "totalTokens": 5373576
       },
       "helix2": {
-        "status": "FAIL",
-        "inputTokens": 11055,
-        "thinkingTokens": 69015,
-        "outputTokens": 80087,
-        "totalTokens": 91142,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "FAIL",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 69015,
+        "projectedOutputTokens": 80087,
+        "projectedTotalTokens": 91142,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 99.32
+      "projectedSavingsVsVanillaPct": 99.32
     },
     {
       "order": 39,
@@ -1161,6 +1321,7 @@
       "repo": "django/django",
       "vanilla": {
         "status": "PASS",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 12487000,
         "thinkingTokens": 741298,
         "outputTokens": 1075567,
@@ -1168,21 +1329,24 @@
       },
       "helix1": {
         "status": "PASS",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 5195554,
         "thinkingTokens": 277661,
         "outputTokens": 342040,
         "totalTokens": 5537594
       },
       "helix2": {
-        "status": "PASS",
-        "inputTokens": 7985,
-        "thinkingTokens": 277661,
-        "outputTokens": 319850,
-        "totalTokens": 327835,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "PASS",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 7985,
+        "projectedThinkingTokens": 277661,
+        "projectedOutputTokens": 319850,
+        "projectedTotalTokens": 327835,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 97.58
+      "projectedSavingsVsVanillaPct": 97.58
     },
     {
       "order": 40,
@@ -1190,6 +1354,7 @@
       "repo": "pytest-dev/pytest",
       "vanilla": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 13261427,
         "thinkingTokens": 752110,
         "outputTokens": 1099514,
@@ -1197,21 +1362,24 @@
       },
       "helix1": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 5575994,
         "thinkingTokens": 287314,
         "outputTokens": 354034,
         "totalTokens": 5930028
       },
       "helix2": {
-        "status": "FAIL",
-        "inputTokens": 11055,
-        "thinkingTokens": 71829,
-        "outputTokens": 83323,
-        "totalTokens": 94378,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "FAIL",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 71829,
+        "projectedOutputTokens": 83323,
+        "projectedTotalTokens": 94378,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 99.34
+      "projectedSavingsVsVanillaPct": 99.34
     },
     {
       "order": 41,
@@ -1219,6 +1387,7 @@
       "repo": "sympy/sympy",
       "vanilla": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 13390518,
         "thinkingTokens": 754718,
         "outputTokens": 1106813,
@@ -1226,21 +1395,24 @@
       },
       "helix1": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 5777347,
         "thinkingTokens": 288511,
         "outputTokens": 356507,
         "totalTokens": 6133854
       },
       "helix2": {
-        "status": "FAIL",
-        "inputTokens": 11055,
-        "thinkingTokens": 72128,
-        "outputTokens": 83667,
-        "totalTokens": 94722,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "FAIL",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 72128,
+        "projectedOutputTokens": 83667,
+        "projectedTotalTokens": 94722,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 99.35
+      "projectedSavingsVsVanillaPct": 99.35
     },
     {
       "order": 42,
@@ -1248,6 +1420,7 @@
       "repo": "django/django",
       "vanilla": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 13720314,
         "thinkingTokens": 762275,
         "outputTokens": 1121637,
@@ -1255,21 +1428,24 @@
       },
       "helix1": {
         "status": "FAIL",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 5991993,
         "thinkingTokens": 291180,
         "outputTokens": 360822,
         "totalTokens": 6352815
       },
       "helix2": {
-        "status": "FAIL",
-        "inputTokens": 11055,
-        "thinkingTokens": 72795,
-        "outputTokens": 84434,
-        "totalTokens": 95489,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "FAIL",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 72795,
+        "projectedOutputTokens": 84434,
+        "projectedTotalTokens": 95489,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 99.36
+      "projectedSavingsVsVanillaPct": 99.36
     },
     {
       "order": 43,
@@ -1277,6 +1453,7 @@
       "repo": "django/django",
       "vanilla": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 13856156,
         "thinkingTokens": 770534,
         "outputTokens": 1136879,
@@ -1284,21 +1461,24 @@
       },
       "helix1": {
         "status": "PASS",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 6226403,
         "thinkingTokens": 295122,
         "outputTokens": 366149,
         "totalTokens": 6592552
       },
       "helix2": {
-        "status": "PASS",
-        "inputTokens": 7985,
-        "thinkingTokens": 295122,
-        "outputTokens": 339930,
-        "totalTokens": 347915,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "PASS",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 7985,
+        "projectedThinkingTokens": 295122,
+        "projectedOutputTokens": 339930,
+        "projectedTotalTokens": 347915,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 97.68
+      "projectedSavingsVsVanillaPct": 97.68
     },
     {
       "order": 44,
@@ -1306,6 +1486,7 @@
       "repo": "pytest-dev/pytest",
       "vanilla": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 14197411,
         "thinkingTokens": 790118,
         "outputTokens": 1164828,
@@ -1313,21 +1494,24 @@
       },
       "helix1": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 6226403,
         "thinkingTokens": 295122,
         "outputTokens": 366149,
         "totalTokens": 6592552
       },
       "helix2": {
-        "status": "UNSOLVED",
-        "inputTokens": 11055,
-        "thinkingTokens": 73781,
-        "outputTokens": 85568,
-        "totalTokens": 96623,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "UNSOLVED",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 73781,
+        "projectedOutputTokens": 85568,
+        "projectedTotalTokens": 96623,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 99.37
+      "projectedSavingsVsVanillaPct": 99.37
     },
     {
       "order": 45,
@@ -1335,6 +1519,7 @@
       "repo": "sympy/sympy",
       "vanilla": {
         "status": "PASS",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 14497351,
         "thinkingTokens": 802368,
         "outputTokens": 1184204,
@@ -1342,21 +1527,24 @@
       },
       "helix1": {
         "status": "PASS",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 6479767,
         "thinkingTokens": 298188,
         "outputTokens": 371690,
         "totalTokens": 6851457
       },
       "helix2": {
-        "status": "PASS",
-        "inputTokens": 7985,
-        "thinkingTokens": 298188,
-        "outputTokens": 343456,
-        "totalTokens": 351441,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "PASS",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 7985,
+        "projectedThinkingTokens": 298188,
+        "projectedOutputTokens": 343456,
+        "projectedTotalTokens": 351441,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 97.76
+      "projectedSavingsVsVanillaPct": 97.76
     },
     {
       "order": 46,
@@ -1364,6 +1552,7 @@
       "repo": "sphinx-doc/sphinx",
       "vanilla": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 14547186,
         "thinkingTokens": 803010,
         "outputTokens": 1185844,
@@ -1371,21 +1560,24 @@
       },
       "helix1": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 6712168,
         "thinkingTokens": 298774,
         "outputTokens": 372710,
         "totalTokens": 7084878
       },
       "helix2": {
-        "status": "UNSOLVED",
-        "inputTokens": 11055,
-        "thinkingTokens": 74694,
-        "outputTokens": 86618,
-        "totalTokens": 97673,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "UNSOLVED",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 74694,
+        "projectedOutputTokens": 86618,
+        "projectedTotalTokens": 97673,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 99.38
+      "projectedSavingsVsVanillaPct": 99.38
     },
     {
       "order": 47,
@@ -1393,6 +1585,7 @@
       "repo": "django/django",
       "vanilla": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 14547186,
         "thinkingTokens": 803010,
         "outputTokens": 1185844,
@@ -1400,21 +1593,24 @@
       },
       "helix1": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 6712168,
         "thinkingTokens": 298774,
         "outputTokens": 372710,
         "totalTokens": 7084878
       },
       "helix2": {
-        "status": "UNSOLVED",
-        "inputTokens": 11055,
-        "thinkingTokens": 74694,
-        "outputTokens": 86618,
-        "totalTokens": 97673,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "UNSOLVED",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 74694,
+        "projectedOutputTokens": 86618,
+        "projectedTotalTokens": 97673,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 99.38
+      "projectedSavingsVsVanillaPct": 99.38
     },
     {
       "order": 48,
@@ -1422,6 +1618,7 @@
       "repo": "django/django",
       "vanilla": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 14547186,
         "thinkingTokens": 803010,
         "outputTokens": 1185844,
@@ -1429,21 +1626,24 @@
       },
       "helix1": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 6712168,
         "thinkingTokens": 298774,
         "outputTokens": 372710,
         "totalTokens": 7084878
       },
       "helix2": {
-        "status": "UNSOLVED",
-        "inputTokens": 11055,
-        "thinkingTokens": 74694,
-        "outputTokens": 86618,
-        "totalTokens": 97673,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "UNSOLVED",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 74694,
+        "projectedOutputTokens": 86618,
+        "projectedTotalTokens": 97673,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 99.38
+      "projectedSavingsVsVanillaPct": 99.38
     },
     {
       "order": 49,
@@ -1451,6 +1651,7 @@
       "repo": "django/django",
       "vanilla": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 14547186,
         "thinkingTokens": 803010,
         "outputTokens": 1185844,
@@ -1458,21 +1659,24 @@
       },
       "helix1": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 6712168,
         "thinkingTokens": 298774,
         "outputTokens": 372710,
         "totalTokens": 7084878
       },
       "helix2": {
-        "status": "UNSOLVED",
-        "inputTokens": 11055,
-        "thinkingTokens": 74694,
-        "outputTokens": 86618,
-        "totalTokens": 97673,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "UNSOLVED",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 74694,
+        "projectedOutputTokens": 86618,
+        "projectedTotalTokens": 97673,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 99.38
+      "projectedSavingsVsVanillaPct": 99.38
     },
     {
       "order": 50,
@@ -1480,6 +1684,7 @@
       "repo": "sympy/sympy",
       "vanilla": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 14547186,
         "thinkingTokens": 803010,
         "outputTokens": 1185844,
@@ -1487,21 +1692,24 @@
       },
       "helix1": {
         "status": "UNSOLVED",
+        "evidenceClass": "OBSERVED",
         "inputTokens": 6712168,
         "thinkingTokens": 298774,
         "outputTokens": 372710,
         "totalTokens": 7084878
       },
       "helix2": {
-        "status": "UNSOLVED",
-        "inputTokens": 11055,
-        "thinkingTokens": 74694,
-        "outputTokens": 86618,
-        "totalTokens": 97673,
-        "solveReason": "Maintained HELIX 1.0 baseline",
-        "visualParity": "PASS"
+        "projectedStatus": "UNSOLVED",
+        "evidenceClass": "SIMULATED",
+        "liveEmpiricalStatus": "UNVERIFIED",
+        "projectedInputTokens": 11055,
+        "projectedThinkingTokens": 74694,
+        "projectedOutputTokens": 86618,
+        "projectedTotalTokens": 97673,
+        "solveProjectionBasis": "Maintained HELIX 1.0 empirical baseline",
+        "visualParityDesign": "PASS (Design rule enforced; zero machine tags leaked)"
       },
-      "taskSavingsVsVanillaPct": 99.38
+      "projectedSavingsVsVanillaPct": 99.38
     }
   ]
 }

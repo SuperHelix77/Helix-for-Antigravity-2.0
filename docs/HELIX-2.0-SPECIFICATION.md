@@ -8,12 +8,16 @@
 
 ## 1. Executive Summary & Design Objectives
 
-HELIX 1.0 established the viability of local evidence retention, boundary sealing, and deterministic execution, achieving **88.6% input token reduction** and **84.8% overall token reduction** across 50 standard SWE-bench tasks. However, empirical benchmarking against Vanilla execution revealed two critical frontiers for advancement:
+HELIX 1.0 established the viability of local evidence retention, boundary sealing, and deterministic execution, achieving **86.4% cached context reduction** and **61.95% net billable token savings** across 50 SWE-bench NEW50 tasks. In empirical benchmarking against Vanilla execution:
+- Vanilla solved 11/50 tasks.
+- HELIX 1.0 solved 10/50 tasks (solving 2 unique tasks that Vanilla missed, but failing 3 tasks that Vanilla solved).
 
-1. **Intelligence Parity:** HELIX 1.0 solved 8/50 tasks compared to Vanilla's 11/50, falling short on 3 complex tasks (`django-14534`, `django-13448`, `django-11564`).
-2. **The 95% Total Savings Frontier:** While boundary sealing eliminated inter-task carryover, intra-task quadratic token growth ($O(K^2)$) across multi-turn debugging sessions prevented reaching $\ge 95\%$ total token savings across entire benchmarks.
+> [!IMPORTANT] Evidence Status & Benchmark Integrity
+> - **OBSERVED:** Empirical benchmark results in this repo reflect HELIX 1.0 vs. Vanilla Antigravity on SWE-bench NEW50 (10/50 vs 11/50 solves; 61.95% net billable savings, 86.42% cached context reduction) backed by immutable logs in `benchmarks/benchmark-results.json`.
+> - **SIMULATED:** The HELIX 2.0 token models and recovery projections (13/50 solves, 95–98% savings) represent theoretical architectural projections modeled from verified module bounds (`benchmarks/helix2-new50-projections.json`).
+> - **UNVERIFIED:** Live empirical benchmark qualification of HELIX 2.0 on NEW50 is pending a frozen live execution run with Gemini 3.8 Flash High.
 
-**HELIX 2.0 directly eliminates both bottlenecks.** It introduces a 4-pillar architecture engineered to recover full intelligence parity while driving total token consumption down to $\le 22.6\text{M}$ tokens across 50 SWE-bench tasks (a $\ge 95\%$ reduction compared to Vanilla's $452.7\text{M}$ tokens).
+**HELIX 2.0 directly targets both bottlenecks.** It introduces a 4-pillar architecture engineered to recover full intelligence parity while driving projected total token consumption down to $\le 22.6\text{M}$ tokens across 50 SWE-bench tasks (a $\ge 95\%$ reduction compared to Vanilla's $452.7\text{M}$ tokens).
 
 ---
 
