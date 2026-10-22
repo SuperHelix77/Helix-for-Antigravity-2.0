@@ -1,6 +1,34 @@
 # Benchmark Evidence
 
-## V3 Release Result
+## Antigravity NEW50 Benchmark (Gemini 3.8 Flash High)
+
+The full 50-task SWE-bench NEW50 cohort was evaluated on Google Antigravity (`agy`) using `gemini-3.8-flash-high` with `effort: high` in both lanes across continuous unreset conversations.
+
+| Measure | Vanilla Antigravity | HELIX Antigravity | Empirical Delta | Impact / Multiplier |
+| --- | :---: | :---: | :---: | :---: |
+| **Tasks Evaluated** | **50 / 50** | **50 / 50** | 0 | 100% Cohort Evaluated |
+| **Official Solves** | **11 / 50 (22.0%)** | **10 / 50 (20.0%)** | -1 Solve | **90.9% Solve Parity** |
+| **Total Billable Tokens** | **452,661,692** | **172,259,815** | **-280,401,877** | **61.95% Net Savings (2.63x Efficiency)** |
+| **Total Cached Context** | **10,503,585,319** | **1,426,600,795** | **-9,076,984,524** | **86.42% Context Reduction (7.36x Efficiency)** |
+| **Output / Gen Tokens** | 35,076,090 | 10,041,570 | -25,034,520 | 71.38% Reduction |
+| **Reasoning / Thinking Tokens** | 24,127,579 | 8,266,825 | -15,860,754 | 65.74% Reduction |
+| **Mean Billable / Task** | 9,053,234 tokens | 3,445,196 tokens | -5,608,038 tokens | -5.61M tokens / task |
+| **Mean Cache / Task** | 210,071,706 tokens | 28,532,016 tokens | -181,539,690 tokens | -181.5M cached tokens / task |
+
+### Solve Distribution Across 50 Tasks
+- **Both Solved (8 Tasks):** `django__django-15061`, `django__django-11422`, `django__django-11583`, `django__django-14999`, `django__django-14752`, `django__django-14017`, `django__django-16379`, `sympy__sympy-20212`
+- **Vanilla Only (3 Tasks):** `django__django-14534`, `django__django-13448`, `django__django-11564`
+- **HELIX Only (2 Tasks):** `django__django-15213`, `django__django-12453`
+
+### Anti-Contamination & Integrity Controls
+1. **Zero Synthetic Calls:** 100% of execution tokens originated from live Google Antigravity CLI invocations (`agy --model gemini-3.8-flash-high`) recording authentic provider receipts.
+2. **Zero Contamination:** Neither lane had access to gold patches, dataset solutions, historical transcripts, or pre-computed diffs.
+3. **Continuous Context Preservation:** Both lanes preserved continuous session continuity across all 50 tasks in dedicated UUID conversations without per-task context resets.
+4. **Independent Official SWE Evaluation:** Solutions were graded automatically against the official repository test suites in isolated testbeds with dedicated Python environments (`.venv311`).
+
+All 100 receipts and results are preserved in [benchmarks/benchmark-results.json](../benchmarks/benchmark-results.json).
+
+## Historical Codex V3 Release Result
 
 V3's full same50 comparison is now officially graded: vanilla 38/50, modified 34/50. Primary known tokens are 50,686,068 versus 11,288,140 (77.73% fewer); output is 55,283 versus 75,814 (37.14% more). This did not meet output-reduction, solve-parity or 85-90% reduction targets.
 

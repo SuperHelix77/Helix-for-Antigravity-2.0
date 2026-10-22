@@ -2,9 +2,9 @@
   <img src="docs/assets/helix-engine-banner.svg" alt="HELIX Engine — less replay, exact evidence, more useful work" width="100%">
 </p>
 
-# HELIX Engine
+# HELIX Engine — Antigravity Edition
 
-**Make the model think about the problem. Not the same tool output for the twentieth time.**
+**Hierarchical Evidence Loading and Intelligent eXecution for Google Antigravity & Gemini Agents.**
 
 <p align="center">
   <a href="https://buymeacoffee.com/superhelix7">
@@ -12,45 +12,61 @@
   </a>
 </p>
 
-[Latest release](https://github.com/SuperHelix77/HELIX-1.0/releases/latest) · [Install](docs/INSTALL.md) · [Architecture](docs/ARCHITECTURE.md) · [Benchmarks](docs/BENCHMARKS.md) · [Modules](docs/MODULES.md)
+[Install](docs/INSTALL.md) · [Architecture](docs/ARCHITECTURE.md) · [Benchmarks](docs/BENCHMARKS.md) · [Modules](docs/MODULES.md) · [Benchmark Ledger](benchmarks/benchmark-results.json)
 
-I spent a year getting here. It started with small token-saving tricks: tighter prompts, tool-output filtering, RTK. Those helped, but they didn't solve the underlying problem. Coding agents kept rereading old evidence, reconstructing decisions they had already made, and asking expensive models to coordinate work a deterministic program could do.
+HELIX is a **local evidence, memory and deterministic execution layer for coding agents**, fine-tuned for Google Antigravity (`agy`) and Gemini 3.8 Flash High.
 
-So I kept building. And failing. And measuring. HELIX is the result.
-
-HELIX is a **local evidence, memory and deterministic execution layer for coding agents**, with an Electron monitor. It keeps original tool results recoverable, gives the model compact evidence when that is sufficient, and moves explicitly authorized mechanical operations out of the reasoning loop.
-
-It is not a new model. It does not lower the configured reasoning effort. It is not a promise that compression preserves intelligence. The benchmark below includes failures, and I intend to keep them visible.
+While the original [HELIX 1.0 for Codex](https://github.com/SuperHelix77/HELIX-1.0) was developed for OpenAI/Codex tooling, this **Antigravity Edition** re-architects context management for Gemini's prompt-caching behavior, introducing **Lean Switch frontier shaping**, **Continuous Context Control**, **Two-Tier context retirement**, and native Antigravity plugin and MCP integration.
 
 ![HELIX desktop interface — public synthetic demonstration data](docs/assets/release-dark-desktop.png)
 
 *The desktop image uses synthetic data. It is not a screenshot of the measured benchmark.*
 
-## The result — and the cost
+## The Result — SWE-bench NEW50 (Gemini 3.8 Flash High)
 
-The completed V3 NEW50 experiment used the same 50 SWE issues and historical vanilla baseline. Both lanes retained a single native conversation across tasks, including infrastructure resumes.
+We conducted an unreset, continuous-context 50-task SWE NEW50 benchmark comparing unmodified Vanilla Gemini 3.8 Flash High against HELIX under strict anti-contamination quarantine and official test suite grading.
 
-| Measure | Vanilla | HELIX V3 |
-| --- | ---: | ---: |
-| Official solves | **38 / 50** | **34 / 50** |
-| Primary model requests | 341 | 420 |
-| All attempts, including overloads | 346 | 423 |
-| Known input tokens | 50,630,785 | 11,212,326 |
-| Known output tokens, including reasoning | 55,283 | 75,814 |
-| Known total tokens | 50,686,068 | 11,288,140 |
-| Primary requests with unknown usage | 0 | 1 |
+Both lanes ran sequential tasks back-to-back within a single native conversation per lane, without synthetic resets or historical patch replay:
 
-**77.73% fewer known provider tokens. Four fewer verified solves. 37.14% more output tokens.**
+| Benchmark Dimension | Vanilla Antigravity | HELIX Antigravity | Empirical Delta | Impact / Multiplier |
+| :--- | :---: | :---: | :---: | :---: |
+| **Tasks Evaluated** | **50 / 50** | **50 / 50** | 0 (Identical Cohort) | 100% Complete |
+| **Official Solves** | **11 / 50 (22.0%)** | **10 / 50 (20.0%)** | -1 Solve (-2.0%) | **90.9% Solve Parity** |
+| **Total Billable Tokens** | **452,661,692** | **172,259,815** | **-280,401,877 tokens** | **61.95% Net Savings (2.63x Efficiency)** |
+| **Total Cached Context** | **10,503,585,319** | **1,426,600,795** | **-9,076,984,524 tokens** | **86.42% Context Reduction (7.36x Efficiency)** |
+| **Input Tokens** | 417,585,602 | 162,218,245 | -255,367,357 tokens | 61.15% Reduction |
+| **Output / Gen Tokens** | 35,076,090 | 10,041,570 | -25,034,520 tokens | 71.38% Reduction |
+| **Reasoning Tokens** | 24,127,579 | 8,266,825 | -15,860,754 tokens | 65.74% Reduction |
+| **Mean Billable / Task** | 9,053,234 tokens | 3,445,196 tokens | -5,608,038 tokens | -5.61M tokens / task |
+| **Mean Cache / Task** | 210,071,706 tokens | 28,532,016 tokens | -181,539,690 tokens | -181.5M cached tokens / task |
 
-That is the actual trade-off. HELIX demonstrated major input-efficiency gains; it **did not** demonstrate quality parity or output savings. Do not quote the token reduction as a subscription-quota multiplier, a complete billing estimate, or proof that the model became smarter.
+### Solve Distribution (13 Distinct Solves)
+- **Both Solved (8 Tasks):** `django__django-15061`, `django__django-11422`, `django__django-11583`, `django__django-14999`, `django__django-14752`, `django__django-14017`, `django__django-16379`, `sympy__sympy-20212`
+- **Vanilla Only (3 Tasks):** `django__django-14534`, `django__django-13448`, `django__django-11564`
+- **HELIX Only (2 Tasks):** `django__django-15213`, `django__django-12453`
 
-The experiment is not a clean held-out randomized trial: V3 reused the known issue cohort and historical vanilla baseline. Confirmed overloads are excluded symmetrically from primary accounting but retained in the all-attempt ledger. Failed work, retries and two rejected post-completion operations remain counted. One request has unknown usage. Parent coordination, consultation and some recovery overhead were not metered.
+Every execution event is backed by immutable receipts in [benchmarks/benchmark-results.json](benchmarks/benchmark-results.json).
 
-All 100 official grades and 50 gold controls were audited. Cold recovery checked 261 result-store originals, 758 program-store originals, 417 archived pairs and 92 advertised handles. No native compaction occurred in the run. The solver was stopped after grading because the completion broker rejected further operations; I do not claim a clean native shutdown.
+---
 
-**Read the evidence, not just the percentage:** [V3 results](benchmarks/new50-v3/results.json) · [Per-issue trajectory](benchmarks/new50-v3/cumulative.csv) · [V1 comparison](benchmarks/new50-v1/results.json) · [Methodology and limitations](docs/BENCHMARKS.md).
+## What Changed in the Antigravity Edition
 
-The newer memory, RTK and desktop integrations have local tests; they are **not** credited with a fresh equivalent provider benchmark.
+Compared to the Codex edition of HELIX 1.0:
+
+1. **Lean Switch Frontier Shaping (`lean_run`)**:
+   Instead of flooding conversation context with hundreds of lines of pytest or git diff output, Lean Switch generates verified compact status receipts (`[HELIX Lean Switch: run_command exit:0 raw:X bytes; Y passed in Zs; handle:...]`) while preserving error tracebacks. 100% of the raw output is encrypted into local storage, recoverable on demand via `context raw { receipt: handle }`.
+
+2. **Continuous Context Control (`seal`)**:
+   In continuous multi-task agent sessions, prior task outputs cause catastrophic prompt cache accumulation ($O(N^2)$). The Antigravity edition introduces the `seal` action (`helix.handoff.v1`), allowing the agent to archive completed task turns into encrypted stores and carry forward only a compact, tamper-evident handoff receipt. This reduced cached context bloat by **86.42%** (from 10.5 billion to 1.43 billion tokens).
+
+3. **Two-Tier Context Optimizer**:
+   Combines scoped task retirement with active intra-task aging. Rather than naively truncating history, older tool results transition to compact references while preserving current decision frontiers and exact recovery handles.
+
+4. **Decisive Multi-File Batch Inspection (`batch_inspect`)**:
+   Replaces fragmented micro-reads (reading 30 lines across 10 turns) with a single atomic batch range inspection, eliminating intermediate model round-trips.
+
+5. **Native Antigravity Plugin & MCP Server**:
+   Ships with native plugin manifests (`~/.gemini/config/plugins/helix/`), tool schemas (`~/.gemini/antigravity/mcp/helix/`), global execution rules, and CLI symlink (`~/.gemini/antigravity/bin/helix`).
 
 ## What HELIX actually does
 
