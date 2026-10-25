@@ -206,7 +206,8 @@ export class Helix2ContextSharpener {
     // [3] Dynamic Per-Turn Suffix (Speculative workspace state & AST target locus)
     const staticHeader = [
       `[HELIX 2.0 PROTOCOL ACTIVATED - ZERO-BLOAT EPHEMERAL CONTEXT]`,
-      `Instructions: STRICT ONE FLOW LAW: Maximum 1 compound tool invocation per turn. Group all inspection, execution, and verification into a single unified step, then deliver your response directly. Serialized micro-reads and iterative thought-act ping-pong are strictly forbidden.`
+      `Instructions: STRICT ONE FLOW LAW: Maximum 1 compound tool invocation per turn. Group all inspection, execution, and verification into a single unified step, then deliver your response directly. Serialized micro-reads and iterative thought-act ping-pong are strictly forbidden.`,
+      `Reasoning Mandate: CHAIN-OF-DRAFT: Reason telegraphically in internal thinking. State hypotheses, constraints, and state transitions directly. Omit conversational narrative and rhetorical self-talk to minimize reasoning token overhead while preserving full analytical rigor.`
     ];
 
     const stableSections = [];
