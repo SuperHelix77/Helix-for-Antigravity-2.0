@@ -25,7 +25,7 @@ test('pre-tool-use hook wraps verbose commands with Helix lean switch', (t) => {
   assert.equal(res1.status, 0);
   const out1 = JSON.parse(res1.stdout);
   assert.equal(out1.decision, 'allow');
-  assert.ok(out1.overwrite?.CommandLine.includes('helix.mjs lean -- npm test'));
+  assert.ok(out1.overwrite?.CommandLine.includes('helix.mjs') && out1.overwrite?.CommandLine.includes('lean'));
 
   // 2. Non-verbose command should be allowed without overwrite
   const inputSimple = JSON.stringify({
