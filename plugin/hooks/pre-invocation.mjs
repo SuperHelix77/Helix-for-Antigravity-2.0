@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 async function main() {
   const chunks = [];
@@ -48,7 +49,14 @@ async function main() {
   }
 
   try {
-    const { Helix2ContextSharpener } = await import('/Users/mert/.gemini/antigravity/scratch/HELIX-1.0/src/helix2-context-sharpener.mjs');
+    const __dirname = path.dirname(fileURLToPath(import.meta.url));
+    const candidates = [
+      path.resolve(__dirname, '../../src/helix2-context-sharpener.mjs'),
+      path.resolve(__dirname, '../src/helix2-context-sharpener.mjs'),
+      '/Users/mert/.gemini/antigravity/scratch/HELIX-1.0/src/helix2-context-sharpener.mjs'
+    ];
+    let sharpenerPath = candidates.find(p => fs.existsSync(p)) || candidates[0];
+    const { Helix2ContextSharpener } = await import(sharpenerPath);
     const sharpener = new Helix2ContextSharpener();
     const sharpContext = sharpener.shapePreInvocation({
       workspaceDir,

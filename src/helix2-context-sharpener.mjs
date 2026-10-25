@@ -5,6 +5,7 @@ import { extractTargetContext } from './helix2-ast-inliner.mjs';
 import { DeterministicMemory } from './memory.mjs';
 import { Helix2LazyManager } from './helix2-lazy-manager.mjs';
 import { Helix2TranscriptShaper } from './helix2-transcript-shaper.mjs';
+import { Helix2SpeculativePreAnalyzer } from './helix2-speculative-pre-analyzer.mjs';
 import { redactContextText } from './compaction-checkpoint.mjs';
 import { STATE_DIR } from './paths.mjs';
 
@@ -22,12 +23,13 @@ try { fs.mkdirSync(CACHE_DIR, { recursive: true, mode: 0o700 }); } catch {}
  * 5. Injects context as an ephemeral message so that transcript.jsonl NEVER bloats.
  */
 export class Helix2ContextSharpener {
-  constructor({ memory, stateDir = STATE_DIR, lazyManager } = {}) {
+  constructor({ memory, stateDir = STATE_DIR, lazyManager, preAnalyzer } = {}) {
     this.memory = memory || new DeterministicMemory(stateDir);
     this.stateDir = stateDir;
     this.cacheDir = path.join(stateDir, 'cache');
     try { fs.mkdirSync(this.cacheDir, { recursive: true, mode: 0o700 }); } catch {}
     this.lazyManager = lazyManager || new Helix2LazyManager();
+    this.preAnalyzer = preAnalyzer || new Helix2SpeculativePreAnalyzer();
   }
 
   /**
@@ -194,9 +196,22 @@ export class Helix2ContextSharpener {
       } catch {}
     }
 
+    // 4. Speculative Pre-Analysis (Working tree diff, prompt target symbols, and recent errors)
+    let specSnippet = '';
+    try {
+      specSnippet = this.preAnalyzer.analyzeWorkspace({
+        workspaceDir,
+        userPrompt: latestUserPrompt,
+        transcriptPath
+      });
+    } catch {}
+
     const sections = [];
     if (astSnippet && astSnippet.trim().length > 0) {
       sections.push(astSnippet.trim());
+    }
+    if (specSnippet && specSnippet.trim().length > 0) {
+      sections.push(specSnippet.trim());
     }
     if (memorySnippet && memorySnippet.trim().length > 0) {
       sections.push(memorySnippet.trim());

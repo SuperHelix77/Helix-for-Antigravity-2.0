@@ -67,3 +67,38 @@ test('Helix2ToolPipeline halts at first failure boundary', async () => {
 
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
+
+test('helix flow CLI supports flags and inline JSON pipelines', async () => {
+  const { execFileSync } = await import('node:child_process');
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'helix2-flow-cli-'));
+  const testFile = path.join(tmpDir, 'sample.txt');
+  fs.writeFileSync(testFile, 'initial content', 'utf8');
+
+  const helixBin = path.resolve('bin/helix.mjs');
+
+  // Test 1: Flag-based execution
+  const flagOut = execFileSync(process.execPath, [
+    helixBin, 'flow',
+    '--edit', testFile,
+    '--target', 'initial',
+    '--replace', 'flow-updated',
+    '--test', `${process.platform === 'win32' ? 'type' : 'cat'} "${testFile}"`
+  ], { cwd: tmpDir, encoding: 'utf8' });
+
+  assert.ok(flagOut.includes('status:SUCCESS'));
+  assert.ok(flagOut.includes('Edited'));
+  assert.equal(fs.readFileSync(testFile, 'utf8'), 'flow-updated content');
+
+  // Test 2: Inline JSON execution
+  const inlineSpec = JSON.stringify([
+    { kind: 'command', command: 'echo "inline success"' }
+  ]);
+  const jsonOut = execFileSync(process.execPath, [
+    helixBin, 'flow', inlineSpec
+  ], { cwd: tmpDir, encoding: 'utf8' });
+
+  assert.ok(jsonOut.includes('status:SUCCESS'));
+  assert.ok(jsonOut.includes('Step #1 (command): PASS'));
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});

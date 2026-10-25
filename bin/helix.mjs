@@ -171,16 +171,49 @@ if (command === 'serve') {
     }
     console.log(`Transcript shaping complete: ${shaped} conversations processed.`);
   }
-} else if (command === 'pipeline') {
+} else if (command === 'pipeline' || command === 'flow') {
   const { Helix2ToolPipeline } = await import('../src/helix2-tool-pipeline.mjs');
-  const specPath = process.argv[3];
-  if (!specPath) {
-    console.error('Usage: helix pipeline <spec.json>');
-    process.exit(1);
+  let operations = [];
+  let project = process.cwd();
+
+  const editIdx = process.argv.indexOf('--edit');
+  const targetIdx = process.argv.indexOf('--target');
+  const replaceIdx = process.argv.indexOf('--replace');
+  const testIdx = process.argv.indexOf('--test');
+
+  if (editIdx !== -1) {
+    operations.push({
+      kind: 'edit',
+      file: process.argv[editIdx + 1],
+      target: targetIdx !== -1 ? process.argv[targetIdx + 1] : '',
+      replacement: replaceIdx !== -1 ? process.argv[replaceIdx + 1] : ''
+    });
+    if (testIdx !== -1) {
+      operations.push({
+        kind: 'command',
+        command: process.argv[testIdx + 1]
+      });
+    }
+  } else {
+    const rawArg = process.argv[3];
+    if (!rawArg || rawArg === '--help' || rawArg === '-h') {
+      console.log('Usage: helix flow --edit <file> --target <str> --replace <str> [--test <cmd>] OR helix flow <spec.json|json_string>');
+      process.exit(0);
+    }
+
+    if (rawArg.startsWith('[') || rawArg.startsWith('{')) {
+      const parsed = JSON.parse(rawArg);
+      operations = Array.isArray(parsed) ? parsed : (parsed.operations || parsed.steps || []);
+      if (parsed.project) project = parsed.project;
+    } else {
+      const spec = JSON.parse(fs.readFileSync(rawArg, 'utf8'));
+      operations = spec.operations || spec.steps || [];
+      if (spec.project) project = spec.project;
+    }
   }
-  const spec = JSON.parse(fs.readFileSync(specPath, 'utf8'));
-  const pipeline = new Helix2ToolPipeline({ directory: process.cwd() });
-  const result = await pipeline.executePipeline(spec.project || process.cwd(), spec.operations || spec.steps || []);
+
+  const pipeline = new Helix2ToolPipeline();
+  const result = await pipeline.executePipeline(project, operations);
   console.log(result.summary);
   if (!result.success) process.exit(1);
 } else if (command === 'raw' || command === 'recover') {
