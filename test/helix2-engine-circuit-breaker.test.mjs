@@ -5,209 +5,184 @@ import path from 'node:path';
 import os from 'node:os';
 import { Helix2EngineCircuitBreaker } from '../src/helix2-engine-circuit-breaker.mjs';
 
-test('Helix2EngineCircuitBreaker - Gate 1: Denies redundant read_file when AST locus is pre-resolved', (t) => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'helix-cb-test-'));
+// =============================================================================
+// PreToolUse: allow + overwrite only, NEVER deny
+// =============================================================================
+
+test('PreToolUse: read_file unbounded → overwrite to 300 lines (never deny)', (t) => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'helix-cb-'));
   const breaker = new Helix2EngineCircuitBreaker({ stateDir: tmpDir });
-  const convId = 'conv-gate1-test';
-  const targetRel = 'src/service.py';
 
-  // Initialize turn with inlined AST target
-  breaker.initTurn({
-    conversationId: convId,
-    workspaceDir: tmpDir,
-    userPrompt: 'Fix bug in ServiceHandler in src/service.py',
-    astInlinedFile: targetRel
-  });
-
-  // Attempting to read the inlined target file must be DENIED
-  const res = breaker.checkPreToolUse({
-    toolCall: {
-      name: 'read_file',
-      args: { Path: targetRel }
-    },
-    workspaceDir: tmpDir,
-    conversationId: convId
-  });
-
-  assert.equal(res.decision, 'deny');
-  assert.ok(res.reason.includes('[HELIX ENGINE 1-FLOW BREAKER]'));
-  assert.ok(res.reason.includes('already 100% pre-resolved'));
-
-  // Attempting to read an unrelated file is allowed (bounded)
-  const resOther = breaker.checkPreToolUse({
-    toolCall: {
-      name: 'read_file',
-      args: { Path: 'src/other.py' }
-    },
-    workspaceDir: tmpDir,
-    conversationId: convId
-  });
-
-  assert.equal(resOther.decision, 'allow');
-  assert.equal(resOther.overwrite?.StartLine, 1);
-  assert.equal(resOther.overwrite?.EndLine, 300);
-
-  fs.rmSync(tmpDir, { recursive: true, force: true });
-});
-
-test('Helix2EngineCircuitBreaker - Gate 2: Denies post-mutation exploratory reads', (t) => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'helix-cb-test-'));
-  const breaker = new Helix2EngineCircuitBreaker({ stateDir: tmpDir });
-  const convId = 'conv-gate2-test';
-
-  breaker.initTurn({
-    conversationId: convId,
-    workspaceDir: tmpDir,
-    userPrompt: 'Refactor auth module'
-  });
-
-  // Record an edit_file mutation
-  breaker.recordPostToolUse({
-    toolCall: {
-      name: 'edit_file',
-      args: { Path: 'src/auth.ts' }
-    },
-    conversationId: convId,
-    workspaceDir: tmpDir
-  });
-
-  // Any subsequent read_file must be DENIED
-  const res = breaker.checkPreToolUse({
-    toolCall: {
-      name: 'read_file',
-      args: { Path: 'src/auth.ts' }
-    },
-    workspaceDir: tmpDir,
-    conversationId: convId
-  });
-
-  assert.equal(res.decision, 'deny');
-  assert.ok(res.reason.includes('[HELIX ENGINE 1-FLOW BREAKER]'));
-  assert.ok(res.reason.includes('Post-mutation read is blocked by engine'));
-
-  fs.rmSync(tmpDir, { recursive: true, force: true });
-});
-
-test('Helix2EngineCircuitBreaker - Gate 3: Enforces single-read budget per turn', (t) => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'helix-cb-test-'));
-  const breaker = new Helix2EngineCircuitBreaker({ stateDir: tmpDir });
-  const convId = 'conv-gate3-test';
-
-  breaker.initTurn({
-    conversationId: convId,
-    workspaceDir: tmpDir,
-    userPrompt: 'Investigate system crash'
-  });
-
-  // First read is allowed
+  // Unbounded read → bounded to 300
   const res1 = breaker.checkPreToolUse({
-    toolCall: {
-      name: 'read_file',
-      args: { Path: 'logs/crash.log' }
-    },
-    workspaceDir: tmpDir,
-    conversationId: convId
+    toolCall: { name: 'read_file', args: { Path: '/any/file.py' } }
   });
   assert.equal(res1.decision, 'allow');
+  assert.equal(res1.overwrite.StartLine, 1);
+  assert.equal(res1.overwrite.EndLine, 300);
 
-  // Record that the first read executed
+  // Bounded read within range → no overwrite
+  const res2 = breaker.checkPreToolUse({
+    toolCall: { name: 'read_file', args: { Path: '/any/file.py', StartLine: 10, EndLine: 50 } }
+  });
+  assert.equal(res2.decision, 'allow');
+  assert.equal(res2.overwrite, undefined);
+
+  // Oversized read → bounded
+  const res3 = breaker.checkPreToolUse({
+    toolCall: { name: 'read_file', args: { Path: '/any/file.py', StartLine: 1, EndLine: 800 } }
+  });
+  assert.equal(res3.decision, 'allow');
+  assert.equal(res3.overwrite.EndLine, 301);
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('PreToolUse: read_file is ALWAYS allowed even with AST pre-resolved or post-mutation', (t) => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'helix-cb-'));
+  const breaker = new Helix2EngineCircuitBreaker({ stateDir: tmpDir });
+  const convId = 'test-no-deny';
+
+  // Set up state: AST inlined + mutation applied
+  breaker.initTurn({
+    conversationId: convId,
+    workspaceDir: tmpDir,
+    userPrompt: 'Fix bug in service.py',
+    astInlinedFile: 'src/service.py'
+  });
   breaker.recordPostToolUse({
-    toolCall: {
-      name: 'read_file',
-      args: { Path: 'logs/crash.log' }
-    },
+    toolCall: { name: 'edit_file', args: { Path: 'src/service.py' } },
     conversationId: convId,
     workspaceDir: tmpDir
   });
 
-  // Second serial read_file must be DENIED
+  // read_file on the AST-resolved file → ALLOWED (not denied!)
+  const res = breaker.checkPreToolUse({
+    toolCall: { name: 'read_file', args: { Path: 'src/service.py' } },
+    conversationId: convId
+  });
+  assert.equal(res.decision, 'allow', 'Must be allow, never deny');
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('PreToolUse: run_command wraps verbose commands with lean switch', (t) => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'helix-cb-'));
+  const breaker = new Helix2EngineCircuitBreaker({ stateDir: tmpDir });
+
+  const res = breaker.checkPreToolUse({
+    toolCall: { name: 'run_command', args: { CommandLine: 'npm test' } },
+    leanRunner: '/path/to/helix.mjs'
+  });
+  assert.equal(res.decision, 'allow');
+  assert.ok(res.overwrite?.CommandLine.includes('helix.mjs'));
+  assert.ok(res.overwrite?.CommandLine.includes('lean'));
+
+  // Non-verbose command → no overwrite
   const res2 = breaker.checkPreToolUse({
-    toolCall: {
-      name: 'read_file',
-      args: { Path: 'logs/secondary.log' }
-    },
-    workspaceDir: tmpDir,
-    conversationId: convId
+    toolCall: { name: 'run_command', args: { CommandLine: 'echo hello' } }
   });
-
-  assert.equal(res2.decision, 'deny');
-  assert.ok(res2.reason.includes('[HELIX ENGINE 1-FLOW BREAKER]'));
-  assert.ok(res2.reason.includes('Multiple serial read_file calls across turns are blocked'));
+  assert.equal(res2.decision, 'allow');
+  assert.equal(res2.overwrite, undefined);
 
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-test('Helix2EngineCircuitBreaker - Gate 4: Denies standalone exploratory shell commands', (t) => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'helix-cb-test-'));
+test('PreToolUse: standalone cat/grep is ALLOWED (no deny)', (t) => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'helix-cb-'));
   const breaker = new Helix2EngineCircuitBreaker({ stateDir: tmpDir });
-  const convId = 'conv-gate4-test';
 
-  breaker.initTurn({
-    conversationId: convId,
-    workspaceDir: tmpDir,
-    userPrompt: 'Fix parser in src/parser.rs',
-    astInlinedFile: 'src/parser.rs'
+  // Even exploratory commands are allowed — PostInvocation handles the loop cap
+  const res = breaker.checkPreToolUse({
+    toolCall: { name: 'run_command', args: { CommandLine: 'cat src/service.py' } }
   });
-
-  // Standalone cat must be DENIED
-  const resCat = breaker.checkPreToolUse({
-    toolCall: {
-      name: 'run_command',
-      args: { CommandLine: 'cat src/parser.rs' }
-    },
-    workspaceDir: tmpDir,
-    conversationId: convId
-  });
-  assert.equal(resCat.decision, 'deny');
-  assert.ok(resCat.reason.includes('Standalone exploratory shell command'));
-
-  // Standalone python inspect must be DENIED
-  const resInspect = breaker.checkPreToolUse({
-    toolCall: {
-      name: 'run_command',
-      args: { CommandLine: 'python3 -c "import inspect; print(inspect.getsource(x))"' }
-    },
-    workspaceDir: tmpDir,
-    conversationId: convId
-  });
-  assert.equal(resInspect.decision, 'deny');
-
-  // Compound pipeline command (&&) is ALLOWED
-  const resCompound = breaker.checkPreToolUse({
-    toolCall: {
-      name: 'run_command',
-      args: { CommandLine: 'npm run build && npm test' }
-    },
-    workspaceDir: tmpDir,
-    conversationId: convId
-  });
-  assert.equal(resCompound.decision, 'allow');
-
-  // helix flow command is ALLOWED
-  const resFlow = breaker.checkPreToolUse({
-    toolCall: {
-      name: 'run_command',
-      args: { CommandLine: 'helix flow --edit src/parser.rs --target "foo" --replace "bar" --test "cargo test"' }
-    },
-    workspaceDir: tmpDir,
-    conversationId: convId
-  });
-  assert.equal(resFlow.decision, 'allow');
+  assert.equal(res.decision, 'allow');
 
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-test('Helix2EngineCircuitBreaker - Turn reset on new prompt', (t) => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'helix-cb-test-'));
-  const breaker = new Helix2EngineCircuitBreaker({ stateDir: tmpDir });
-  const convId = 'conv-reset-test';
+// =============================================================================
+// PostInvocation: the actual enforcement point
+// =============================================================================
 
-  // Turn 1
-  breaker.initTurn({
+test('PostInvocation: terminates at invocation cap (default 2)', (t) => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'helix-cb-'));
+  const breaker = new Helix2EngineCircuitBreaker({ stateDir: tmpDir, maxInvocations: 2 });
+  const convId = 'test-post-inv';
+
+  breaker.initTurn({ conversationId: convId, workspaceDir: tmpDir, userPrompt: 'Fix bug' });
+
+  // invocationNum 0 → allow
+  const r0 = breaker.checkPostInvocation({ conversationId: convId, invocationNum: 0 });
+  assert.equal(r0.terminationBehavior, undefined);
+
+  // invocationNum 1 → TERMINATE (>= maxInvocations - 1)
+  const r1 = breaker.checkPostInvocation({ conversationId: convId, invocationNum: 1 });
+  assert.equal(r1.terminationBehavior, 'terminate');
+
+  // invocationNum 2 → TERMINATE
+  const r2 = breaker.checkPostInvocation({ conversationId: convId, invocationNum: 2 });
+  assert.equal(r2.terminationBehavior, 'terminate');
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('PostInvocation: soft-terminates after mutation + invocation 1', (t) => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'helix-cb-'));
+  const breaker = new Helix2EngineCircuitBreaker({ stateDir: tmpDir, maxInvocations: 3 });
+  const convId = 'test-post-inv-soft';
+
+  breaker.initTurn({ conversationId: convId, workspaceDir: tmpDir, userPrompt: 'Fix bug' });
+
+  // Record a mutation
+  breaker.recordPostToolUse({
+    toolCall: { name: 'edit_file', args: { Path: 'src/service.py' } },
     conversationId: convId,
-    workspaceDir: tmpDir,
-    userPrompt: 'First prompt'
+    workspaceDir: tmpDir
   });
+
+  // invocationNum 0 → allow (mutation done, but let model see the result)
+  const r0 = breaker.checkPostInvocation({ conversationId: convId, invocationNum: 0 });
+  assert.equal(r0.terminationBehavior, undefined);
+
+  // invocationNum 1 with mutation → TERMINATE (soft cap)
+  const r1 = breaker.checkPostInvocation({ conversationId: convId, invocationNum: 1 });
+  assert.equal(r1.terminationBehavior, 'terminate');
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('PostInvocation: respects configurable maxInvocations', (t) => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'helix-cb-'));
+
+  // Very tight cap: 1 invocation max
+  const breaker1 = new Helix2EngineCircuitBreaker({ stateDir: tmpDir, maxInvocations: 1 });
+  const convId = 'test-tight-cap';
+  breaker1.initTurn({ conversationId: convId, workspaceDir: tmpDir, userPrompt: 'Fix bug' });
+
+  const r0 = breaker1.checkPostInvocation({ conversationId: convId, invocationNum: 0 });
+  assert.equal(r0.terminationBehavior, 'terminate', 'maxInvocations=1 should terminate after invocation 0');
+
+  // Loose cap: 5 invocations
+  const breaker5 = new Helix2EngineCircuitBreaker({ stateDir: tmpDir, maxInvocations: 5 });
+  const r3 = breaker5.checkPostInvocation({ conversationId: convId, invocationNum: 3 });
+  assert.equal(r3.terminationBehavior, undefined, 'maxInvocations=5 should allow invocation 3');
+  const r4 = breaker5.checkPostInvocation({ conversationId: convId, invocationNum: 4 });
+  assert.equal(r4.terminationBehavior, 'terminate', 'maxInvocations=5 should terminate at invocation 4');
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+// =============================================================================
+// Turn reset
+// =============================================================================
+
+test('Turn state resets on new user prompt', (t) => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'helix-cb-'));
+  const breaker = new Helix2EngineCircuitBreaker({ stateDir: tmpDir });
+  const convId = 'test-reset';
+
+  breaker.initTurn({ conversationId: convId, workspaceDir: tmpDir, userPrompt: 'First prompt' });
   breaker.recordPostToolUse({
     toolCall: { name: 'edit_file', args: { Path: 'a.js' } },
     conversationId: convId,
@@ -217,15 +192,10 @@ test('Helix2EngineCircuitBreaker - Turn reset on new prompt', (t) => {
   let state = breaker.getState(convId);
   assert.equal(state.mutationsCount, 1);
 
-  // Turn 2 with new prompt
-  breaker.initTurn({
-    conversationId: convId,
-    workspaceDir: tmpDir,
-    userPrompt: 'Second prompt with different requirements'
-  });
-
+  // New prompt → counters reset
+  breaker.initTurn({ conversationId: convId, workspaceDir: tmpDir, userPrompt: 'Different prompt' });
   state = breaker.getState(convId);
-  assert.equal(state.mutationsCount, 0, 'Counters must reset on new prompt');
+  assert.equal(state.mutationsCount, 0);
   assert.equal(state.readsCount, 0);
 
   fs.rmSync(tmpDir, { recursive: true, force: true });
