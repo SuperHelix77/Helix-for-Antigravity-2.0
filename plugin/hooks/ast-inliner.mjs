@@ -66,6 +66,10 @@ export function extractTargetContext(repoDir, problemStatement) {
     if (l.includes('test') || l.includes('doc') || l.includes('tutorial') || l.includes('example') || l.includes('benchmark')) {
       return false;
     }
+    // Security Guard: never inline sensitive keyfiles, secrets, or credential stores
+    if (/(?:secret|credential|token|password|auth|private|cert|key)\b/i.test(l)) {
+      return false;
+    }
     return rel.endsWith('.py') || rel.endsWith('.js') || rel.endsWith('.mjs') || rel.endsWith('.ts') || rel.endsWith('.tsx');
   }
 

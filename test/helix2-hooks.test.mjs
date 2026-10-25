@@ -61,3 +61,39 @@ test('post-tool-use hook runs without error and outputs empty object', (t) => {
   const out = JSON.parse(res.stdout);
   assert.deepEqual(out, {});
 });
+
+test('pre-tool-use hook bounds unbounded read_file calls to 300 lines max', (t) => {
+  const inputUnbounded = JSON.stringify({
+    toolCall: {
+      name: 'read_file',
+      args: { Path: '/some/large/file.py' }
+    }
+  });
+
+  const res = spawnSync(process.execPath, [preToolHook], {
+    input: inputUnbounded,
+    encoding: 'utf8'
+  });
+
+  assert.equal(res.status, 0);
+  const out = JSON.parse(res.stdout);
+  assert.equal(out.decision, 'allow');
+  assert.equal(out.overwrite?.StartLine, 1);
+  assert.equal(out.overwrite?.EndLine, 300);
+
+  // Bounded read_file should not be overwritten
+  const inputBounded = JSON.stringify({
+    toolCall: {
+      name: 'read_file',
+      args: { Path: '/some/file.py', StartLine: 10, EndLine: 50 }
+    }
+  });
+  const res2 = spawnSync(process.execPath, [preToolHook], {
+    input: inputBounded,
+    encoding: 'utf8'
+  });
+  assert.equal(res2.status, 0);
+  const out2 = JSON.parse(res2.stdout);
+  assert.equal(out2.decision, 'allow');
+  assert.equal(out2.overwrite, undefined);
+});

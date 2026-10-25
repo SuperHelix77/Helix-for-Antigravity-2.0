@@ -19,7 +19,30 @@ async function main() {
   }
 
   const toolCall = input.toolCall;
-  if (!toolCall || toolCall.name !== 'run_command' || !toolCall.args?.CommandLine) {
+  if (!toolCall) {
+    process.stdout.write(JSON.stringify({ decision: 'allow' }));
+    return;
+  }
+
+  // 1. Intercept read_file: bound unbounded reads to 300 lines max to prevent prompt dumps
+  if (toolCall.name === 'read_file' && toolCall.args?.Path) {
+    const args = toolCall.args;
+    if (args.StartLine === undefined && args.EndLine === undefined) {
+      process.stdout.write(JSON.stringify({
+        decision: 'allow',
+        overwrite: {
+          StartLine: 1,
+          EndLine: 300
+        }
+      }));
+      return;
+    }
+    process.stdout.write(JSON.stringify({ decision: 'allow' }));
+    return;
+  }
+
+  // 2. Intercept verbose terminal commands with Lean Switch
+  if (toolCall.name !== 'run_command' || !toolCall.args?.CommandLine) {
     process.stdout.write(JSON.stringify({ decision: 'allow' }));
     return;
   }
