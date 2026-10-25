@@ -35,7 +35,7 @@ async function main() {
     // Auto-shape transcript if it exceeds bounded limit (Solution A: O(1) auto-compaction)
     try {
       const { Helix2TranscriptShaper } = await import('/Users/mert/.gemini/antigravity/scratch/HELIX-1.0/src/helix2-transcript-shaper.mjs');
-      const shaper = new Helix2TranscriptShaper({ maxUncompactedBytes: 500 * 1024, retainRecentSteps: 25 });
+      const shaper = new Helix2TranscriptShaper({ maxUncompactedBytes: 300 * 1024, retainRecentSteps: 8 });
       if (shaper.needsShaping(transcriptPath)) {
         await shaper.shapeTranscript({ transcriptPath });
       }

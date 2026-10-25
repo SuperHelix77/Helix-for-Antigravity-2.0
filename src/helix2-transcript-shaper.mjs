@@ -13,7 +13,7 @@ import readline from 'node:readline';
  * 4. Runs atomically in < 25ms.
  */
 export class Helix2TranscriptShaper {
-  constructor({ maxUncompactedBytes = 400 * 1024, retainRecentSteps = 15 } = {}) {
+  constructor({ maxUncompactedBytes = 300 * 1024, retainRecentSteps = 8 } = {}) {
     this.maxUncompactedBytes = maxUncompactedBytes;
     this.retainRecentSteps = retainRecentSteps;
   }
@@ -29,8 +29,8 @@ export class Helix2TranscriptShaper {
       const lastCheckFile = `${transcriptPath}.last_shaped_size`;
       if (fs.existsSync(lastCheckFile)) {
         const lastSize = parseInt(fs.readFileSync(lastCheckFile, 'utf8').trim(), 10) || 0;
-        if (stat.size - lastSize > 30 * 1024) return true;
-      } else if (stat.size > 80 * 1024) {
+        if (stat.size - lastSize > 20 * 1024) return true;
+      } else if (stat.size > 50 * 1024) {
         return true;
       }
       return false;
