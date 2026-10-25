@@ -98,6 +98,28 @@ async function main() {
     });
 
     if (sharpContext && sharpContext.trim().length > 0) {
+      let astInlinedFile = null;
+      const astMatch = sharpContext.match(/\[HELIX UNIVERSAL 100% AST TARGET\][\s\S]*?File:\s*([^\s(]+)/);
+      if (astMatch) astInlinedFile = astMatch[1];
+
+      try {
+        const candidateBreakers = [
+          path.resolve(__dirname, '../src/helix2-engine-circuit-breaker.mjs'),
+          path.resolve(__dirname, '../../src/helix2-engine-circuit-breaker.mjs'),
+          '/Users/mert/.gemini/antigravity/scratch/HELIX-1.0/src/helix2-engine-circuit-breaker.mjs'
+        ];
+        const breakerPath = candidateBreakers.find(p => fs.existsSync(p)) || candidateBreakers[0];
+        const { Helix2EngineCircuitBreaker } = await import(breakerPath);
+        const breaker = new Helix2EngineCircuitBreaker();
+        breaker.initTurn({
+          conversationId,
+          workspaceDir,
+          userPrompt: latestUserPrompt,
+          astInlinedFile,
+          invocationNum: input.invocationNum ?? 0
+        });
+      } catch {}
+
       const output = {
         injectSteps: [
           {

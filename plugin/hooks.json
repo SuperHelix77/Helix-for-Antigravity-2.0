@@ -17,17 +17,7 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "run_command",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node /Users/mert/.gemini/config/plugins/helix/hooks/pre-tool-use.mjs",
-            "timeout": 10
-          }
-        ]
-      },
-      {
-        "matcher": "read_file",
+        "matcher": "*",
         "hooks": [
           {
             "type": "command",

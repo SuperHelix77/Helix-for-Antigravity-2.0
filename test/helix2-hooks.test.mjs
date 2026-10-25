@@ -132,6 +132,85 @@ test('session-start hook runs without error and outputs empty object', (t) => {
   assert.deepEqual(out, {});
 });
 
+test('pre-tool-use hook denies redundant read_file when AST target locus is pre-resolved in turn state', (t) => {
+  const { Helix2EngineCircuitBreaker } = import('../src/helix2-engine-circuit-breaker.mjs');
+  const convId = 'test-ast-breaker-hook';
+  const targetFile = 'src/service.py';
+
+  // Seed turn state with AST pre-resolution
+  const breakerPath = path.join(root, 'src/helix2-engine-circuit-breaker.mjs');
+  spawnSync(process.execPath, ['-e', `
+    import('${breakerPath}').then(({ Helix2EngineCircuitBreaker }) => {
+      const b = new Helix2EngineCircuitBreaker();
+      b.initTurn({
+        conversationId: '${convId}',
+        workspaceDir: '${root}',
+        userPrompt: 'Fix bug in ${targetFile}',
+        astInlinedFile: '${targetFile}'
+      });
+    });
+  `], { encoding: 'utf8' });
+
+  // Tool call attempting to read pre-resolved target file
+  const input = JSON.stringify({
+    conversationId: convId,
+    workspacePaths: [root],
+    toolCall: {
+      name: 'read_file',
+      args: { Path: targetFile }
+    }
+  });
+
+  const res = spawnSync(process.execPath, [preToolHook], {
+    input,
+    encoding: 'utf8'
+  });
+
+  assert.equal(res.status, 0);
+  const out = JSON.parse(res.stdout);
+  assert.equal(out.decision, 'deny');
+  assert.ok(out.reason.includes('[HELIX ENGINE 1-FLOW BREAKER]'));
+  assert.ok(out.reason.includes('already 100% pre-resolved'));
+});
+
+test('pre-tool-use hook denies standalone exploratory shell commands when in active turn', (t) => {
+  const convId = 'test-shell-breaker-hook';
+  const targetFile = 'src/service.py';
+
+  // Seed turn state
+  const breakerPath = path.join(root, 'src/helix2-engine-circuit-breaker.mjs');
+  spawnSync(process.execPath, ['-e', `
+    import('${breakerPath}').then(({ Helix2EngineCircuitBreaker }) => {
+      const b = new Helix2EngineCircuitBreaker();
+      b.initTurn({
+        conversationId: '${convId}',
+        workspaceDir: '${root}',
+        userPrompt: 'Fix bug in ${targetFile}',
+        astInlinedFile: '${targetFile}'
+      });
+    });
+  `], { encoding: 'utf8' });
+
+  const inputCat = JSON.stringify({
+    conversationId: convId,
+    workspacePaths: [root],
+    toolCall: {
+      name: 'run_command',
+      args: { CommandLine: 'cat src/service.py' }
+    }
+  });
+
+  const res = spawnSync(process.execPath, [preToolHook], {
+    input: inputCat,
+    encoding: 'utf8'
+  });
+
+  assert.equal(res.status, 0);
+  const out = JSON.parse(res.stdout);
+  assert.equal(out.decision, 'deny');
+  assert.ok(out.reason.includes('Standalone exploratory shell command'));
+});
+
 test('stop-monitor hook records step metrics and returns allow decision', (t) => {
   const input = JSON.stringify({
     conversationId: 'test-stop-01',

@@ -32,6 +32,10 @@ if (fs.existsSync(path.join(pluginDst, 'mcp'))) {
   fs.rmSync(path.join(pluginDst, 'mcp'), { recursive: true, force: true });
 }
 
+// 1.5 Copy src and bin so plugin is completely standalone and self-contained
+copyDir(path.join(root, 'src'), path.join(pluginDst, 'src'));
+copyDir(path.join(root, 'bin'), path.join(pluginDst, 'bin'));
+
 // 2. Copy MCP schemas
 fs.mkdirSync(mcpDst, { recursive: true });
 const mcpSrc = path.join(pluginSrc, 'mcp');

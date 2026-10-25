@@ -2,6 +2,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import { fileURLToPath } from 'node:url';
+
+const currentDir = path.dirname(fileURLToPath(import.meta.url));
 
 async function main() {
   const chunks = [];
@@ -107,6 +110,24 @@ async function main() {
       }
     } catch {}
   }
+
+  // Update Engine Circuit Breaker Turn State
+  try {
+    const candidateBreakers = [
+      path.resolve(currentDir, '../src/helix2-engine-circuit-breaker.mjs'),
+      path.resolve(currentDir, '../../src/helix2-engine-circuit-breaker.mjs'),
+      '/Users/mert/.gemini/antigravity/scratch/HELIX-1.0/src/helix2-engine-circuit-breaker.mjs'
+    ];
+    const breakerPath = candidateBreakers.find(p => fs.existsSync(p)) || candidateBreakers[0];
+    const { Helix2EngineCircuitBreaker } = await import(breakerPath);
+    const breaker = new Helix2EngineCircuitBreaker();
+    breaker.recordPostToolUse({
+      toolCall: input.toolCall,
+      error: input.error,
+      conversationId,
+      workspaceDir
+    });
+  } catch {}
 
   // Antigravity PostToolUse contract expects {}
   process.stdout.write(JSON.stringify({}));
