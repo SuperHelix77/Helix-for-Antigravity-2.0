@@ -45,13 +45,17 @@ if (fs.existsSync(mcpSrc)) {
   }
 }
 
-// 3. Make all hooks executable
+// 3. Make all hooks and binaries executable
 const hooksDir = path.join(pluginDst, 'hooks');
 if (fs.existsSync(hooksDir)) {
   for (const f of fs.readdirSync(hooksDir)) {
-    if (f.endsWith('.mjs')) {
-      try { fs.chmodSync(path.join(hooksDir, f), 0o755); } catch {}
-    }
+    try { fs.chmodSync(path.join(hooksDir, f), 0o755); } catch {}
+  }
+}
+const pluginBinDir = path.join(pluginDst, 'bin');
+if (fs.existsSync(pluginBinDir)) {
+  for (const f of fs.readdirSync(pluginBinDir)) {
+    try { fs.chmodSync(path.join(pluginBinDir, f), 0o755); } catch {}
   }
 }
 
