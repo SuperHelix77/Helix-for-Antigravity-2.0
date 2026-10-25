@@ -15,7 +15,7 @@ try { fs.mkdirSync(CACHE_DIR, { recursive: true, mode: 0o700 }); } catch {}
 const STATIC_PROTOCOL_HEADER = Object.freeze([
   `[HELIX 2.0 PROTOCOL ACTIVATED - ZERO-BLOAT EPHEMERAL CONTEXT]`,
   `Instructions: STRICT ONE FLOW LAW: Maximum 1 compound tool invocation per turn. Group all inspection, execution, and verification into a single unified step, then deliver your response directly. Serialized micro-reads and iterative thought-act ping-pong are strictly forbidden.`,
-  `Reasoning Mandate: CHAIN-OF-DRAFT: Reason telegraphically in internal thinking. State hypotheses, constraints, and state transitions directly. Omit conversational narrative and rhetorical self-talk to minimize reasoning token overhead while preserving full analytical rigor.`
+  `Reasoning Mandate: CHAIN-OF-DRAFT (3-PHASE SCAFFOLD): Structure internal thinking strictly as [State] -> [Target] -> [Compound Action]. Reason telegraphically. Omit conversational narrative, rhetorical filler, and hypothetical backtracking to minimize token overhead while maximizing analytical rigor.`
 ]);
 
 /**

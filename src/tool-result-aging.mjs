@@ -222,7 +222,9 @@ export function shapeToolResult(value) {
   if (typeof value !== "string" || !value) return value;
   const webShaped = shapeWebAndMcpPayload(value);
   const normalized = collapseTerminalRewrites(webShaped);
-  const repeated = collapseRepeatedLines(normalized.split("\n"));
+  // Optimization 4: Whitespace Squeezing & Blank Run Collapsing
+  const trimmedLines = normalized.split("\n").map(l => l.trimEnd()).join("\n").replace(/\n{3,}/g, '\n\n');
+  const repeated = collapseRepeatedLines(trimmedLines.split("\n"));
   const shaped = collapseDeeplyIndentedBlocks(repeated).join("\n");
   return shaped.length < value.length ? shaped : value;
 }

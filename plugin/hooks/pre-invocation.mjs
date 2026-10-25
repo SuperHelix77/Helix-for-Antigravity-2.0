@@ -49,10 +49,17 @@ async function main() {
     return;
   }
 
-  // Find the latest user message from the transcript
+  // Optimization 2: Fast 32KB Reverse Tail Seek (Zero full-file transcript read overhead)
   let latestUserPrompt = '';
   try {
-    const lines = fs.readFileSync(transcriptPath, 'utf8').trim().split('\n');
+    const stat = fs.statSync(transcriptPath);
+    const readSize = Math.min(stat.size, 32768);
+    const buffer = Buffer.alloc(readSize);
+    const fd = fs.openSync(transcriptPath, 'r');
+    fs.readSync(fd, buffer, 0, readSize, Math.max(0, stat.size - readSize));
+    fs.closeSync(fd);
+    const tailContent = buffer.toString('utf8');
+    const lines = tailContent.trim().split('\n');
     for (let i = lines.length - 1; i >= 0; i--) {
       try {
         const item = JSON.parse(lines[i]);
