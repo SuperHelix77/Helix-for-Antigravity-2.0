@@ -12,47 +12,27 @@ async function main() {
     chunks.push(chunk);
   }
 
+  // INSTANT RESOLUTION: Deliver {} immediately so Antigravity marks tool complete with zero delay
+  process.stdout.write('{}');
+
   let input = {};
   try {
     const raw = Buffer.concat(chunks).toString('utf8').trim();
     if (raw) input = JSON.parse(raw);
   } catch {
-    process.stdout.write(JSON.stringify({}));
     return;
   }
 
+  const toolName = input.toolCall?.name || '';
+  const conversationId = input.conversationId || input.conversation_id || process.env.CONVERSATION_ID || process.env.ANTIGRAVITY_CONVERSATION_ID || 'default';
   const workspacePaths = input.workspacePaths || [];
   const workspaceDir = workspacePaths[0] || process.cwd();
-  const conversationId = input.conversationId || input.conversation_id || process.env.CONVERSATION_ID || process.env.ANTIGRAVITY_CONVERSATION_ID || 'default';
-  
-  // Robust transcript path resolution
-  const brainDir = path.join(os.homedir(), '.gemini/antigravity/brain');
-  let transcriptPath = input.transcriptPath || input.transcript_path;
-  if (!transcriptPath && conversationId && conversationId !== 'default') {
-    const candidate = path.join(brainDir, conversationId, '.system_generated/logs/transcript.jsonl');
-    if (fs.existsSync(candidate)) transcriptPath = candidate;
-  }
-  if (!transcriptPath && fs.existsSync(brainDir)) {
-    try {
-      const convs = fs.readdirSync(brainDir).filter(c => !c.startsWith('.'));
-      let newest = null, newestMtime = 0;
-      for (const conv of convs) {
-        const cand = path.join(brainDir, conv, '.system_generated/logs/transcript.jsonl');
-        if (fs.existsSync(cand)) {
-          const mtime = fs.statSync(cand).mtimeMs;
-          if (mtime > newestMtime) { newestMtime = mtime; newest = cand; }
-        }
-      }
-      if (newest && Date.now() - newestMtime < 15 * 60 * 1000) transcriptPath = newest;
-    } catch {}
-  }
 
-  // Fast background syntax pre-flight on edited files (<10ms)
-  const toolName = input.toolCall?.name || '';
+  // Async non-blocking: Fast background syntax pre-flight on edited files
   const filePath = input.toolCall?.args?.Path || input.toolCall?.arguments?.Path || '';
   if (filePath && (toolName === 'edit_file' || toolName === 'write_file')) {
     try {
-      const { spawnSync } = await import('node:child_process');
+      const { spawn } = await import('node:child_process');
       const ext = path.extname(filePath);
       const isJs = ['.js', '.mjs', '.cjs'].includes(ext);
       const isPy = ext === '.py';
@@ -61,52 +41,27 @@ async function main() {
       const syntaxErrorFile = path.join(cacheDir, `${conversationId}.syntax_error`);
 
       if (isJs && fs.existsSync(filePath)) {
-        const res = spawnSync(process.execPath, ['--check', filePath], { timeout: 1000, encoding: 'utf8' });
-        if (res.status !== 0) {
-          const errText = (res.stderr || res.stdout || '').trim().split('\n').slice(0, 3).join('\n');
-          fs.writeFileSync(syntaxErrorFile, JSON.stringify({ file: filePath, error: errText, at: Date.now() }), 'utf8');
-        } else {
-          try { fs.unlinkSync(syntaxErrorFile); } catch {}
-        }
+        const child = spawn(process.execPath, ['--check', filePath], { timeout: 1000 });
+        let errText = '';
+        child.stderr?.on('data', d => errText += d.toString());
+        child.on('close', code => {
+          if (code !== 0 && errText) {
+            fs.writeFileSync(syntaxErrorFile, JSON.stringify({ file: filePath, error: errText.trim().split('\n').slice(0, 3).join('\n'), at: Date.now() }), 'utf8');
+          } else {
+            try { fs.unlinkSync(syntaxErrorFile); } catch {}
+          }
+        });
       } else if (isPy && fs.existsSync(filePath)) {
-        const res = spawnSync('python3', ['-m', 'py_compile', filePath], { timeout: 1000, encoding: 'utf8' });
-        if (res.status !== 0) {
-          const errText = (res.stderr || res.stdout || '').trim().split('\n').slice(0, 3).join('\n');
-          fs.writeFileSync(syntaxErrorFile, JSON.stringify({ file: filePath, error: errText, at: Date.now() }), 'utf8');
-        } else {
-          try { fs.unlinkSync(syntaxErrorFile); } catch {}
-        }
-      }
-    } catch {}
-  }
-
-  // Record verified command pass if exit code was 0 (<2ms)
-  if (toolName === 'run_command' && !input.error) {
-    try {
-      const { Helix2SpeculativeWorker } = await import('/Users/mert/.gemini/antigravity/scratch/HELIX-1.0/src/helix2-speculative-worker.mjs');
-      const worker = new Helix2SpeculativeWorker();
-      const cmd = input.toolCall?.args?.CommandLine || input.toolCall?.arguments?.CommandLine || '';
-      if (cmd) worker.recordVerifiedPass(cmd, workspaceDir, 0);
-    } catch {}
-  }
-
-  if (transcriptPath && fs.existsSync(transcriptPath)) {
-    try {
-      const { Helix2ContextSharpener } = await import('/Users/mert/.gemini/antigravity/scratch/HELIX-1.0/src/helix2-context-sharpener.mjs');
-      const sharpener = new Helix2ContextSharpener();
-      sharpener.evacuateStaleContext({
-        workspaceDir,
-        transcriptPath,
-        conversationId
-      });
-    } catch {}
-
-    // Auto-shape transcript if it exceeds bounded limit (Solution A: O(1) auto-compaction)
-    try {
-      const { Helix2TranscriptShaper } = await import('/Users/mert/.gemini/antigravity/scratch/HELIX-1.0/src/helix2-transcript-shaper.mjs');
-      const shaper = new Helix2TranscriptShaper({ maxUncompactedBytes: 40 * 1024, retainRecentSteps: 4, archiveThresholdLines: 15 });
-      if (shaper.needsShaping(transcriptPath)) {
-        shaper.shapeTranscript({ transcriptPath });
+        const child = spawn('python3', ['-m', 'py_compile', filePath], { timeout: 1000 });
+        let errText = '';
+        child.stderr?.on('data', d => errText += d.toString());
+        child.on('close', code => {
+          if (code !== 0 && errText) {
+            fs.writeFileSync(syntaxErrorFile, JSON.stringify({ file: filePath, error: errText.trim().split('\n').slice(0, 3).join('\n'), at: Date.now() }), 'utf8');
+          } else {
+            try { fs.unlinkSync(syntaxErrorFile); } catch {}
+          }
+        });
       }
     } catch {}
   }
@@ -128,11 +83,6 @@ async function main() {
       workspaceDir
     });
   } catch {}
-
-  // Antigravity PostToolUse contract expects {}
-  process.stdout.write(JSON.stringify({}));
 }
 
-main().catch(() => {
-  process.stdout.write(JSON.stringify({}));
-});
+main().catch(() => {});
