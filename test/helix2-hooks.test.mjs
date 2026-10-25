@@ -7,6 +7,8 @@ import { fileURLToPath } from 'node:url';
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const preToolHook = path.join(root, 'plugin/hooks/pre-tool-use.mjs');
 const postToolHook = path.join(root, 'plugin/hooks/post-tool-use.mjs');
+const sessionStartHook = path.join(root, 'plugin/hooks/session-start.mjs');
+const stopMonitorHook = path.join(root, 'plugin/hooks/stop-monitor.mjs');
 
 test('pre-tool-use hook wraps verbose commands with Helix lean switch', (t) => {
   // 1. Verbose test command should be overwritten
@@ -112,4 +114,37 @@ test('pre-tool-use hook bounds unbounded read_file calls to 300 lines max', (t) 
   const out3 = JSON.parse(res3.stdout);
   assert.equal(out3.decision, 'allow');
   assert.equal(out3.overwrite?.EndLine, 301);
+});
+
+test('session-start hook runs without error and outputs empty object', (t) => {
+  const input = JSON.stringify({
+    conversationId: 'test-session-start-01',
+    workspacePaths: [root]
+  });
+
+  const res = spawnSync(process.execPath, [sessionStartHook], {
+    input,
+    encoding: 'utf8'
+  });
+
+  assert.equal(res.status, 0);
+  const out = JSON.parse(res.stdout);
+  assert.deepEqual(out, {});
+});
+
+test('stop-monitor hook records step metrics and returns allow decision', (t) => {
+  const input = JSON.stringify({
+    conversationId: 'test-stop-01',
+    workspacePaths: [root],
+    terminationReason: 'NO_TOOL_CALL'
+  });
+
+  const res = spawnSync(process.execPath, [stopMonitorHook], {
+    input,
+    encoding: 'utf8'
+  });
+
+  assert.equal(res.status, 0);
+  const out = JSON.parse(res.stdout);
+  assert.equal(out.decision, 'allow');
 });

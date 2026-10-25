@@ -1,6 +1,13 @@
 {
   "helix-engine": {
     "enabled": true,
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "node /Users/mert/.gemini/config/plugins/helix/hooks/session-start.mjs",
+        "timeout": 10
+      }
+    ],
     "PreInvocation": [
       {
         "type": "command",
@@ -40,6 +47,13 @@
             "timeout": 10
           }
         ]
+      }
+    ],
+    "Stop": [
+      {
+        "type": "command",
+        "command": "node /Users/mert/.gemini/config/plugins/helix/hooks/stop-monitor.mjs",
+        "timeout": 10
       }
     ]
   }
