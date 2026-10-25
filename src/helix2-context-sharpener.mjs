@@ -127,10 +127,10 @@ export class Helix2ContextSharpener {
       ? path.basename(workspaceDir)
       : (conversationId ? `session-${conversationId.slice(0, 16)}` : 'default');
     
-    // Multi-project search scope ensures global & core architectural invariants are recalled
+    // Search scope: current project, helix, and global directives
     const projects = [project];
-    if (project !== 'HELIX-1.0') projects.push('HELIX-1.0');
-    projects.push('global');
+    if (project !== 'helix') projects.push('helix');
+    if (project !== 'global') projects.push('global');
     
     // Extract domain search terms (words >= 4 chars, strictly excluding conversational stop words)
     const words = userPrompt.match(/\b[a-zA-Z_][a-zA-Z0-9_-]{3,}\b/g) || [];
@@ -219,7 +219,7 @@ export class Helix2ContextSharpener {
     const sharpContext = (
       `[HELIX 2.0 PROTOCOL ACTIVATED - ZERO-BLOAT EPHEMERAL CONTEXT]\n` +
       sections.join('\n\n') +
-      `\nInstructions: Stale context evacuated to SQLite (~/.helix/memory.sqlite). Batch inspection, execution, and verification into unified 1-turn pipelines. Single-pass verification.`
+      `\nInstructions: ONE FLOW LAW: Think once, execute all batch inspections, edits, or tests in a single compound tool invocation, and conclude directly. Zero mid-turn thinking loops. Stale context evacuated to SQLite (~/.helix/memory.sqlite).`
     );
 
     return sharpContext;

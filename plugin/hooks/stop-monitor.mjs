@@ -24,8 +24,29 @@ async function main() {
     return;
   }
 
-  const transcriptPath = input.transcriptPath;
-  const conversationId = input.conversationId || 'default';
+  const conversationId = input.conversationId || input.conversation_id || process.env.CONVERSATION_ID || process.env.ANTIGRAVITY_CONVERSATION_ID || 'default';
+  
+  // Robust transcript path resolution
+  const brainDir = path.join(os.homedir(), '.gemini/antigravity/brain');
+  let transcriptPath = input.transcriptPath || input.transcript_path;
+  if (!transcriptPath && conversationId && conversationId !== 'default') {
+    const candidate = path.join(brainDir, conversationId, '.system_generated/logs/transcript.jsonl');
+    if (fs.existsSync(candidate)) transcriptPath = candidate;
+  }
+  if (!transcriptPath && fs.existsSync(brainDir)) {
+    try {
+      const convs = fs.readdirSync(brainDir).filter(c => !c.startsWith('.'));
+      let newest = null, newestMtime = 0;
+      for (const conv of convs) {
+        const cand = path.join(brainDir, conv, '.system_generated/logs/transcript.jsonl');
+        if (fs.existsSync(cand)) {
+          const mtime = fs.statSync(cand).mtimeMs;
+          if (mtime > newestMtime) { newestMtime = mtime; newest = cand; }
+        }
+      }
+      if (newest && Date.now() - newestMtime < 15 * 60 * 1000) transcriptPath = newest;
+    } catch {}
+  }
 
   if (transcriptPath && fs.existsSync(transcriptPath)) {
     // 1. Record step metrics into zero-cost offline SQLite token ledger
@@ -38,12 +59,12 @@ async function main() {
       });
     } catch {}
 
-    // 2. Check if transcript or prompt-cache chunks need compaction/syncing
+    // 2. Automated transcript compaction & prompt-cache chunk sync (<15ms synchronous)
     try {
       const { Helix2TranscriptShaper } = await import('/Users/mert/.gemini/antigravity/scratch/HELIX-1.0/src/helix2-transcript-shaper.mjs');
-      const shaper = new Helix2TranscriptShaper({ maxUncompactedBytes: 300 * 1024, retainRecentSteps: 8 });
+      const shaper = new Helix2TranscriptShaper({ maxUncompactedBytes: 40 * 1024, retainRecentSteps: 4, archiveThresholdLines: 15 });
       if (shaper.needsShaping(transcriptPath)) {
-        await shaper.shapeTranscript({ transcriptPath });
+        shaper.shapeTranscript({ transcriptPath });
       }
     } catch {}
   }

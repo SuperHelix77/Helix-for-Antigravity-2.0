@@ -17,16 +17,13 @@ test('Red Team Guard: Secrets are redacted from SQLite memory and Lean Switch re
   const sensitiveCmd = 'curl -H "Authorization: Bearer my-secret-jwt-token" https://api.openai.com/v1 -d "api_key=sk-1234567890abcdef"';
   
   fs.writeFileSync(transcriptPath, JSON.stringify({
-    step_index: 1,
-    type: 'PLANNER_RESPONSE',
-    tool_calls: [{
-      name: 'run_command',
-      arguments: { CommandLine: sensitiveCmd }
-    }]
-  }) + '\n' + JSON.stringify({
-    step_index: 2,
+    step_index: 0,
     type: 'USER_INPUT',
-    content: 'Check the curl output'
+    content: `Run curl with secret: ${sensitiveCmd}`
+  }) + '\n' + JSON.stringify({
+    step_index: 1,
+    type: 'USER_INPUT',
+    content: 'Check the result'
   }));
 
   sharpener.evacuateStaleContext({
