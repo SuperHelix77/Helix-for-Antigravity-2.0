@@ -1,5 +1,7 @@
 import { createHash } from "node:crypto";
 import path from "node:path";
+import { lstatSync } from "node:fs";
+import os from "node:os";
 import { deflateRawSync, inflateRawSync } from "node:zlib";
 import { STATE_DIR } from "./paths.mjs";
 import { retainToolResult, readRetainedToolResult } from "./tool-result-store.mjs";
@@ -7,10 +9,32 @@ import { redactContextText, latestUserItemIndex } from "./compaction-checkpoint.
 
 export const CONTEXT_ARCHIVE_DIR = process.env.MODEL_ROUTER_CONTEXT_ARCHIVE_DIR || path.join(STATE_DIR, "context-archive");
 const MAX_RAW_BYTES = 64 * 1024 * 1024;
+function legacyArchiveDirectory(directory) {
+  if (directory !== CONTEXT_ARCHIVE_DIR) return undefined;
+  if (process.env.MODEL_ROUTER_LEGACY_CONTEXT_ARCHIVE_DIR) return process.env.MODEL_ROUTER_LEGACY_CONTEXT_ARCHIVE_DIR;
+  if (path.resolve(directory) !== path.join(os.homedir(), ".helix", "context-archive")) return undefined;
+  return path.join(process.env.CODEX_HOME || path.join(os.homedir(), ".codex"), "codex-router", "context-archive");
+}
 const sha = (value) => createHash("sha256").update(value).digest("hex");
 
-function decode(handle, directory) {
-  const value = JSON.parse(readRetainedToolResult(handle, { directory }));
+function decode(handle, directory, legacyDirectory) {
+  if (typeof handle !== "string" || !/^[A-Za-z0-9_-]{43}$/.test(handle)) throw new Error("Invalid context archive handle.");
+  if (legacyDirectory && !path.isAbsolute(legacyDirectory)) throw new Error("Legacy context archive directory must be absolute.");
+  let selected;
+  for (const candidate of new Set([directory, ...(legacyDirectory ? [legacyDirectory] : [])])) {
+    try {
+      lstatSync(path.join(candidate, `${handle}.result`));
+      selected = candidate;
+      break;
+    } catch (error) { if (error.code !== "ENOENT") throw error; }
+  }
+  if (!selected) {
+    const error = new Error(`Context archive receipt ${handle} not found in configured archives.`);
+    error.code = "ENOENT";
+    throw error;
+  }
+  // Never mix archive keys or mask integrity failures with a fallback.
+  const value = JSON.parse(readRetainedToolResult(handle, { directory: selected }));
   if (value.schema !== "router.context.v1" || !Number.isSafeInteger(value.bytes) || value.bytes < 2 || value.bytes > MAX_RAW_BYTES
     || !/^[a-f0-9]{64}$/.test(value.sha256) || typeof value.deflate !== "string") throw new Error("Invalid context archive contract.");
   const raw = inflateRawSync(Buffer.from(value.deflate, "base64"), { maxOutputLength: MAX_RAW_BYTES });
@@ -33,8 +57,8 @@ export function archiveCompactionInput(input, { directory = CONTEXT_ARCHIVE_DIR 
   return { handle, sha256, bytes: raw.length, items: input.length, latest_user_index };
 }
 
-export function recoverCompactionInput(handle, { directory = CONTEXT_ARCHIVE_DIR } = {}) {
-  return decode(handle, directory).input;
+export function recoverCompactionInput(handle, { directory = CONTEXT_ARCHIVE_DIR, legacyDirectory = legacyArchiveDirectory(directory) } = {}) {
+  return decode(handle, directory, legacyDirectory).input;
 }
 
 function credentialLike(value, key = "") {
@@ -45,8 +69,8 @@ function credentialLike(value, key = "") {
   return false;
 }
 
-export function readContextItem({ receipt, item, offset = 0, limit = 12000, query }, { directory = CONTEXT_ARCHIVE_DIR } = {}) {
-  const restored = decode(receipt, directory);
+export function readContextItem({ receipt, item, offset = 0, limit = 12000, query }, { directory = CONTEXT_ARCHIVE_DIR, legacyDirectory = legacyArchiveDirectory(directory) } = {}) {
+  const restored = decode(receipt, directory, legacyDirectory);
   if (!Number.isSafeInteger(item) || item < 0 || item >= restored.input.length) throw new Error("Context item index out of bounds.");
   if (!Number.isSafeInteger(offset) || offset < 0 || !Number.isSafeInteger(limit) || limit < 4 || limit > 24000) throw new Error("Invalid context byte range.");
   const original = JSON.stringify(restored.input[item]);

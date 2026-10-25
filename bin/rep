@@ -1,0 +1,6 @@
+#!/usr/bin/env python3
+# rep FILE OLD NEW : replace exactly one occurrence
+import sys
+f,o,n=sys.argv[1:4]; s=open(f).read(); c=s.count(o)
+if c!=1: sys.exit(f'{c} matches')
+open(f,'w').write(s.replace(o,n)); print('ok')

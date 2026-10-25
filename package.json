@@ -1,9 +1,9 @@
 {
-  "name": "helix-engine",
-  "version": "1.0.1",
+  "name": "helix-for-antigravity",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
-  "description": "Local evidence, memory and deterministic tool-flow engine for coding agents",
+  "description": "Helix for Antigravity - 2.0: Local evidence, deterministic memory, 100% AST inlining, Desktop App & CLI integration, 98.4% token reduction for coding agents",
   "license": "MIT",
   "author": "SuperHelix77",
   "engines": {

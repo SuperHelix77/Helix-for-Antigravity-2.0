@@ -1,0 +1,19 @@
+#!/usr/bin/env python3
+# sym F NAME : numbered source of one symbol (python ast; else brace/indent heuristic)
+import sys,ast,re
+f,name=sys.argv[1],sys.argv[2]; L=open(f).read().split('\n')
+a=b=None
+if f.endswith('.py'):
+    for n in ast.walk(ast.parse('\n'.join(L))):
+        if isinstance(n,(ast.FunctionDef,ast.AsyncFunctionDef,ast.ClassDef)) and n.name==name:
+            a=(n.decorator_list[0].lineno if n.decorator_list else n.lineno); b=n.end_lineno; break
+else:
+    for i,l in enumerate(L):
+        if re.search(r'\b'+re.escape(name)+r'\b',l) and re.search(r'\b(function|class|def|fn|func|const)\b',l):
+            ind=len(l)-len(l.lstrip()); a=i+1; b=a
+            for j in range(i+1,len(L)):
+                if L[j].strip() and len(L[j])-len(L[j].lstrip())<=ind and not L[j].lstrip().startswith(('}',')',']')): break
+                b=j+1
+            break
+if a is None: sys.exit('not found')
+for i in range(a,b+1): print(f'{i}:{L[i-1]}')

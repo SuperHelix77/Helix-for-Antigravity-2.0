@@ -1,0 +1,5 @@
+#!/bin/sh
+# Print scratchpad directory for HELIX toolchain
+D="${HELIX_SCRATCH:-${TMPDIR:-/tmp}/helix-$(id -u)/scratchpad}"
+mkdir -p "$D"
+echo "$D"

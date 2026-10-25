@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+# contract [-C REPO] FILE:SYMBOL ... : source, callers, called helpers and tests for each target (capped ~15k chars)
+import sys,os,re,subprocess,keyword,builtins,shutil
+SYM=os.environ.get('HELIX_BIN_SYM') or shutil.which('sym') or os.path.join(os.path.dirname(os.path.abspath(__file__)), 'sym')
+args=sys.argv[1:]; repo='.'
+if args[:1]==['-C'] and len(args)>1: repo=args[1]; args=args[2:]
+if not args: sys.exit('usage: contract [-C REPO] FILE:SYMBOL [FILE:SYMBOL...]')
+os.chdir(repo)
+CAP=15000
+JSKW=set('if for while switch catch function return typeof new await async import require super with else do in of delete void yield class'.split())
+SKIP=set(dir(builtins))|set(keyword.kwlist)|JSKW|{'self','cls','print','len','str','int','list','dict','set','tuple','Object','Array','String','Number','Promise','Error','Math','JSON','Map','Set','console'}
+def run(*c):
+    r=subprocess.run(c,capture_output=True,text=True); return r.stdout
+out=[]
+def per(n,s): 
+    l=s.rstrip('\n').split('\n'); return l if s.strip() else []
+def trunc(lines,n): return lines[:n]+([f'…+{len(lines)-n}'] if len(lines)>n else [])
+for t in args:
+    f,_,name=t.rpartition(':')
+    if not f: out.append(f'## {t}: expected FILE:SYMBOL'); continue
+    name=name.split('.')[-1]
+    p=subprocess.run([SYM,f,name],capture_output=True,text=True)
+    src=p.stdout if p.returncode==0 else ''
+    out.append(f'## {f}:{name}\n### source\n'+(src.rstrip() if src else f'(sym: {(p.stderr or "not found").strip()})'))
+    defre=re.compile(r'\b(def|class|function)\s+'+re.escape(name)+r'\b|\b'+re.escape(name)+r'\s*=\s*(\(|async|function)')
+    cl=[]
+    for l in per(0,run('git','grep','-n','-w','--',name)):
+        parts=l.split(':',2)
+        if len(parts)==3 and parts[0]==f and defre.search(parts[2]): continue
+        if len(parts)==3 and defre.search(parts[2]): continue
+        cl.append(l)
+    out.append(f'### callers ({len(cl)})\n'+'\n'.join(trunc(cl,25) if len(cl)<=25 else cl[:25]+[f'…+{len(cl)-25}']))
+    body='\n'.join(x.split(':',1)[1] if ':' in x else x for x in src.split('\n')[1:])
+    seen=[]
+    for m in re.finditer(r'\b(\w+)\(',body):
+        h=m.group(1)
+        if h in SKIP or h==name or h in seen: continue
+        seen.append(h)
+    hs=[];js=not f.endswith('.py')
+    for h in seen:
+        pat=(rf'function {h}([^A-Za-z0-9_]|$)|(^|[^A-Za-z0-9_]){h}[[:space:]]*=[[:space:]]*\(' if js else rf'(def|class) {h}([^A-Za-z0-9_]|$)')
+        g=run('git','grep','-n','-E',pat)
+        if not g.strip(): continue
+        first=g.split('\n')[0].split(':',2)
+        if len(first)<3: continue
+        hf,ln=first[0],int(first[1])
+        try: L=open(hf).read().split('\n')[ln-1:ln+11]
+        except Exception: continue
+        hs.append(f'-- {h} {hf}:{ln}\n'+'\n'.join(f'{ln+i}:{x}' for i,x in enumerate(L)))
+        if len(hs)>=6: break
+    out.append(f'### helpers ({len(hs)} found: {", ".join(seen[:15]) or "none"})\n'+'\n'.join(hs))
+    ts=per(0,run('git','grep','-l','-w',name,'--','*test*'))
+    out.append(f'### tests ({len(ts)})\n'+'\n'.join(trunc(ts,8)))
+s='\n'.join(out)
+if len(s)>CAP: s=s[:CAP]+f'\n…truncated ({len(s)} chars)'
+print(s)

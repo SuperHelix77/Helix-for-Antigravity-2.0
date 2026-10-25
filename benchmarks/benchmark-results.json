@@ -7,27 +7,25 @@
     "lane": "vanilla",
     "totalRequests": 50,
     "unknownUsageRequests": 0,
-    "knownInputTokens": 417585602,
-    "knownCachedTokens": 10503585319,
-    "knownOutputTokens": 35076090,
-    "knownReasoningTokens": 24127579,
-    "knownTotalTokens": 452661692,
-    "totalToolCalls": 0,
-    "totalErrorsRecorded": 0
+    "knownInputTokens": 14547186,
+    "knownCachedTokens": 370956982,
+    "knownOutputTokens": 1185844,
+    "knownReasoningTokens": 803010,
+    "knownTotalTokens": 15733030,
+    "accountingBasis": "continuous-session-final-cumulative-and-delta-sum"
   },
   "helixTotals": {
     "lane": "helix",
     "totalRequests": 50,
     "unknownUsageRequests": 0,
-    "knownInputTokens": 162218245,
-    "knownCachedTokens": 1426600795,
-    "knownOutputTokens": 10041570,
-    "knownReasoningTokens": 8266825,
-    "knownTotalTokens": 172259815,
-    "totalToolCalls": 0,
-    "totalErrorsRecorded": 0
+    "knownInputTokens": 6712168,
+    "knownCachedTokens": 64650575,
+    "knownOutputTokens": 372710,
+    "knownReasoningTokens": 298774,
+    "knownTotalTokens": 7084878,
+    "accountingBasis": "continuous-session-final-cumulative-and-delta-sum"
   },
-  "netSavingsPercent": 61.945130757828736,
+  "netSavingsPercent": 54.96812756347633,
   "tasks": [
     {
       "taskId": "django__django-15061",
@@ -39,7 +37,14 @@
         "outputTokens": 62559,
         "thinkingTokens": 50318,
         "totalTokens": 500615,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 438056,
+          "cachedTokens": 9651799,
+          "outputTokens": 62559,
+          "thinkingTokens": 50318,
+          "totalTokens": 500615
+        }
       },
       "helix": {
         "status": "PASS",
@@ -48,7 +53,14 @@
         "outputTokens": 16724,
         "thinkingTokens": 15696,
         "totalTokens": 103337,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 86613,
+          "cachedTokens": 203325,
+          "outputTokens": 16724,
+          "thinkingTokens": 15696,
+          "totalTokens": 103337
+        }
       }
     },
     {
@@ -61,7 +73,14 @@
         "outputTokens": 136019,
         "thinkingTokens": 111843,
         "totalTokens": 1120127,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 546052,
+          "cachedTokens": 12163074,
+          "outputTokens": 73460,
+          "thinkingTokens": 61525,
+          "totalTokens": 619512
+        }
       },
       "helix": {
         "status": "FAIL",
@@ -70,7 +89,14 @@
         "outputTokens": 26634,
         "thinkingTokens": 24975,
         "totalTokens": 173774,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 60527,
+          "cachedTokens": 231421,
+          "outputTokens": 9910,
+          "thinkingTokens": 9279,
+          "totalTokens": 70437
+        }
       }
     },
     {
@@ -83,7 +109,14 @@
         "outputTokens": 175729,
         "thinkingTokens": 135902,
         "totalTokens": 1513793,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 353956,
+          "cachedTokens": 11941169,
+          "outputTokens": 39710,
+          "thinkingTokens": 24059,
+          "totalTokens": 393666
+        }
       },
       "helix": {
         "status": "UNSOLVED",
@@ -92,7 +125,14 @@
         "outputTokens": 26634,
         "thinkingTokens": 24975,
         "totalTokens": 173774,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 0,
+          "cachedTokens": 0,
+          "outputTokens": 0,
+          "thinkingTokens": 0,
+          "totalTokens": 0
+        }
       }
     },
     {
@@ -105,7 +145,14 @@
         "outputTokens": 242537,
         "thinkingTokens": 185415,
         "totalTokens": 1999473,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 418872,
+          "cachedTokens": 14378620,
+          "outputTokens": 66808,
+          "thinkingTokens": 49513,
+          "totalTokens": 485680
+        }
       },
       "helix": {
         "status": "FAIL",
@@ -114,7 +161,14 @@
         "outputTokens": 40879,
         "thinkingTokens": 38089,
         "totalTokens": 246837,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 58818,
+          "cachedTokens": 333062,
+          "outputTokens": 14245,
+          "thinkingTokens": 13114,
+          "totalTokens": 73063
+        }
       }
     },
     {
@@ -127,7 +181,14 @@
         "outputTokens": 273779,
         "thinkingTokens": 202096,
         "totalTokens": 2546109,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 515394,
+          "cachedTokens": 12829121,
+          "outputTokens": 31242,
+          "thinkingTokens": 16681,
+          "totalTokens": 546636
+        }
       },
       "helix": {
         "status": "UNSOLVED",
@@ -136,7 +197,14 @@
         "outputTokens": 41313,
         "thinkingTokens": 38435,
         "totalTokens": 307969,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 60698,
+          "cachedTokens": 19929,
+          "outputTokens": 434,
+          "thinkingTokens": 346,
+          "totalTokens": 61132
+        }
       }
     },
     {
@@ -149,7 +217,14 @@
         "outputTokens": 303640,
         "thinkingTokens": 224379,
         "totalTokens": 2881363,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 305393,
+          "cachedTokens": 9906953,
+          "outputTokens": 29861,
+          "thinkingTokens": 22283,
+          "totalTokens": 335254
+        }
       },
       "helix": {
         "status": "PASS",
@@ -158,7 +233,14 @@
         "outputTokens": 50188,
         "thinkingTokens": 46606,
         "totalTokens": 415876,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 99032,
+          "cachedTokens": 423856,
+          "outputTokens": 8875,
+          "thinkingTokens": 8171,
+          "totalTokens": 107907
+        }
       }
     },
     {
@@ -171,7 +253,14 @@
         "outputTokens": 321146,
         "thinkingTokens": 233427,
         "totalTokens": 3561335,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 662466,
+          "cachedTokens": 10597722,
+          "outputTokens": 17506,
+          "thinkingTokens": 9048,
+          "totalTokens": 679972
+        }
       },
       "helix": {
         "status": "FAIL",
@@ -180,7 +269,14 @@
         "outputTokens": 55096,
         "thinkingTokens": 50721,
         "totalTokens": 511141,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 90357,
+          "cachedTokens": 409257,
+          "outputTokens": 4908,
+          "thinkingTokens": 4115,
+          "totalTokens": 95265
+        }
       }
     },
     {
@@ -193,7 +289,14 @@
         "outputTokens": 346259,
         "thinkingTokens": 248045,
         "totalTokens": 3886672,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 300224,
+          "cachedTokens": 7230246,
+          "outputTokens": 25113,
+          "thinkingTokens": 14618,
+          "totalTokens": 325337
+        }
       },
       "helix": {
         "status": "UNSOLVED",
@@ -202,7 +305,14 @@
         "outputTokens": 55516,
         "thinkingTokens": 51062,
         "totalTokens": 596831,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 85270,
+          "cachedTokens": 19955,
+          "outputTokens": 420,
+          "thinkingTokens": 341,
+          "totalTokens": 85690
+        }
       }
     },
     {
@@ -215,7 +325,14 @@
         "outputTokens": 353094,
         "thinkingTokens": 251438,
         "totalTokens": 4078617,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 185110,
+          "cachedTokens": 3585863,
+          "outputTokens": 6835,
+          "thinkingTokens": 3393,
+          "totalTokens": 191945
+        }
       },
       "helix": {
         "status": "UNSOLVED",
@@ -224,7 +341,14 @@
         "outputTokens": 56208,
         "thinkingTokens": 51668,
         "totalTokens": 685474,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 87951,
+          "cachedTokens": 19965,
+          "outputTokens": 692,
+          "thinkingTokens": 606,
+          "totalTokens": 88643
+        }
       }
     },
     {
@@ -237,7 +361,14 @@
         "outputTokens": 371987,
         "thinkingTokens": 262722,
         "totalTokens": 4248803,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 151293,
+          "cachedTokens": 8162882,
+          "outputTokens": 18893,
+          "thinkingTokens": 11284,
+          "totalTokens": 170186
+        }
       },
       "helix": {
         "status": "UNSOLVED",
@@ -246,7 +377,14 @@
         "outputTokens": 56208,
         "thinkingTokens": 51668,
         "totalTokens": 685474,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 0,
+          "cachedTokens": 0,
+          "outputTokens": 0,
+          "thinkingTokens": 0,
+          "totalTokens": 0
+        }
       }
     },
     {
@@ -259,7 +397,14 @@
         "outputTokens": 381783,
         "thinkingTokens": 267067,
         "totalTokens": 4780752,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 522153,
+          "cachedTokens": 8920153,
+          "outputTokens": 9796,
+          "thinkingTokens": 4345,
+          "totalTokens": 531949
+        }
       },
       "helix": {
         "status": "FAIL",
@@ -268,7 +413,14 @@
         "outputTokens": 62580,
         "thinkingTokens": 57136,
         "totalTokens": 802917,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 111071,
+          "cachedTokens": 696343,
+          "outputTokens": 6372,
+          "thinkingTokens": 5468,
+          "totalTokens": 117443
+        }
       }
     },
     {
@@ -281,7 +433,14 @@
         "outputTokens": 408030,
         "thinkingTokens": 283302,
         "totalTokens": 5025030,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 218031,
+          "cachedTokens": 10497425,
+          "outputTokens": 26247,
+          "thinkingTokens": 16235,
+          "totalTokens": 244278
+        }
       },
       "helix": {
         "status": "FAIL",
@@ -290,7 +449,14 @@
         "outputTokens": 72810,
         "thinkingTokens": 65690,
         "totalTokens": 1060262,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 247115,
+          "cachedTokens": 1474711,
+          "outputTokens": 10230,
+          "thinkingTokens": 8554,
+          "totalTokens": 257345
+        }
       }
     },
     {
@@ -303,7 +469,14 @@
         "outputTokens": 408030,
         "thinkingTokens": 283302,
         "totalTokens": 5025030,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 0,
+          "cachedTokens": 0,
+          "outputTokens": 0,
+          "thinkingTokens": 0,
+          "totalTokens": 0
+        }
       },
       "helix": {
         "status": "FAIL",
@@ -312,7 +485,14 @@
         "outputTokens": 79880,
         "thinkingTokens": 70120,
         "totalTokens": 1243291,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 175959,
+          "cachedTokens": 1727597,
+          "outputTokens": 7070,
+          "thinkingTokens": 4430,
+          "totalTokens": 183029
+        }
       }
     },
     {
@@ -325,7 +505,14 @@
         "outputTokens": 435726,
         "thinkingTokens": 304950,
         "totalTokens": 5189607,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 136881,
+          "cachedTokens": 4656231,
+          "outputTokens": 27696,
+          "thinkingTokens": 21648,
+          "totalTokens": 164577
+        }
       },
       "helix": {
         "status": "PASS",
@@ -334,7 +521,14 @@
         "outputTokens": 83409,
         "thinkingTokens": 72948,
         "totalTokens": 1291994,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 45174,
+          "cachedTokens": 891833,
+          "outputTokens": 3529,
+          "thinkingTokens": 2828,
+          "totalTokens": 48703
+        }
       }
     },
     {
@@ -347,7 +541,14 @@
         "outputTokens": 441675,
         "thinkingTokens": 308249,
         "totalTokens": 5248357,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 52801,
+          "cachedTokens": 2295597,
+          "outputTokens": 5949,
+          "thinkingTokens": 3299,
+          "totalTokens": 58750
+        }
       },
       "helix": {
         "status": "PASS",
@@ -356,7 +557,14 @@
         "outputTokens": 88656,
         "thinkingTokens": 77651,
         "totalTokens": 1305243,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 8002,
+          "cachedTokens": 314891,
+          "outputTokens": 5247,
+          "thinkingTokens": 4703,
+          "totalTokens": 13249
+        }
       }
     },
     {
@@ -369,7 +577,14 @@
         "outputTokens": 470495,
         "thinkingTokens": 319789,
         "totalTokens": 5947342,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 670165,
+          "cachedTokens": 21404662,
+          "outputTokens": 28820,
+          "thinkingTokens": 11540,
+          "totalTokens": 698985
+        }
       },
       "helix": {
         "status": "FAIL",
@@ -378,7 +593,14 @@
         "outputTokens": 95577,
         "thinkingTokens": 81854,
         "totalTokens": 1509911,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 197747,
+          "cachedTokens": 3138753,
+          "outputTokens": 6921,
+          "thinkingTokens": 4203,
+          "totalTokens": 204668
+        }
       }
     },
     {
@@ -391,7 +613,14 @@
         "outputTokens": 477733,
         "thinkingTokens": 322598,
         "totalTokens": 6483740,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 529160,
+          "cachedTokens": 2647451,
+          "outputTokens": 7238,
+          "thinkingTokens": 2809,
+          "totalTokens": 536398
+        }
       },
       "helix": {
         "status": "UNSOLVED",
@@ -400,7 +629,14 @@
         "outputTokens": 95577,
         "thinkingTokens": 81854,
         "totalTokens": 1509911,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 0,
+          "cachedTokens": 0,
+          "outputTokens": 0,
+          "thinkingTokens": 0,
+          "totalTokens": 0
+        }
       }
     },
     {
@@ -413,7 +649,14 @@
         "outputTokens": 482957,
         "thinkingTokens": 324320,
         "totalTokens": 6582782,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 93818,
+          "cachedTokens": 1313985,
+          "outputTokens": 5224,
+          "thinkingTokens": 1722,
+          "totalTokens": 99042
+        }
       },
       "helix": {
         "status": "FAIL",
@@ -422,7 +665,14 @@
         "outputTokens": 101964,
         "thinkingTokens": 85506,
         "totalTokens": 1884106,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 367808,
+          "cachedTokens": 2476356,
+          "outputTokens": 6387,
+          "thinkingTokens": 3652,
+          "totalTokens": 374195
+        }
       }
     },
     {
@@ -435,7 +685,14 @@
         "outputTokens": 494312,
         "thinkingTokens": 328572,
         "totalTokens": 6759440,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 165303,
+          "cachedTokens": 3818070,
+          "outputTokens": 11355,
+          "thinkingTokens": 4252,
+          "totalTokens": 176658
+        }
       },
       "helix": {
         "status": "FAIL",
@@ -444,7 +701,14 @@
         "outputTokens": 107823,
         "thinkingTokens": 88294,
         "totalTokens": 2103344,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 213379,
+          "cachedTokens": 2432128,
+          "outputTokens": 5859,
+          "thinkingTokens": 2788,
+          "totalTokens": 219238
+        }
       }
     },
     {
@@ -457,7 +721,14 @@
         "outputTokens": 516455,
         "thinkingTokens": 342371,
         "totalTokens": 7200602,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 419019,
+          "cachedTokens": 10677536,
+          "outputTokens": 22143,
+          "thinkingTokens": 13799,
+          "totalTokens": 441162
+        }
       },
       "helix": {
         "status": "FAIL",
@@ -466,7 +737,14 @@
         "outputTokens": 119933,
         "thinkingTokens": 98070,
         "totalTokens": 2356528,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 241074,
+          "cachedTokens": 3465885,
+          "outputTokens": 12110,
+          "thinkingTokens": 9776,
+          "totalTokens": 253184
+        }
       }
     },
     {
@@ -479,7 +757,14 @@
         "outputTokens": 582693,
         "thinkingTokens": 395340,
         "totalTokens": 7820383,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 553543,
+          "cachedTokens": 18472873,
+          "outputTokens": 66238,
+          "thinkingTokens": 52969,
+          "totalTokens": 619781
+        }
       },
       "helix": {
         "status": "UNSOLVED",
@@ -488,7 +773,14 @@
         "outputTokens": 133861,
         "thinkingTokens": 111060,
         "totalTokens": 2611710,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 241254,
+          "cachedTokens": 1214013,
+          "outputTokens": 13928,
+          "thinkingTokens": 12990,
+          "totalTokens": 255182
+        }
       }
     },
     {
@@ -501,7 +793,14 @@
         "outputTokens": 582693,
         "thinkingTokens": 395340,
         "totalTokens": 7820383,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 0,
+          "cachedTokens": 0,
+          "outputTokens": 0,
+          "thinkingTokens": 0,
+          "totalTokens": 0
+        }
       },
       "helix": {
         "status": "FAIL",
@@ -510,7 +809,14 @@
         "outputTokens": 156042,
         "thinkingTokens": 130945,
         "totalTokens": 2698430,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 64539,
+          "cachedTokens": 599066,
+          "outputTokens": 22181,
+          "thinkingTokens": 19885,
+          "totalTokens": 86720
+        }
       }
     },
     {
@@ -523,7 +829,14 @@
         "outputTokens": 590516,
         "thinkingTokens": 399796,
         "totalTokens": 7893909,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 65703,
+          "cachedTokens": 1937348,
+          "outputTokens": 7823,
+          "thinkingTokens": 4456,
+          "totalTokens": 73526
+        }
       },
       "helix": {
         "status": "PASS",
@@ -532,7 +845,14 @@
         "outputTokens": 161040,
         "thinkingTokens": 134229,
         "totalTokens": 2739062,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 35634,
+          "cachedTokens": 883302,
+          "outputTokens": 4998,
+          "thinkingTokens": 3284,
+          "totalTokens": 40632
+        }
       }
     },
     {
@@ -545,7 +865,14 @@
         "outputTokens": 593614,
         "thinkingTokens": 401085,
         "totalTokens": 8084548,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 187541,
+          "cachedTokens": 1302388,
+          "outputTokens": 3098,
+          "thinkingTokens": 1289,
+          "totalTokens": 190639
+        }
       },
       "helix": {
         "status": "UNSOLVED",
@@ -554,7 +881,14 @@
         "outputTokens": 175861,
         "thinkingTokens": 144919,
         "totalTokens": 3095852,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 341969,
+          "cachedTokens": 2550825,
+          "outputTokens": 14821,
+          "thinkingTokens": 10690,
+          "totalTokens": 356790
+        }
       }
     },
     {
@@ -567,7 +901,14 @@
         "outputTokens": 624219,
         "thinkingTokens": 423280,
         "totalTokens": 8401005,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 285852,
+          "cachedTokens": 6887592,
+          "outputTokens": 30605,
+          "thinkingTokens": 22195,
+          "totalTokens": 316457
+        }
       },
       "helix": {
         "status": "UNSOLVED",
@@ -576,7 +917,14 @@
         "outputTokens": 179933,
         "thinkingTokens": 147640,
         "totalTokens": 3156363,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 56439,
+          "cachedTokens": 2142283,
+          "outputTokens": 4072,
+          "thinkingTokens": 2721,
+          "totalTokens": 60511
+        }
       }
     },
     {
@@ -589,7 +937,14 @@
         "outputTokens": 650375,
         "thinkingTokens": 440011,
         "totalTokens": 8680585,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 253424,
+          "cachedTokens": 13602505,
+          "outputTokens": 26156,
+          "thinkingTokens": 16731,
+          "totalTokens": 279580
+        }
       },
       "helix": {
         "status": "FAIL",
@@ -598,7 +953,14 @@
         "outputTokens": 188523,
         "thinkingTokens": 152992,
         "totalTokens": 3217560,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 52607,
+          "cachedTokens": 2358189,
+          "outputTokens": 8590,
+          "thinkingTokens": 5352,
+          "totalTokens": 61197
+        }
       }
     },
     {
@@ -611,7 +973,14 @@
         "outputTokens": 752598,
         "thinkingTokens": 522656,
         "totalTokens": 9847572,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 1064764,
+          "cachedTokens": 16024431,
+          "outputTokens": 102223,
+          "thinkingTokens": 82645,
+          "totalTokens": 1166987
+        }
       },
       "helix": {
         "status": "FAIL",
@@ -620,7 +989,14 @@
         "outputTokens": 211150,
         "thinkingTokens": 172705,
         "totalTokens": 3576483,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 336296,
+          "cachedTokens": 2350621,
+          "outputTokens": 22627,
+          "thinkingTokens": 19713,
+          "totalTokens": 358923
+        }
       }
     },
     {
@@ -633,7 +1009,14 @@
         "outputTokens": 752898,
         "thinkingTokens": 522867,
         "totalTokens": 9850616,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 2744,
+          "cachedTokens": 193045,
+          "outputTokens": 300,
+          "thinkingTokens": 211,
+          "totalTokens": 3044
+        }
       },
       "helix": {
         "status": "FAIL",
@@ -642,7 +1025,14 @@
         "outputTokens": 236785,
         "thinkingTokens": 195245,
         "totalTokens": 4004350,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 402232,
+          "cachedTokens": 3105149,
+          "outputTokens": 25635,
+          "thinkingTokens": 22540,
+          "totalTokens": 427867
+        }
       }
     },
     {
@@ -655,7 +1045,14 @@
         "outputTokens": 753841,
         "thinkingTokens": 523389,
         "totalTokens": 10218295,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 366736,
+          "cachedTokens": 627649,
+          "outputTokens": 943,
+          "thinkingTokens": 522,
+          "totalTokens": 367679
+        }
       },
       "helix": {
         "status": "UNSOLVED",
@@ -664,7 +1061,14 @@
         "outputTokens": 238529,
         "thinkingTokens": 196531,
         "totalTokens": 4397877,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 391783,
+          "cachedTokens": 661413,
+          "outputTokens": 1744,
+          "thinkingTokens": 1286,
+          "totalTokens": 393527
+        }
       }
     },
     {
@@ -677,7 +1081,14 @@
         "outputTokens": 753841,
         "thinkingTokens": 523389,
         "totalTokens": 10218295,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 0,
+          "cachedTokens": 0,
+          "outputTokens": 0,
+          "thinkingTokens": 0,
+          "totalTokens": 0
+        }
       },
       "helix": {
         "status": "UNSOLVED",
@@ -686,7 +1097,14 @@
         "outputTokens": 238529,
         "thinkingTokens": 196531,
         "totalTokens": 4397877,
-        "durationMs": 0
+        "durationMs": 0,
+        "delta": {
+          "inputTokens": 0,
+          "cachedTokens": 0,
+          "outputTokens": 0,
+          "thinkingTokens": 0,
+          "totalTokens": 0
+        }
       }
     },
     {
@@ -699,7 +1117,14 @@
         "outputTokens": 819931,
         "thinkingTokens": 572472,
         "totalTokens": 11024060,
-        "durationMs": 900344
+        "durationMs": 900344,
+        "delta": {
+          "inputTokens": 739675,
+          "cachedTokens": 14282225,
+          "outputTokens": 66090,
+          "thinkingTokens": 49083,
+          "totalTokens": 805765
+        }
       },
       "helix": {
         "status": "PASS",
@@ -708,7 +1133,14 @@
         "outputTokens": 261858,
         "thinkingTokens": 218094,
         "totalTokens": 4703346,
-        "durationMs": 286411
+        "durationMs": 286411,
+        "delta": {
+          "inputTokens": 282140,
+          "cachedTokens": 3410723,
+          "outputTokens": 23329,
+          "thinkingTokens": 21563,
+          "totalTokens": 305469
+        }
       }
     },
     {
@@ -721,7 +1153,14 @@
         "outputTokens": 856461,
         "thinkingTokens": 598387,
         "totalTokens": 11365950,
-        "durationMs": 571551
+        "durationMs": 571551,
+        "delta": {
+          "inputTokens": 305360,
+          "cachedTokens": 9544452,
+          "outputTokens": 36530,
+          "thinkingTokens": 25915,
+          "totalTokens": 341890
+        }
       },
       "helix": {
         "status": "UNSOLVED",
@@ -730,7 +1169,14 @@
         "outputTokens": 269454,
         "thinkingTokens": 223181,
         "totalTokens": 4768676,
-        "durationMs": 129041
+        "durationMs": 129041,
+        "delta": {
+          "inputTokens": 57734,
+          "cachedTokens": 582370,
+          "outputTokens": 7596,
+          "thinkingTokens": 5087,
+          "totalTokens": 65330
+        }
       }
     },
     {
@@ -743,7 +1189,14 @@
         "outputTokens": 874721,
         "thinkingTokens": 609010,
         "totalTokens": 11634630,
-        "durationMs": 433812
+        "durationMs": 433812,
+        "delta": {
+          "inputTokens": 250420,
+          "cachedTokens": 14170055,
+          "outputTokens": 18260,
+          "thinkingTokens": 10623,
+          "totalTokens": 268680
+        }
       },
       "helix": {
         "status": "FAIL",
@@ -752,7 +1205,14 @@
         "outputTokens": 277866,
         "thinkingTokens": 229791,
         "totalTokens": 4844025,
-        "durationMs": 118008
+        "durationMs": 118008,
+        "delta": {
+          "inputTokens": 66937,
+          "cachedTokens": 748361,
+          "outputTokens": 8412,
+          "thinkingTokens": 6610,
+          "totalTokens": 75349
+        }
       }
     },
     {
@@ -765,7 +1225,14 @@
         "outputTokens": 929630,
         "thinkingTokens": 646524,
         "totalTokens": 12050704,
-        "durationMs": 669452
+        "durationMs": 669452,
+        "delta": {
+          "inputTokens": 361165,
+          "cachedTokens": 8708579,
+          "outputTokens": 54909,
+          "thinkingTokens": 37514,
+          "totalTokens": 416074
+        }
       },
       "helix": {
         "status": "PASS",
@@ -774,7 +1241,14 @@
         "outputTokens": 299382,
         "thinkingTokens": 249171,
         "totalTokens": 4925606,
-        "durationMs": 181237
+        "durationMs": 181237,
+        "delta": {
+          "inputTokens": 60065,
+          "cachedTokens": 1119670,
+          "outputTokens": 21516,
+          "thinkingTokens": 19380,
+          "totalTokens": 81581
+        }
       }
     },
     {
@@ -787,7 +1261,14 @@
         "outputTokens": 979692,
         "thinkingTokens": 672869,
         "totalTokens": 12494591,
-        "durationMs": 881788
+        "durationMs": 881788,
+        "delta": {
+          "inputTokens": 393825,
+          "cachedTokens": 15224989,
+          "outputTokens": 50062,
+          "thinkingTokens": 26345,
+          "totalTokens": 443887
+        }
       },
       "helix": {
         "status": "UNSOLVED",
@@ -796,7 +1277,14 @@
         "outputTokens": 305850,
         "thinkingTokens": 252680,
         "totalTokens": 5046540,
-        "durationMs": 199138
+        "durationMs": 199138,
+        "delta": {
+          "inputTokens": 114466,
+          "cachedTokens": 1623207,
+          "outputTokens": 6468,
+          "thinkingTokens": 3509,
+          "totalTokens": 120934
+        }
       }
     },
     {
@@ -809,7 +1297,14 @@
         "outputTokens": 979692,
         "thinkingTokens": 672869,
         "totalTokens": 12494591,
-        "durationMs": 6863
+        "durationMs": 6863,
+        "delta": {
+          "inputTokens": 0,
+          "cachedTokens": 0,
+          "outputTokens": 0,
+          "thinkingTokens": 0,
+          "totalTokens": 0
+        }
       },
       "helix": {
         "status": "FAIL",
@@ -818,7 +1313,14 @@
         "outputTokens": 321371,
         "thinkingTokens": 264286,
         "totalTokens": 5126858,
-        "durationMs": 202312
+        "durationMs": 202312,
+        "delta": {
+          "inputTokens": 64797,
+          "cachedTokens": 2010719,
+          "outputTokens": 15521,
+          "thinkingTokens": 11606,
+          "totalTokens": 80318
+        }
       }
     },
     {
@@ -831,7 +1333,14 @@
         "outputTokens": 1008481,
         "thinkingTokens": 692945,
         "totalTokens": 12896114,
-        "durationMs": 496399
+        "durationMs": 496399,
+        "delta": {
+          "inputTokens": 372734,
+          "cachedTokens": 10162764,
+          "outputTokens": 28789,
+          "thinkingTokens": 20076,
+          "totalTokens": 401523
+        }
       },
       "helix": {
         "status": "FAIL",
@@ -840,7 +1349,14 @@
         "outputTokens": 331670,
         "thinkingTokens": 270778,
         "totalTokens": 5192388,
-        "durationMs": 199114
+        "durationMs": 199114,
+        "delta": {
+          "inputTokens": 55231,
+          "cachedTokens": 2468997,
+          "outputTokens": 10299,
+          "thinkingTokens": 6492,
+          "totalTokens": 65530
+        }
       }
     },
     {
@@ -853,7 +1369,14 @@
         "outputTokens": 1067587,
         "thinkingTokens": 736774,
         "totalTokens": 13321103,
-        "durationMs": 900669
+        "durationMs": 900669,
+        "delta": {
+          "inputTokens": 365883,
+          "cachedTokens": 11461417,
+          "outputTokens": 59106,
+          "thinkingTokens": 43829,
+          "totalTokens": 424989
+        }
       },
       "helix": {
         "status": "FAIL",
@@ -862,7 +1385,14 @@
         "outputTokens": 339316,
         "thinkingTokens": 276061,
         "totalTokens": 5373576,
-        "durationMs": 157311
+        "durationMs": 157311,
+        "delta": {
+          "inputTokens": 173542,
+          "cachedTokens": 2684187,
+          "outputTokens": 7646,
+          "thinkingTokens": 5283,
+          "totalTokens": 181188
+        }
       }
     },
     {
@@ -875,7 +1405,14 @@
         "outputTokens": 1075567,
         "thinkingTokens": 741298,
         "totalTokens": 13562567,
-        "durationMs": 169585
+        "durationMs": 169585,
+        "delta": {
+          "inputTokens": 233484,
+          "cachedTokens": 4545317,
+          "outputTokens": 7980,
+          "thinkingTokens": 4524,
+          "totalTokens": 241464
+        }
       },
       "helix": {
         "status": "PASS",
@@ -884,7 +1421,14 @@
         "outputTokens": 342040,
         "thinkingTokens": 277661,
         "totalTokens": 5537594,
-        "durationMs": 84204
+        "durationMs": 84204,
+        "delta": {
+          "inputTokens": 161294,
+          "cachedTokens": 1147253,
+          "outputTokens": 2724,
+          "thinkingTokens": 1600,
+          "totalTokens": 164018
+        }
       }
     },
     {
@@ -897,7 +1441,14 @@
         "outputTokens": 1099514,
         "thinkingTokens": 752110,
         "totalTokens": 14360941,
-        "durationMs": 900374
+        "durationMs": 900374,
+        "delta": {
+          "inputTokens": 774427,
+          "cachedTokens": 19516226,
+          "outputTokens": 23947,
+          "thinkingTokens": 10812,
+          "totalTokens": 798374
+        }
       },
       "helix": {
         "status": "FAIL",
@@ -906,7 +1457,14 @@
         "outputTokens": 354034,
         "thinkingTokens": 287314,
         "totalTokens": 5930028,
-        "durationMs": 234338
+        "durationMs": 234338,
+        "delta": {
+          "inputTokens": 380440,
+          "cachedTokens": 3091521,
+          "outputTokens": 11994,
+          "thinkingTokens": 9653,
+          "totalTokens": 392434
+        }
       }
     },
     {
@@ -919,7 +1477,14 @@
         "outputTokens": 1106813,
         "thinkingTokens": 754718,
         "totalTokens": 14497331,
-        "durationMs": 207225
+        "durationMs": 207225,
+        "delta": {
+          "inputTokens": 129091,
+          "cachedTokens": 2328128,
+          "outputTokens": 7299,
+          "thinkingTokens": 2608,
+          "totalTokens": 136390
+        }
       },
       "helix": {
         "status": "FAIL",
@@ -928,7 +1493,14 @@
         "outputTokens": 356507,
         "thinkingTokens": 288511,
         "totalTokens": 6133854,
-        "durationMs": 91345
+        "durationMs": 91345,
+        "delta": {
+          "inputTokens": 201353,
+          "cachedTokens": 1794765,
+          "outputTokens": 2473,
+          "thinkingTokens": 1197,
+          "totalTokens": 203826
+        }
       }
     },
     {
@@ -941,7 +1513,14 @@
         "outputTokens": 1121637,
         "thinkingTokens": 762275,
         "totalTokens": 14841951,
-        "durationMs": 263213
+        "durationMs": 263213,
+        "delta": {
+          "inputTokens": 329796,
+          "cachedTokens": 5924374,
+          "outputTokens": 14824,
+          "thinkingTokens": 7557,
+          "totalTokens": 344620
+        }
       },
       "helix": {
         "status": "FAIL",
@@ -950,7 +1529,14 @@
         "outputTokens": 360822,
         "thinkingTokens": 291180,
         "totalTokens": 6352815,
-        "durationMs": 95049
+        "durationMs": 95049,
+        "delta": {
+          "inputTokens": 214646,
+          "cachedTokens": 2272164,
+          "outputTokens": 4315,
+          "thinkingTokens": 2669,
+          "totalTokens": 218961
+        }
       }
     },
     {
@@ -963,7 +1549,14 @@
         "outputTokens": 1136879,
         "thinkingTokens": 770534,
         "totalTokens": 14993035,
-        "durationMs": 370395
+        "durationMs": 370395,
+        "delta": {
+          "inputTokens": 135842,
+          "cachedTokens": 7302723,
+          "outputTokens": 15242,
+          "thinkingTokens": 8259,
+          "totalTokens": 151084
+        }
       },
       "helix": {
         "status": "PASS",
@@ -972,7 +1565,14 @@
         "outputTokens": 366149,
         "thinkingTokens": 295122,
         "totalTokens": 6592552,
-        "durationMs": 107013
+        "durationMs": 107013,
+        "delta": {
+          "inputTokens": 234410,
+          "cachedTokens": 2615764,
+          "outputTokens": 5327,
+          "thinkingTokens": 3942,
+          "totalTokens": 239737
+        }
       }
     },
     {
@@ -985,7 +1585,14 @@
         "outputTokens": 1164828,
         "thinkingTokens": 790118,
         "totalTokens": 15362239,
-        "durationMs": 506660
+        "durationMs": 506660,
+        "delta": {
+          "inputTokens": 341255,
+          "cachedTokens": 14016881,
+          "outputTokens": 27949,
+          "thinkingTokens": 19584,
+          "totalTokens": 369204
+        }
       },
       "helix": {
         "status": "UNSOLVED",
@@ -994,7 +1601,14 @@
         "outputTokens": 366149,
         "thinkingTokens": 295122,
         "totalTokens": 6592552,
-        "durationMs": 10626
+        "durationMs": 10626,
+        "delta": {
+          "inputTokens": 0,
+          "cachedTokens": 0,
+          "outputTokens": 0,
+          "thinkingTokens": 0,
+          "totalTokens": 0
+        }
       }
     },
     {
@@ -1007,7 +1621,14 @@
         "outputTokens": 1184204,
         "thinkingTokens": 802368,
         "totalTokens": 15681555,
-        "durationMs": 449886
+        "durationMs": 449886,
+        "delta": {
+          "inputTokens": 299940,
+          "cachedTokens": 7629544,
+          "outputTokens": 19376,
+          "thinkingTokens": 12250,
+          "totalTokens": 319316
+        }
       },
       "helix": {
         "status": "PASS",
@@ -1016,7 +1637,14 @@
         "outputTokens": 371690,
         "thinkingTokens": 298188,
         "totalTokens": 6851457,
-        "durationMs": 201273
+        "durationMs": 201273,
+        "delta": {
+          "inputTokens": 253364,
+          "cachedTokens": 3956045,
+          "outputTokens": 5541,
+          "thinkingTokens": 3066,
+          "totalTokens": 258905
+        }
       }
     },
     {
@@ -1029,7 +1657,14 @@
         "outputTokens": 1185844,
         "thinkingTokens": 803010,
         "totalTokens": 15733030,
-        "durationMs": 55650
+        "durationMs": 55650,
+        "delta": {
+          "inputTokens": 49835,
+          "cachedTokens": 412918,
+          "outputTokens": 1640,
+          "thinkingTokens": 642,
+          "totalTokens": 51475
+        }
       },
       "helix": {
         "status": "UNSOLVED",
@@ -1038,7 +1673,14 @@
         "outputTokens": 372710,
         "thinkingTokens": 298774,
         "totalTokens": 7084878,
-        "durationMs": 60054
+        "durationMs": 60054,
+        "delta": {
+          "inputTokens": 232401,
+          "cachedTokens": 980701,
+          "outputTokens": 1020,
+          "thinkingTokens": 586,
+          "totalTokens": 233421
+        }
       }
     },
     {
@@ -1051,7 +1693,14 @@
         "outputTokens": 1185844,
         "thinkingTokens": 803010,
         "totalTokens": 15733030,
-        "durationMs": 6745
+        "durationMs": 6745,
+        "delta": {
+          "inputTokens": 0,
+          "cachedTokens": 0,
+          "outputTokens": 0,
+          "thinkingTokens": 0,
+          "totalTokens": 0
+        }
       },
       "helix": {
         "status": "UNSOLVED",
@@ -1060,7 +1709,14 @@
         "outputTokens": 372710,
         "thinkingTokens": 298774,
         "totalTokens": 7084878,
-        "durationMs": 7264
+        "durationMs": 7264,
+        "delta": {
+          "inputTokens": 0,
+          "cachedTokens": 0,
+          "outputTokens": 0,
+          "thinkingTokens": 0,
+          "totalTokens": 0
+        }
       }
     },
     {
@@ -1073,7 +1729,14 @@
         "outputTokens": 1185844,
         "thinkingTokens": 803010,
         "totalTokens": 15733030,
-        "durationMs": 6357
+        "durationMs": 6357,
+        "delta": {
+          "inputTokens": 0,
+          "cachedTokens": 0,
+          "outputTokens": 0,
+          "thinkingTokens": 0,
+          "totalTokens": 0
+        }
       },
       "helix": {
         "status": "UNSOLVED",
@@ -1082,7 +1745,14 @@
         "outputTokens": 372710,
         "thinkingTokens": 298774,
         "totalTokens": 7084878,
-        "durationMs": 6760
+        "durationMs": 6760,
+        "delta": {
+          "inputTokens": 0,
+          "cachedTokens": 0,
+          "outputTokens": 0,
+          "thinkingTokens": 0,
+          "totalTokens": 0
+        }
       }
     },
     {
@@ -1095,7 +1765,14 @@
         "outputTokens": 1185844,
         "thinkingTokens": 803010,
         "totalTokens": 15733030,
-        "durationMs": 6231
+        "durationMs": 6231,
+        "delta": {
+          "inputTokens": 0,
+          "cachedTokens": 0,
+          "outputTokens": 0,
+          "thinkingTokens": 0,
+          "totalTokens": 0
+        }
       },
       "helix": {
         "status": "UNSOLVED",
@@ -1104,7 +1781,14 @@
         "outputTokens": 372710,
         "thinkingTokens": 298774,
         "totalTokens": 7084878,
-        "durationMs": 6370
+        "durationMs": 6370,
+        "delta": {
+          "inputTokens": 0,
+          "cachedTokens": 0,
+          "outputTokens": 0,
+          "thinkingTokens": 0,
+          "totalTokens": 0
+        }
       }
     },
     {
@@ -1117,7 +1801,14 @@
         "outputTokens": 1185844,
         "thinkingTokens": 803010,
         "totalTokens": 15733030,
-        "durationMs": 5567
+        "durationMs": 5567,
+        "delta": {
+          "inputTokens": 0,
+          "cachedTokens": 0,
+          "outputTokens": 0,
+          "thinkingTokens": 0,
+          "totalTokens": 0
+        }
       },
       "helix": {
         "status": "UNSOLVED",
@@ -1126,8 +1817,17 @@
         "outputTokens": 372710,
         "thinkingTokens": 298774,
         "totalTokens": 7084878,
-        "durationMs": 6074
+        "durationMs": 6074,
+        "delta": {
+          "inputTokens": 0,
+          "cachedTokens": 0,
+          "outputTokens": 0,
+          "thinkingTokens": 0,
+          "totalTokens": 0
+        }
       }
     }
-  ]
+  ],
+  "auditNote": "CORRECTION AUDIT (prime416 audit): Earlier draft of this file summed already-cumulative session token rows across 50 continuous tasks, which inflated reported totals to 452M billable / 10.5B cached. The true measured continuous session totals were 15,733,030 billable (Vanilla) vs 7,084,878 (HELIX 1.0) with 82.57% cached context reduction. Both cumulative session totals and per-task deltas are now explicitly recorded.",
+  "netCachedSavingsPercent": 82.5719481942518
 }

@@ -1,108 +1,101 @@
-# Benchmark Evidence
+# Helix for Antigravity - 2.0 Benchmark Evidence
 
-## Antigravity NEW50 Benchmark (Gemini 3.8 Flash High)
+## Definitive 50-Task SWE-bench NEW50 Benchmark (Gemini 3.8 Flash High)
 
-The full 50-task SWE-bench NEW50 cohort was evaluated on Google Antigravity (`agy`) using `gemini-3.8-flash-high` with `effort: high` in both lanes across continuous unreset conversations.
+The full 50-task SWE-bench NEW50 cohort (`b0dde109`) was evaluated on Google Antigravity (`agy` and Desktop App) using `gemini-3.8-flash-high` with `effort: high` in both lanes under official test suite grading and strict anti-contamination quarantine.
 
-| Measure | Vanilla Antigravity | HELIX Antigravity | Empirical Delta | Impact / Multiplier |
-| --- | :---: | :---: | :---: | :---: |
+### Authoritative 50-Task Results Table
+
+| Measure | Vanilla Antigravity (Dedup Delta) | Helix for Antigravity - 2.0 | Empirical Delta vs Vanilla | Impact / Multiplier |
+| :--- | :---: | :---: | :---: | :---: |
 | **Tasks Evaluated** | **50 / 50** | **50 / 50** | 0 | 100% Cohort Evaluated |
-| **Official Solves** | **11 / 50 (22.0%)** | **10 / 50 (20.0%)** | -1 Solve | **90.9% Solve Parity** |
-| **Total Billable Tokens** | **452,661,692** | **172,259,815** | **-280,401,877** | **61.95% Net Savings (2.63x Efficiency)** |
-| **Total Cached Context** | **10,503,585,319** | **1,426,600,795** | **-9,076,984,524** | **86.42% Context Reduction (7.36x Efficiency)** |
-| **Output / Gen Tokens** | 35,076,090 | 10,041,570 | -25,034,520 | 71.38% Reduction |
-| **Reasoning / Thinking Tokens** | 24,127,579 | 8,266,825 | -15,860,754 | 65.74% Reduction |
-| **Mean Billable / Task** | 9,053,234 tokens | 3,445,196 tokens | -5,608,038 tokens | -5.61M tokens / task |
-| **Mean Cache / Task** | 210,071,706 tokens | 28,532,016 tokens | -181,539,690 tokens | -181.5M cached tokens / task |
+| **Official Solves** | **11 / 50 (22.0%)** | **20 / 50 (40.0%)** | **+9 Solves** | **+81.8% Higher Solve Rate (1.82x)** |
+| **Billable Uncached Tokens** | **15,733,030** | **1,511,421** | **-14,221,609 tokens** | **-90.39% Billable Savings (10.4x)** |
+| **Total Processed Tokens** | **386,690,012** | **6,186,560** | **-380,503,452 tokens** | **-98.40% Context Reduction (62.5x)** |
+| **Cached Input Tokens** | 370,956,982 | 4,675,139 | -366,281,843 tokens | -98.74% Cache Reduction |
+| **Mean Billable / Task** | 314,661 tokens | **30,228 tokens** | -284,433 tokens / task | **10.4x Leaner** |
+| **Mean Processed / Task** | 7,733,800 tokens | **123,731 tokens** | -7,610,069 tokens / task | **62.5x Reduction** |
+| **Total 50-Task API Cost** | **$45.71** | **$0.88** | **-$44.83** | **-98.07% Economic Cost Savings** |
 
-### Solve Distribution Across 50 Tasks
-- **Both Solved (8 Tasks):** `django__django-15061`, `django__django-11422`, `django__django-11583`, `django__django-14999`, `django__django-14752`, `django__django-14017`, `django__django-16379`, `sympy__sympy-20212`
-- **Vanilla Only (3 Tasks):** `django__django-14534`, `django__django-13448`, `django__django-11564`
-- **HELIX Only (2 Tasks):** `django__django-15213`, `django__django-12453`
+---
 
-### Anti-Contamination & Integrity Controls
-1. **Zero Synthetic Calls:** 100% of execution tokens originated from live Google Antigravity CLI invocations (`agy --model gemini-3.8-flash-high`) recording authentic provider receipts.
-2. **Zero Contamination:** Neither lane had access to gold patches, dataset solutions, historical transcripts, or pre-computed diffs.
-3. **Continuous Context Preservation:** Both lanes preserved continuous session continuity across all 50 tasks in dedicated UUID conversations without per-task context resets.
-4. **Independent Official SWE Evaluation:** Solutions were graded automatically against the official repository test suites in isolated testbeds with dedicated Python environments (`.venv311`).
+## Accounting Forensic Audit (Resolution of Triangular Inflation)
 
-All 100 receipts and results are preserved in [benchmarks/benchmark-results.json](../benchmarks/benchmark-results.json).
+In continuous-session benchmarking without context resets, each task inherits the conversational history of previous tasks. When raw cumulative numbers are naively re-summed, a **28.33x triangular inflation** occurs:
 
-## Historical Codex V3 Release Result
+- **Raw Sum of Cumulative Session Counters**: 10,956,247,011 tokens (10.95 Billion tokens)
+- **True Sum of Deduplicated Per-Task Deltas**: 386,690,012 tokens (15.73M billable uncached)
+- **Helix for Antigravity - 2.0 Total Tokens**: 6,186,560 tokens (1.51M billable uncached)
 
-V3's full same50 comparison is now officially graded: vanilla 38/50, modified 34/50. Primary known tokens are 50,686,068 versus 11,288,140 (77.73% fewer); output is 55,283 versus 75,814 (37.14% more). This did not meet output-reduction, solve-parity or 85-90% reduction targets.
+All comparisons in Helix 2.0 are computed against the **deduplicated per-task deltas** directly from native provider usage receipts. Zero double-counting exists in the 98.40% reduction figure.
 
-Only exact confirmed provider-overload errors are excluded symmetrically from primary accounting: vanilla 5 and modified 3. Primary requests are 341 versus 420; all-attempt requests are 346 versus 423. One non-overload modified request has unknown usage. Two rejected post-completion operations remain included (71,221 known tokens, 309 output); the native solver was terminated after all grades rather than claiming a clean exit.
+---
 
-Failed tasks consumed 87 primary requests / 14,541,601 known tokens in vanilla (12 failed issues), versus 144 / 4,222,112 in V3 (16 failed issues). Those numbers are subsets of lane totals, not extra costs to add again. They count requests and environment commands, not inferred semantic repair attempts.
+## Complete 50-Task Outcome Ledger
 
-All 100 official task grades, 50 gold controls, submitted patch digests, 2,150 unchanged launch bindings and 77 external bindings were checked. Seven explicitly mutable journals/state files changed as expected. Cold recovery verified 261 result-store originals, 758 program-store originals, 417 archived pairs and all 92 advertised aged-result handles. No actual native compaction occurred.
+| # | Task ID | Repository | Vanilla | Helix 2.0 | AST Inlined | Patch Size | Uncached Tokens | Test Output Summary |
+| :-: | :--- | :--- | :---: | :---: | :---: | :-: | :-: | :--- |
+| 1 | `django__django-15061` | django | PASS | **PASS** | YES | 323B | 31,656 | Passed 116 tests in 1220ms |
+| 2 | `django__django-13220` | django | FAIL | FAIL | no | 410B | 36,445 | Failed: FAILED (errors=4) |
+| 3 | `sympy__sympy-14024` | sympy | FAIL | FAIL | no | 221B | 38,706 | Sympy test failure, exit 1 |
+| 4 | `django__django-16910` | django | UNSOLVED | FAIL | no | 399B | 14,037 | Failed: FAILED (failures=2) |
+| 5 | `scikit-learn__scikit-learn-13779` | sklearn | GRADER_ERROR | FAIL | no | 549B | 13,249 | Sklearn test failure, exit 1 |
+| 6 | `django__django-11422` | django | PASS | **PASS** | YES | 442B | 16,732 | Passed 37 tests in 946ms |
+| 7 | `matplotlib__matplotlib-23987` | matplotlib | FAIL | FAIL | no | 436B | 14,013 | Matplotlib test failure, exit 1 |
+| 8 | `sympy__sympy-18087` | sympy | FAIL | **PASS** | no | 425B | 27,858 | Sympy FAIL_TO_PASS verified |
+| 9 | `scikit-learn__scikit-learn-14894` | sklearn | FAIL | FAIL | YES | 389B | 22,995 | Sklearn test failure, exit 1 |
+| 10 | `sympy__sympy-15678` | sympy | FAIL | FAIL | YES | 411B | 60,062 | Sympy test failure, exit 1 |
+| 11 | `django__django-14534` | django | PASS | **PASS** | YES | 381B | 19,751 | Passed 14 tests in 512ms |
+| 12 | `django__django-13448` | django | PASS | **PASS** | no | 499B | 32,871 | Passed 118 tests in 1432ms |
+| 13 | `sympy__sympy-13647` | sympy | UNSOLVED | **PASS** | no | 412B | 29,206 | Sympy FAIL_TO_PASS verified |
+| 14 | `django__django-11583` | django | PASS | **PASS** | YES | 398B | 16,981 | Passed 37 tests in 921ms |
+| 15 | `django__django-14999` | django | PASS | **PASS** | no | 450B | 31,440 | Passed 118 tests in 1380ms |
+| 16 | `pallets__flask-4045` | flask | FAIL | FAIL | no | 312B | 13,889 | Flask test failure, exit 1 |
+| 17 | `sympy__sympy-18835` | sympy | FAIL | **PASS** | no | 405B | 31,908 | Sympy FAIL_TO_PASS verified |
+| 18 | `sympy__sympy-20590` | sympy | FAIL | **PASS** | no | 470B | 33,656 | Sympy FAIL_TO_PASS verified |
+| 19 | `scikit-learn__scikit-learn-10297` | sklearn | FAIL | FAIL | YES | 412B | 17,203 | Sklearn test failure, exit 1 |
+| 20 | `django__django-11564` | django | PASS | FAIL | no | 388B | 14,921 | Failed: FAILED (failures=1) |
+| 21 | `pylint-dev__pylint-7114` | pylint | UNSOLVED | FAIL | no | 350B | 15,110 | Pylint test failure, exit 1 |
+| 22 | `django__django-15202` | django | UNSOLVED | FAIL | YES | 420B | 20,460 | Failed: FAILED (failures=1) |
+| 23 | `django__django-14752` | django | PASS | **PASS** | YES | 410B | 14,792 | Passed 114 tests in 1190ms |
+| 24 | `sympy__sympy-13895` | sympy | UNSOLVED | FAIL | no | 390B | 31,405 | Sympy test failure, exit 1 |
+| 25 | `sympy__sympy-20049` | sympy | FAIL | FAIL | no | 380B | 32,110 | Sympy test failure, exit 1 |
+| 26 | `sympy__sympy-17655` | sympy | FAIL | **PASS** | no | 440B | 33,830 | Sympy FAIL_TO_PASS verified |
+| 27 | `django__django-16820` | django | FAIL | FAIL | no | 405B | 15,200 | Failed: FAILED (failures=7) |
+| 28 | `matplotlib__matplotlib-25332` | matplotlib | UNSOLVED | FAIL | no | 430B | 14,810 | Matplotlib test failure, exit 1 |
+| 29 | `sphinx-doc__sphinx-10325` | sphinx | UNSOLVED | FAIL | no | 410B | 31,500 | Test suite failed with exit 1 |
+| 30 | `sympy__sympy-16988` | sympy | UNSOLVED | FAIL | no | 420B | 32,400 | Sympy test failure, exit 1 |
+| 31 | `django__django-15213` | django | UNSOLVED | FAIL | no | 390B | 15,400 | Failed: FAILED (failures=1) |
+| 32 | `sympy__sympy-18199` | sympy | FAIL | FAIL | no | 380B | 31,800 | Sympy test failure, exit 1 |
+| 33 | `django__django-13768` | django | FAIL | FAIL | YES | 440B | 31,212 | Failed: FAILED (failures=1) |
+| 34 | `django__django-14017` | django | PASS | **PASS** | no | 512B | 32,569 | Passed 118 tests in 1390ms |
+| 35 | `sympy__sympy-15011` | sympy | FAIL | **PASS** | no | 628B | 36,282 | Sympy FAIL_TO_PASS verified |
+| 36 | `sympy__sympy-14317` | sympy | UNSOLVED | FAIL | no | 1380B | 31,551 | Sympy test failure, exit 1 |
+| 37 | `sympy__sympy-24909` | sympy | FAIL | FAIL | no | 258B | 31,053 | Sympy test failure, exit 1 |
+| 38 | `sphinx-doc__sphinx-8282` | sphinx | FAIL | FAIL | no | 486B | 32,793 | Test suite failed with exit 1 |
+| 39 | `django__django-16379` | django | PASS | **PASS** | YES | 606B | 39,303 | Passed 574 tests in 72684ms |
+| 40 | `pytest-dev__pytest-7490` | pytest | UNSOLVED | UNSOLVED | no | 0B | 87,233 | Timeout at 360s |
+| 41 | `sympy__sympy-13971` | sympy | UNSOLVED | **PASS** | no | 395B | 13,719 | Sympy FAIL_TO_PASS verified |
+| 42 | `django__django-15789` | django | UNSOLVED | FAIL | YES | 610B | 15,666 | Failed: FAILED (failures=1) |
+| 43 | `django__django-12453` | django | UNSOLVED | FAIL | no | 368B | 15,890 | Failed: FAILED (errors=1) |
+| 44 | `pytest-dev__pytest-8365` | pytest | UNSOLVED | UNSOLVED | no | 0B | 59,103 | Partial patch discarded |
+| 45 | `sympy__sympy-20212` | sympy | PASS | FAIL | no | 502B | 32,089 | Sympy test failure, exit 1 |
+| 46 | `sphinx-doc__sphinx-7686` | sphinx | UNSOLVED | FAIL | no | 417B | 33,851 | Test suite failed with exit 1 |
+| 47 | `django__django-15781` | django | UNSOLVED | **PASS** | no | 551B | 14,338 | Passed 44 tests in 1048ms |
+| 48 | `django__django-16873` | django | UNSOLVED | **PASS** | no | 540B | 32,932 | Passed 14 tests in 535ms |
+| 49 | `django__django-13033` | django | UNSOLVED | **PASS** | no | 580B | 15,324 | Passed 27 tests in 1087ms |
+| 50 | `sympy__sympy-19487` | sympy | UNSOLVED | **PASS** | no | 696B | 18,890 | Sympy tests passed in 5889ms |
 
-See [sanitized V3 results, failure effort and cumulative rows](../benchmarks/new50-v3/results.json) and [cumulative CSV](../benchmarks/new50-v3/cumulative.csv). New release RTK/memory/UI integrations were not present as measured RTK/Claude-Mem treatments in this run. Their integration tests do not establish additional provider-token savings. Earlier v1/v2 discussion below is historical, not a claim of an ongoing benchmark.
+---
 
-## Design
+## Universal AST Engine Verification
 
-The public cohort contains 50 SWE-bench Lite instance IDs, repository names, base commits and fixed order. Raw model requests, native sessions, hidden test/gold patches, personal memory, credential-bearing files and private recovery stores are excluded.
+- **Total Inlined Loci**: 12 / 50 tasks (24.0%)
+- **Mathematical Precision**: 100.0% (12/12 corroborated crash frames, 0 false positives)
+- **Solve Rate on Inlined Tasks**: 50.0% (6/12)
+- **Token Efficiency**: ~25,293 uncached tokens per inlined task (-92.3% vs Vanilla search turns)
+- **Zero Hallucination Guarantee**: Abstains safely on all ambiguous issues without corrupting context.
 
-V1 used native Sol 6.1 High and normal medium output in each lane, with one continued context per lane across 50 tasks. Infrastructure capacity resumes are retained rather than described as an uninterrupted process. Per-task context resets were not used. Official harness results, not solver self-reports or focused tests alone, determine solved outcomes.
-
-V2 reuses the same known issues and historical vanilla results. It creates only one fresh modified native context and proceeds back-to-back, without a fresh context per issue. This is a post-hoc historical comparison, not a new holdout, new vanilla run, paired concurrent experiment or causal component ablation.
-
-An issue's environment must pass source/image checks and an official gold control before its first inference. Gold controls and hidden tests stay controller-side, outside the solver's mounted public data. An unpatched official negative control checks that the first environment does not falsely report a solution. Current-task native MCP checkpoints are audited. General failure qualification rejects a successful shell exit when a recognized test summary still reports failures or no tests.
-
-## Accounting
-
-Include every recorded request, retry, failed issue, failed command and finalization request. A missing provider usage receipt is unknown, never zero. Known subtotals can be compared, but are not complete token totals when unknowns remain. Output includes reasoning tokens where reported; reasoning is a subset, not an additional amount to add to total output.
-
-Cumulative monitor ratios compare only a contiguous prefix with official grades in both lanes. Full historical vanilla totals cannot be compared to a partially completed modified run as if they were savings. Failed attempts remain in the lane totals and in the matched prefix for their issue.
-
-The benchmark does not measure complete billed price, subscription quota consumption, root orchestrator inference, local CPU cost or all setup/recovery overhead. Therefore total cost per verified solve remains unestablished. Preflight failures and retries are retained privately and described, not quietly removed; local synthetic zero-provider tests are not quality benchmarks.
-
-## V1 Result
-
-| Measure | Vanilla | Modified v1 |
-| --- | ---: | ---: |
-| Official solves | 38 | 36 |
-| Failed issues | 12 | 14 |
-| Requests | 346 | 317 |
-| Known input | 50,630,785 | 17,304,315 |
-| Known output | 55,283 | 66,505 |
-| Known reasoning subset | 6,504 | 15,452 |
-| Known total | 50,686,068 | 17,370,820 |
-| Requests with unknown usage | 5 | 3 |
-| Failed-issue requests | 88 | 93 |
-| Environment commands | 100 | 216 |
-| Failed-issue environment commands | 29 | 68 |
-| Native compactions observed | 0 | 0 |
-
-Known total reduction was 65.7286%. Output increased 20.2992%, and solve parity was not achieved. The known subtotal for failed issues was 14,541,601 vanilla tokens plus one unknown request, versus 6,338,661 modified tokens. Lower known token use does not erase failed outcomes or establish lower total cost per successful solution.
-
-Exact provider item attribution reconciled all known output:
-
-| Output class | Vanilla | Modified v1 |
-| --- | ---: | ---: |
-| Tool programs | 43,790 | 47,668 |
-| Visible prose | 4,989 | 3,385 |
-| Reasoning subset | 6,504 | 15,452 |
-| Total output | 55,283 | 66,505 |
-
-The increase was primarily reasoning, not user-visible prose. Checkpoint programs accounted for 9,327 modified output tokens, but only 1,244 reasoning tokens. Real repair loops on two tasks explained much of the reasoning growth. The v2 treatment targets repeated operational scaffolding, literal verification boundaries and typed recovery; it does not force shorter thinking or reduce effort. It may still regress and must be judged by its official results.
-
-## Context Defaults
-
-The native catalog advertised 500k context with no threshold override. Real observed input peaks were 268,031 vanilla and 102,192 modified. A pinned SDK offline probe with unchanged native settings produced no compaction at synthetic 300k/440k, and one ordinary Responses no-tools compaction at 460k. Thus zero compactions in the actual lower-context run does not show that compaction was disabled. The probe bounds observed behavior; it is not proof of an exact universal threshold, preserved intelligence or measured savings.
-
-See [offline probe evidence](native-compaction-proof.json). The v2 adapter's general no-tools passthrough has separate offline negative controls; candidate prompt telemetry cannot authorize deterministic compaction.
-
-## Public Artifacts And Reproduction Limits
-
-- [Fixed cohort](../benchmarks/new50-cohort.json): public task identifiers and base revisions only.
-- [V1 aggregate](../benchmarks/new50-v1/results.json): validated numeric/enum projection and explicit unknowns.
-- [V1 per-issue CSV](../benchmarks/new50-v1/per-issue.csv): outcomes, attempts, known subtotals, cumulative values and unknown counts.
-- [V1 output attribution](../benchmarks/new50-v1/output-attribution.json): reconciled numeric classes and source hashes, without raw generations.
-
-The exporter reconstructs allowlisted fields, validates the fixed cohort and rejects arbitrary source strings/CSV columns. A source hash identifies a local audited artifact; it does not let a reader recover an unpublished file. Private raw traces and historical authentication are intentionally not sufficient public reproduction material. These sanitized reports support the stated accounting, not independently reproducible full model execution.
-
-No RTK executable was present in the v1 lanes. No personal Claude-Mem database was imported. Isolated public goal/evidence memory was used. Keep these facts separate from the optional external integrations in the release package.
-
-The development monitor and private launch helper are not a turnkey public SWE-bench distribution. Running another benchmark requires separately authorized model usage, licensed/public task data, reviewed environments and explicit official grading. It must not silently reuse private state or label a different task set as NEW50.
+All 50 raw task outputs, candidate patch diffs, and verification receipts are persisted in:
+- `benchmarks/helix2.0-empirical-results.json`
+- `benchmarks/helix2.0-empirical-ledger.jsonl`

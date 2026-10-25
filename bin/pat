@@ -1,0 +1,16 @@
+#!/usr/bin/env python3
+# pat [-b TAG] FILE <<'X' : exact replacements from stdin. Block = OLD, line '=====', NEW; blocks split by line '%%%%%'.
+# Each OLD must occur exactly once (checked in order, all-or-nothing). -b TAG first copies FILE to $BK (default $HELIX_LEAN_HOME/backups/current) as NAME.TAG.
+import sys,os,re,shutil
+a=sys.argv[1:];tag=None
+if a[:1]==['-b']:tag,a=a[1],a[2:]
+f=a[0];t=s=open(f).read();spec=sys.stdin.read().removesuffix('\n');bl=spec.split('\n%%%%%\n')
+for i,b in enumerate(bl,1):
+    p=re.split(r'\n=====(?:\n|$)',b,maxsplit=1)
+    if len(p)!=2:sys.exit(f'block {i}: need OLD / ===== / NEW; nothing written')
+    c=t.count(p[0])
+    if c!=1:sys.exit(f'block {i}: {c} matches; nothing written')
+    t=t.replace(p[0],p[1])
+if tag:
+    d=os.path.expanduser(os.environ.get('BK') or os.path.join(os.environ.get('HELIX_LEAN_HOME') or '~/.claude-lean','backups','current'));os.makedirs(d,exist_ok=True);shutil.copy2(f,os.path.join(d,os.path.basename(f)+'.'+tag))
+open(f,'w').write(t);print(f'{os.path.basename(f)}: {len(bl)} replaced'+(f', backup .{tag}' if tag else ''))

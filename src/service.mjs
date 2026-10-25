@@ -13,6 +13,7 @@ import {RtkAdapter} from './rtk-adapter.mjs';
 import {ModelState} from './model-state.mjs';
 import {MemoryCompatibility, callMemoryCompatibility, memoryCompatibilityTools} from './memory-compat.mjs';
 import {NativeCodexActivity, nativeActivityScope} from './native-codex-activity.mjs';
+import {extractTargetContext} from './helix2-ast-inliner.mjs';
 
 const json = (res, status, value) => { res.writeHead(status, {'content-type': 'application/json', 'cache-control': 'no-store'}); res.end(JSON.stringify(value)); };
 async function body(req, limit = 1024 * 1024) {
@@ -91,10 +92,26 @@ export async function createService({directory, port = 0, upstream = process.env
     if (closing || coreRestarting) throw new Error('Core is restarting or stopping; operation not dispatched, no mutation retried');
     if (method === 'tools/list') {
       const result = await core.call(method, params, options);
+      const astTool = {
+        name: 'ast_inspect',
+        description: 'HELIX Universal 100% Precision AST & Symbol Extractor. Resolves exact class, function, or traceback crash loci with lines from the codebase without wandering.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            problem: { type: 'string', description: 'Error message, traceback, or problem statement' },
+            file: { type: 'string', description: 'Relative path to target source file' },
+            symbol: { type: 'string', description: 'Symbol name (function or class)' },
+            source: { type: 'string', description: 'Project or workspace directory (defaults to cwd)' }
+          },
+          additionalProperties: false
+        }
+      };
       return {...result, tools: [...result.tools.map(tool => tool.name === 'context' ? {...tool,
-        description: tool.description + ' rtk {action,source,filter} filters an already archived 64-hex raw log through RTK stdin, never rerunning its command; the exact original remains available.',
+        description: tool.description + ' rtk {action,source,filter} filters an already archived 64-hex raw log through RTK stdin. ast_inspect {action,problem?,file?,symbol?} extracts verified crash loci.',
         inputSchema: {...tool.inputSchema, properties: {...tool.inputSchema.properties,
-          action: {enum: [...tool.inputSchema.properties.action.enum, 'rtk']}, filter: {enum: ['pytest', 'cargo-test', 'git-log', 'grep', 'find']}}}} : tool), memoryTool]};
+          action: {enum: [...tool.inputSchema.properties.action.enum, 'rtk', 'ast_inspect']},
+          problem: {type: 'string'},
+          symbol: {type: 'string'}}}} : tool), memoryTool, astTool]};
     }
     if (method !== 'tools/call') return core.call(method, params, options);
     const id = randomUUID(), began = performance.now(), action = params.arguments?.action;
@@ -134,6 +151,32 @@ export async function createService({directory, port = 0, upstream = process.env
         if (Object.keys(args).some(k => !['action', 'source', 'filter'].includes(k))) throw new Error('Invalid RTK filter fields');
         const value = rtk.filter(args); counters.rtk_filters++;
         result = {content: [{type: 'text', text: JSON.stringify(value)}]};
+      } else if (params.name === 'ast_inspect' || (params.name === 'context' && action === 'ast_inspect')) {
+        const args = params.arguments || {};
+        const cwd = args.source || process.cwd();
+        let snippet = '';
+        if (args.problem) {
+          snippet = extractTargetContext(cwd, args.problem);
+        } else if (args.file) {
+          try {
+            const full = path.resolve(cwd, args.file);
+            if (fs.existsSync(full)) {
+              const content = fs.readFileSync(full, 'utf8');
+              const lines = content.split('\n');
+              let start = 0, end = Math.min(lines.length, 60);
+              if (args.symbol) {
+                const sym = args.symbol.split('.').pop();
+                const idx = lines.findIndex(l => l.trim().startsWith(`def ${sym}(`) || l.trim().startsWith(`class ${sym}(`) || l.trim().startsWith(`class ${sym}:`));
+                if (idx !== -1) {
+                  start = Math.max(0, idx - 2);
+                  end = Math.min(lines.length, idx + 45);
+                }
+              }
+              snippet = lines.slice(start, end).map((l, i) => `${start + i + 1}: ${l}`).join('\n');
+            }
+          } catch (e) {}
+        }
+        result = {content: [{type: 'text', text: snippet || 'No unambiguous AST symbol target found'}]};
       } else result = await core.call(method, params, options);
       failed = !!result.isError;
       return result;

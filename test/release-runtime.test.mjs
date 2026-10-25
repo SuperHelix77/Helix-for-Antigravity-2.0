@@ -39,7 +39,7 @@ test('one service, private capability, real MCP core, local memory and precise s
   assert.equal((await fetch(info.url + '/snapshot', {headers: {authorization: `Bearer ${info.token}`, origin: 'https://untrusted.invalid'}})).status, 403);
   const invoke = (name, args) => request('/rpc', {directory, value: {method: 'tools/call', params: {name, arguments: args}}});
   const list = await request('/rpc', {directory, value: {method: 'tools/list'}});
-  assert.deepEqual(list.tools.map(r => r.name), ['goal', 'context', 'memory']);
+  assert.deepEqual(list.tools.map(r => r.name), ['goal', 'context', 'memory', 'ast_inspect']);
   assert.match((await invoke('context', {action: 'doctor'})).content[0].text, /Ollama.*none/);
   const note = await invoke('memory', {action: 'put', project: 'test', task: 'current', title: 'Exact recovery', body: 'Literal test memory'});
   const id = JSON.parse(note.content[0].text).id;

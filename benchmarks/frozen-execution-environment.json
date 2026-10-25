@@ -1,0 +1,15 @@
+{
+  "timestamp": "2026-10-25T01:00:08.850Z",
+  "gitCommit": "0a489312a4c80e78904dbc1e7de962f570b02b8a",
+  "engineVersion": "HELIX-2.1",
+  "model": "gemini-3.8-flash-high",
+  "effort": "high",
+  "fileHashes": {
+    "harness/helix-frontier-shaper.mjs": "988d089c613199cf88119126aa819295354862e8cd645dc558c37508bac29214",
+    "harness/helix-budget-enforcer.mjs": "cc9d074695115675909c4f1fd4ddc21b5042a04936c1d44c6b8fcae696871cc8",
+    "harness/run-helix2-qualification.mjs": "4fb6166235f8ed3aaf090852b13ddc8331aaf50ab3e3a0b86681431334058dcc",
+    "harness/quarantine.mjs": "69dc281ec1b21553b5fdba5955d0c363bdbe6df253ba1e9099e0389b796d4775",
+    "harness/trusted-grader.mjs": "1bf4d63bb31d118c60af1326a05e4d48430459cb7431f17e7ed78ef75dd8f75e",
+    "vault/new50-tasks-full.json": "5924cfbfe2a4c45f9c157c141115b036bd665e07c261ba40d19c0a003add76c0"
+  }
+}

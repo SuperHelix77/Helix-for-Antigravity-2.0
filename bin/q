@@ -1,0 +1,39 @@
+#!/usr/bin/env python3
+# q 'CMD' : run a test/build/check with elastic output; full log always saved, exit code kept.
+#   pass            -> one-line receipt + summary lines
+#   first failure   -> error lines with context + last 20 lines (<=120 lines)
+#   repeat failure  -> whole log (<=360 lines: head 60 + tail 300), so hard bugs keep full evidence
+import sys, os, re, json, hashlib, subprocess
+if len(sys.argv) < 2: sys.exit(__doc__ or "q 'CMD'")
+cmd = " ".join(sys.argv[1:])
+sp = subprocess.run([os.path.join(os.path.dirname(os.path.abspath(__file__)), "sp")], capture_output=True, text=True).stdout.strip()
+d = os.path.join(sp or os.path.join(os.environ.get("TMPDIR", "/tmp"), "q-" + str(os.getuid())), "q"); os.makedirs(d, exist_ok=True)
+key = hashlib.sha1((os.getcwd() + "\0" + cmd).encode()).hexdigest()[:10]; sf = os.path.join(d, "state.json")
+try: st = json.load(open(sf))
+except Exception: st = {}
+r = subprocess.run(["bash", "-c", cmd], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+out = r.stdout.decode(errors="replace"); L = out.rstrip("\n").split("\n") if out.strip() else []
+fails = 0 if r.returncode == 0 else st.get(key, 0) + 1
+log = os.path.join(d, f"{key}-{fails}.log"); open(log, "w").write(out)
+st[key] = fails; json.dump(st, open(sf, "w"))
+SUM = re.compile(r"\d+\s+(?i:passed|failed|errors?|skipped|pending|tests?|suites?|warnings?)\b|^\s*[#ℹ]\s*(?i:pass|fail|tests|suites|skipped|todo|cancelled|duration)|\b(?:Tests?|Suites?|Ran)\b[: ].*\d|\b(?:OK|PASSED|FAILED|BUILD SUCCESS\w*)\b|(?i:warn)")
+ERR = re.compile(r"error|fail|assert|traceback|exception|panic|not ok|expected|received|actual|✗|✖|denied|cannot|undefined|E\s{3}", re.I)
+def emit(rows): print("\n".join(rows))
+head = f"[q exit {r.returncode} lines {len(L)} bytes {len(out)} log={log}"
+if r.returncode == 0:
+    s = [l for l in L[-30:] if SUM.search(l)][-8:] or L[-3:]
+    emit([head + "]"] + s)
+elif fails == 1:
+    keep = set()
+    for i, l in enumerate(L):
+        if ERR.search(l): keep.update(range(max(0, i - 2), min(len(L), i + 3)))
+    tail = set(range(max(0, len(L) - 20), len(L))); idx = sorted(keep - tail)[:90] + sorted(tail)
+    rows, prev = [], -2
+    for i in idx:
+        if i != prev + 1: rows.append("…")
+        rows.append(L[i]); prev = i
+    emit([head + " fail 1: focused; rerun same cmd if it fails again for full output]"] + rows)
+else:
+    rows = L if len(L) <= 360 else L[:60] + [f"… {len(L) - 360} lines omitted (full: {log}) …"] + L[-300:]
+    emit([head + f" fail {fails}: full output]"] + rows)
+sys.exit(r.returncode)

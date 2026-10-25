@@ -32,7 +32,7 @@ test('context batch_inspect retrieves multiple file slices in a single determini
   assert.ok(result.content);
   const text = result.content[0].text;
   assert.ok(text.includes('--- FILE: package.json (lines 1-15/'));
-  assert.ok(text.includes('"name": "helix-engine"'));
+  assert.ok(text.includes('"name": "helix-for-antigravity"'));
   assert.ok(text.includes('--- FILE: src/paths.mjs (lines 1-6/'));
   assert.ok(text.includes('STATE_DIR'));
 });

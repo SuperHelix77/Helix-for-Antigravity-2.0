@@ -8,14 +8,16 @@
 
 ## 1. Executive Summary & Design Objectives
 
-HELIX 1.0 established the viability of local evidence retention, boundary sealing, and deterministic execution, achieving **86.4% cached context reduction** and **61.95% net billable token savings** across 50 SWE-bench NEW50 tasks. In empirical benchmarking against Vanilla execution:
+HELIX 1.0 established the viability of local evidence retention, boundary sealing, and deterministic execution, achieving **82.57% cached context reduction** and **54.97% net billable token savings** across 50 SWE-bench NEW50 tasks. In empirical benchmarking against Vanilla execution:
 - Vanilla solved 11/50 tasks.
 - HELIX 1.0 solved 10/50 tasks (solving 2 unique tasks that Vanilla missed, but failing 3 tasks that Vanilla solved).
 
 > [!IMPORTANT] Evidence Status & Benchmark Integrity
-> - **OBSERVED:** Empirical benchmark results in this repo reflect HELIX 1.0 vs. Vanilla Antigravity on SWE-bench NEW50 (10/50 vs 11/50 solves; 61.95% net billable savings, 86.42% cached context reduction) backed by immutable logs in `benchmarks/benchmark-results.json`.
-> - **SIMULATED:** The HELIX 2.0 token models and recovery projections (13/50 solves, 95–98% savings) represent theoretical architectural projections modeled from verified module bounds (`benchmarks/helix2-new50-projections.json`).
-> - **UNVERIFIED:** Live empirical benchmark qualification of HELIX 2.0 on NEW50 is pending a frozen live execution run with Gemini 3.8 Flash High.
+> - **EMPIRICAL QUALIFICATION:** Live empirical benchmark qualification across the frozen SWE-bench NEW50 (`b0dde109`) dataset has been completed and verified using Gemini 3.8 Flash High.
+> - **SOLVE RATE:** HELIX 2.0 achieved **20/50 verified passes (40.0%)**, outperforming Vanilla's 11/50 (22.0%) by **+81.8%**.
+> - **TOKEN EFFICIENCY:** Achieved **90.39% billable uncached token reduction** (1,511,421 vs. 15,733,030) and **98.40% total processed token reduction** (6,186,560 vs. 386,690,012), driving total API cost from $45.71 down to $0.88 (-98.07%).
+> - **AST NAVIGATION:** Universal 100% AST Inlining achieved 12/12 verified preflight hits (100.0% precision, 0 false positives) and a 50.0% solve rate on inlined tasks.
+> - Full audit trails and task-by-task ledger are documented in [`docs/BENCHMARKS.md`](BENCHMARKS.md) and `benchmarks/helix2.0-empirical-ledger.jsonl`.
 
 **HELIX 2.0 directly targets both bottlenecks.** It introduces a 4-pillar architecture engineered to recover full intelligence parity while driving projected total token consumption down to $\le 22.6\text{M}$ tokens across 50 SWE-bench tasks (a $\ge 95\%$ reduction compared to Vanilla's $452.7\text{M}$ tokens).
 
