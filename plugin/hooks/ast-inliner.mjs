@@ -66,7 +66,7 @@ export function extractTargetContext(repoDir, problemStatement) {
     if (l.includes('test') || l.includes('doc') || l.includes('tutorial') || l.includes('example') || l.includes('benchmark')) {
       return false;
     }
-    return rel.endsWith('.py');
+    return rel.endsWith('.py') || rel.endsWith('.js') || rel.endsWith('.mjs') || rel.endsWith('.ts') || rel.endsWith('.tsx');
   }
 
   const lines = problemStatement.split('\n');
@@ -228,7 +228,10 @@ function buildSnippet(repoDir, rel, lineNo, symbol, provenance, confidence) {
       const bareSym = symbol.split('.').pop();
       const idx = lines.findIndex(l => {
         const t = l.trim();
-        return t.startsWith(`def ${bareSym}(`) || t.startsWith(`class ${bareSym}(`) || t.startsWith(`class ${bareSym}:`);
+        return t.startsWith(`def ${bareSym}(`) || t.startsWith(`class ${bareSym}(`) || t.startsWith(`class ${bareSym}:`) ||
+               t.startsWith(`function ${bareSym}(`) || t.startsWith(`export function ${bareSym}(`) ||
+               t.startsWith(`export class ${bareSym}`) || t.startsWith(`class ${bareSym} `) ||
+               t.startsWith(`const ${bareSym} =`) || t.startsWith(`export const ${bareSym} =`);
       });
       if (idx !== -1) {
         start = Math.max(0, idx - 2);
@@ -239,13 +242,15 @@ function buildSnippet(repoDir, rel, lineNo, symbol, provenance, confidence) {
       end = Math.min(lines.length, lineNo + 15);
     }
 
+    const ext = path.extname(rel).replace('.', '') || 'text';
+    const lang = ext === 'py' ? 'python' : (['js', 'mjs', 'ts', 'tsx', 'jsx'].includes(ext) ? 'javascript' : ext);
     const snip = lines.slice(start, end).map((l, i) => `${start + i + 1}: ${l}`).join('\n');
     return (
       `\n[HELIX UNIVERSAL 100% AST TARGET]\n` +
       `File: ${rel} (Lines ${start + 1}-${end})\n` +
       `Symbol: ${symbol || 'Module Header'}\n` +
       `Provenance: ${provenance} (Confidence: ${confidence.toFixed(2)})\n` +
-      `\`\`\`python\n${snip}\n\`\`\`\n`
+      `\`\`\`${lang}\n${snip}\n\`\`\`\n`
     );
   } catch (e) {
     return '';

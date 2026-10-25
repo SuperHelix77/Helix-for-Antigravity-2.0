@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 
-const LEAN_TARGET_REGEX = /(?:npm\s+test|npx\s+test|node\s+--test|pytest|cargo\s+test|git\s+log|vitest|jest|make\s+test|mvn\s+test|gradle\s+test)/i;
+const LEAN_TARGET_REGEX = /(?:npm\s+(?:test|run\s+build|install|ci)|npx\s+(?:test|build)|node\s+--test|pytest|cargo\s+(?:test|build)|git\s+log|vitest|jest|make\s+(?:test|build)|mvn\s+(?:test|compile)|gradle\s+(?:test|build)|vite\s+build|tsc\b)/i;
 
 async function main() {
   const chunks = [];
