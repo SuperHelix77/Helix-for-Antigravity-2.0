@@ -24,15 +24,26 @@ async function main() {
     return;
   }
 
-  // 1. Intercept read_file: bound unbounded reads to 300 lines max to prevent prompt dumps
+  // 1. Intercept read_file: bound reads to 300 lines max to prevent prompt dumps
   if (toolCall.name === 'read_file' && toolCall.args?.Path) {
     const args = toolCall.args;
-    if (args.StartLine === undefined && args.EndLine === undefined) {
+    const start = typeof args.StartLine === 'number' ? args.StartLine : (args.StartLine ? parseInt(args.StartLine, 10) : 1);
+    const end = typeof args.EndLine === 'number' ? args.EndLine : (args.EndLine ? parseInt(args.EndLine, 10) : null);
+    
+    if (end === null) {
       process.stdout.write(JSON.stringify({
         decision: 'allow',
         overwrite: {
-          StartLine: 1,
-          EndLine: 300
+          StartLine: start,
+          EndLine: start + 299
+        }
+      }));
+      return;
+    } else if (end - start > 350) {
+      process.stdout.write(JSON.stringify({
+        decision: 'allow',
+        overwrite: {
+          EndLine: start + 300
         }
       }));
       return;

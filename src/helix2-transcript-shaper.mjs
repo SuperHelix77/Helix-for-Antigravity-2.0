@@ -33,9 +33,61 @@ export class Helix2TranscriptShaper {
       } else if (stat.size > 50 * 1024) {
         return true;
       }
+      // Also check if chunks/transcript has orphaned chunks
+      const chunkDir = path.join(path.dirname(transcriptPath), 'chunks', 'transcript');
+      if (fs.existsSync(chunkDir)) {
+        const chunkFiles = fs.readdirSync(chunkDir).filter(f => f.endsWith('.jsonl'));
+        const expectedChunks = Math.ceil(stat.size / 102400) || 1;
+        if (chunkFiles.length > expectedChunks) return true;
+      }
       return false;
     } catch {
       return false;
+    }
+  }
+
+  /**
+   * Synchronize 100KB transcript chunks in chunks/transcript/ with the shaped transcript.
+   * Eliminates prompt-cache bloat from orphaned historical chunks.
+   */
+  syncChunks({ transcriptPath }) {
+    if (!transcriptPath || !fs.existsSync(transcriptPath)) {
+      return { status: 'no_transcript' };
+    }
+    const chunkDir = path.join(path.dirname(transcriptPath), 'chunks', 'transcript');
+    if (!fs.existsSync(chunkDir)) {
+      return { status: 'no_chunk_dir' };
+    }
+
+    try {
+      const content = fs.readFileSync(transcriptPath);
+      const CHUNK_SIZE = 102400; // Exact chunk size used by Antigravity language_server
+      const totalChunks = Math.ceil(content.length / CHUNK_SIZE) || 1;
+
+      for (let i = 0; i < totalChunks; i++) {
+        const chunkFile = path.join(chunkDir, `${String(i).padStart(8, '0')}.jsonl`);
+        const chunkData = content.subarray(i * CHUNK_SIZE, Math.min((i + 1) * CHUNK_SIZE, content.length));
+        fs.writeFileSync(chunkFile, chunkData);
+      }
+
+      let removedCount = 0;
+      const existingFiles = fs.readdirSync(chunkDir).filter(f => f.endsWith('.jsonl'));
+      for (const f of existingFiles) {
+        const match = f.match(/^(\d{8})\.jsonl$/);
+        if (match) {
+          const idx = parseInt(match[1], 10);
+          if (idx >= totalChunks) {
+            try {
+              fs.unlinkSync(path.join(chunkDir, f));
+              removedCount++;
+            } catch {}
+          }
+        }
+      }
+
+      return { status: 'synced', totalChunks, removedCount };
+    } catch (e) {
+      return { status: 'sync_error', error: e.message };
     }
   }
 
@@ -109,20 +161,11 @@ export class Helix2TranscriptShaper {
         // 1. Tool outputs (GENERIC type)
         if (item.type === 'GENERIC' && item.content) {
           let contentStr = typeof item.content === 'string' ? item.content : JSON.stringify(item.content);
-          contentStr = contentStr
-            .replace(/^Created At: [^\n]+\nCompleted At: [^\n]+\n?/i, '')
-            .replace(/The command exited with code \d+\.\n(?:Output:\n)?/g, '')
-            .replace(/Command output:\n/g, '')
-            .replace(/\n?\[\.\.\. truncated by Helix Lean Switch, full raw preserved in transcript_full\.jsonl\]/g, '\n[helix:raw]');
-          if (contentStr.length > 50) {
-            const preview = contentStr.slice(0, 35).trim();
-            item.content = `${preview}\n[helix:raw]`;
+          if (contentStr.length > 20 || contentStr.includes('[helix:raw]')) {
+            item.content = '[helix:raw]';
             const tf = new Set(item.truncated_fields || []);
             tf.add('content');
             item.truncated_fields = Array.from(tf);
-            modified = true;
-          } else if (contentStr !== item.content) {
-            item.content = contentStr;
             modified = true;
           }
         } else if (item.type === 'PLANNER_RESPONSE') {
@@ -135,13 +178,9 @@ export class Helix2TranscriptShaper {
           }
           // Truncate older response markdown
           if (item.content && typeof item.content === 'string') {
-            let cStr = item.content.replace(/\n?\[\.\.\. truncated by Helix Lean Switch, full raw preserved in transcript_full\.jsonl\]/g, '\n[helix:raw]');
-            if (cStr.length > 50) {
-              item.content = cStr.slice(0, 35).trim() + '\n[helix:raw]';
+            if (item.content.length > 20 || item.content.includes('[helix:raw]')) {
+              item.content = '[helix:raw]';
               tf.add('content');
-              modified = true;
-            } else if (cStr !== item.content) {
-              item.content = cStr;
               modified = true;
             }
           }
@@ -170,9 +209,8 @@ export class Helix2TranscriptShaper {
           }
         } else if ((item.type === 'SYSTEM_MESSAGE' || item.type === 'EPHEMERAL_MESSAGE' || item.type === 'CHECKPOINT') && item.content) {
           const contentStr = typeof item.content === 'string' ? item.content : JSON.stringify(item.content);
-          if (contentStr.length > 70) {
-            const preview = contentStr.slice(0, 40).trim();
-            item.content = `${preview}\n[helix:raw]`;
+          if (contentStr.length > 20 || contentStr.includes('[helix:raw]')) {
+            item.content = '[helix:raw]';
             const tf = new Set(item.truncated_fields || []);
             tf.add('content');
             item.truncated_fields = Array.from(tf);
@@ -199,6 +237,10 @@ export class Helix2TranscriptShaper {
     try {
       fs.writeFileSync(`${transcriptPath}.last_shaped_size`, String(statAfter.size), { mode: 0o600 });
     } catch {}
+
+    // 5. Synchronize prompt cache chunks
+    const chunkSync = this.syncChunks({ transcriptPath });
+
     const savedBytes = Math.max(0, statBefore.size - statAfter.size);
 
     return {
@@ -208,7 +250,8 @@ export class Helix2TranscriptShaper {
       savedBytes,
       savedPercent: ((savedBytes / statBefore.size) * 100).toFixed(1) + '%',
       totalLines,
-      shapedCount
+      shapedCount,
+      chunkSync
     };
   }
 }

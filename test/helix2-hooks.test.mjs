@@ -96,4 +96,20 @@ test('pre-tool-use hook bounds unbounded read_file calls to 300 lines max', (t) 
   const out2 = JSON.parse(res2.stdout);
   assert.equal(out2.decision, 'allow');
   assert.equal(out2.overwrite, undefined);
+
+  // Oversized read_file (> 350 lines) should be bounded
+  const inputOversized = JSON.stringify({
+    toolCall: {
+      name: 'read_file',
+      args: { Path: '/some/file.py', StartLine: 1, EndLine: 800 }
+    }
+  });
+  const res3 = spawnSync(process.execPath, [preToolHook], {
+    input: inputOversized,
+    encoding: 'utf8'
+  });
+  assert.equal(res3.status, 0);
+  const out3 = JSON.parse(res3.stdout);
+  assert.equal(out3.decision, 'allow');
+  assert.equal(out3.overwrite?.EndLine, 301);
 });
