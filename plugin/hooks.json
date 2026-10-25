@@ -21,8 +21,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/mert/.gemini/config/plugins/helix/bin/pre_tool_use",
-            "timeout": 5
+            "command": "node /Users/mert/.gemini/config/plugins/helix/hooks/pre-tool-use.mjs",
+            "timeout": 10
           }
         ]
       }
