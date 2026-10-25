@@ -184,21 +184,19 @@ export class Helix2ContextSharpener {
       };
     }
 
-    // 2. Minimal / Mechanical tier (<500 thinking tokens): direct status queries, feedback, greetings, acknowledgments, Q&A
-    const isInformationalOrFeedback = /^(?:sitrep|status|token\s+savings|metrics|what\s+is|show\s+me|list|where\s+are|did\s+we|thanks|yes|no|ok|done|nice|cost|burn|quota|optimization|speed|latency|usage|rate\s+limit|how\s+much|why|tell\s+me)\b/i.test(cleanPrompt)
-      || /(?:any\s+more|burned\s+through|cost\s+optimization|usage\s+preservation)\b/i.test(cleanPrompt);
-
-    if (isInformationalOrFeedback || (cleanPrompt.length < 45 && !cleanPrompt.includes('refactor') && !cleanPrompt.includes('architect') && !cleanPrompt.includes('build'))) {
+    // 2. Heavy Architectural Tier: Explicitly requested complex overhaul (Full capacity)
+    const isHeavyArchitecture = /\b(?:refactor|architect|redesign|migrate|migration|overhaul|system\s+design|rearchitect)\b/i.test(cleanPrompt);
+    if (isHeavyArchitecture) {
       return {
-        tier: 'MINIMAL',
-        guidance: `Adaptive Reasoning Budget: MINIMAL (<500 tokens). This is a direct status query, lookup, or acknowledgment. Conclude directly without exploratory hypothetical branching.`
+        tier: 'DEEP',
+        guidance: `Adaptive Reasoning Budget: THOROUGH. Complex or multi-component requirements. Rigorously analyze invariants, error cases, and dependencies before acting.`
       };
     }
 
-    // 3. Deep / Thorough tier (Full capacity)
+    // 3. Default to MINIMAL (<500 thinking tokens): chat, feedback, status, fixes, reviews, queries
     return {
-      tier: 'DEEP',
-      guidance: `Adaptive Reasoning Budget: THOROUGH. Complex or multi-component requirements. Rigorously analyze invariants, error cases, and dependencies before acting.`
+      tier: 'MINIMAL',
+      guidance: `Adaptive Reasoning Budget: MINIMAL (<500 tokens). Focus reasoning purely on the immediate direct response or compound execution. Omit exploratory narrative.`
     };
   }
 
