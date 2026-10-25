@@ -45,7 +45,7 @@ test('Helix2ContextSharpener evacuates context to SQLite memory and retrieves sh
     userPrompt: 'What was the result of latency and test command?'
   });
 
-  assert.ok(retrieved.includes('[HELIX DETERMINISTIC MEMORY RECALL]'), 'Should format memory header');
+  assert.ok(retrieved.includes('[HELIX MEMORY (<25 tok)]'), 'Should format memory header');
   assert.ok(retrieved.includes('npm test'), 'Should contain the evacuated tool command');
 
   // 3. Shape PreInvocation

@@ -61,39 +61,25 @@ export class Helix2ContextSharpener {
         const item = JSON.parse(lines[i]);
         const stepIdx = item.step_index ?? i;
 
-        // Evacuate tool outputs that are large or informative (e.g. test runs, benchmarks, file edits)
+        // Evacuate tool outputs and verifiable results only (never save raw user prompt strings)
         if (item.type === 'PLANNER_RESPONSE' && item.tool_calls && item.tool_calls.length > 0) {
           for (const tc of item.tool_calls) {
             const toolName = tc.name || tc.tool || 'tool';
             const cmd = tc.arguments?.CommandLine || tc.arguments?.Path || '';
             if (cmd) {
-              const title = `Tool Execution: ${toolName} ${cmd.slice(0, 60)}`;
-              const body = `Step ${stepIdx}: ${toolName} args: ${JSON.stringify(tc.arguments).slice(0, 500)}`;
+              const title = `${toolName}: ${cmd.slice(0, 50)}`;
+              const body = `Step ${stepIdx}: ${toolName} ${cmd.slice(0, 100)}`;
               try {
                 this.memory.put({
                   project,
                   task: conversationId ? conversationId.slice(0, 36) : 'task',
-                  title: title.slice(0, 200),
+                  title: title.slice(0, 100),
                   body,
                   kind: 'fact'
                 });
                 evacuatedCount++;
               } catch {}
             }
-          }
-        } else if (item.type === 'USER_INPUT' && item.content) {
-          const prompt = typeof item.content === 'string' ? item.content : JSON.stringify(item.content);
-          if (prompt.length > 50 && prompt.length < 2000) {
-            try {
-              this.memory.put({
-                project,
-                task: conversationId ? conversationId.slice(0, 36) : 'task',
-                title: `User Intent: ${prompt.slice(0, 60)}...`,
-                body: prompt,
-                kind: 'decision'
-              });
-              evacuatedCount++;
-            } catch {}
           }
         }
       } catch {}
@@ -108,15 +94,20 @@ export class Helix2ContextSharpener {
 
   /**
    * Deterministically retrieve relevant memory items matching the current user prompt.
+   * Near-zero token footprint: max 2 items, telegraphic 1-liners.
    */
-  retrieveSharpContext({ workspaceDir, conversationId, userPrompt, limit = 3 }) {
+  retrieveSharpContext({ workspaceDir, conversationId, userPrompt, limit = 2 }) {
     if (!userPrompt || typeof userPrompt !== 'string') return '';
     const project = path.basename(workspaceDir || process.cwd()) || 'default';
     
-    // Extract search terms (words >= 4 chars, not common stop words)
+    // Extract domain search terms (words >= 4 chars, strictly excluding conversational stop words)
     const words = userPrompt.match(/\b[a-zA-Z_][a-zA-Z0-9_-]{3,}\b/g) || [];
-    const stopWords = new Set(['what', 'when', 'where', 'which', 'make', 'sure', 'this', 'that', 'with', 'from', 'have', 'been', 'want', 'need', 'also', 'look', 'your']);
-    const queryTerms = words.filter(w => !stopWords.has(w.toLowerCase())).slice(0, 8);
+    const stopWords = new Set([
+      'what', 'when', 'where', 'which', 'make', 'sure', 'this', 'that', 'with', 'from',
+      'have', 'been', 'want', 'need', 'also', 'look', 'your', 'about', 'these', 'those',
+      'attack', 'automatic', 'cost', 'near', 'nothing', 'plus', 'please', 'working'
+    ]);
+    const queryTerms = words.filter(w => !stopWords.has(w.toLowerCase())).slice(0, 6);
     
     if (queryTerms.length === 0) return '';
     const query = queryTerms.join(' ');
@@ -125,8 +116,9 @@ export class Helix2ContextSharpener {
       const results = this.memory.search({ project, query, limit, expand: false });
       if (!results || results.length === 0) return '';
 
-      const items = results.map(r => `• [${r.kind.toUpperCase()}] ${r.title}: ${r.body.replace(/\n+/g, ' ').slice(0, 160)}`).join('\n');
-      return `[HELIX DETERMINISTIC MEMORY RECALL]\n${items}`;
+      // Near-zero token format: single compact line per item (max 15 words)
+      const items = results.map(r => `• ${r.title.slice(0, 45)}: ${r.body.replace(/\n+/g, ' ').slice(0, 50)}`).join('\n');
+      return `[HELIX MEMORY (<25 tok)]\n${items}`;
     } catch {
       return '';
     }

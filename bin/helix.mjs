@@ -100,6 +100,31 @@ if (command === 'serve') {
       console.log('Note: Antigravity plugin installation skipped:', e.message);
     }
   }
+} else if (command === 'lean') {
+  const { HelixLeanSwitch } = await import('../src/helix-lean-switch.mjs');
+  const { spawn } = await import('node:child_process');
+  const { STATE_DIR } = await import('../src/paths.mjs');
+  const path = await import('node:path');
+  const cmdArgs = process.argv.slice(3);
+  if (cmdArgs[0] === '--') cmdArgs.shift();
+  const fullCmd = cmdArgs.join(' ');
+  if (!fullCmd) {
+    console.error('Usage: helix lean -- <command>');
+    process.exit(1);
+  }
+
+  const child = spawn(fullCmd, { shell: true, stdio: ['inherit', 'pipe', 'pipe'] });
+  let stdout = '';
+  let stderr = '';
+  child.stdout.on('data', d => stdout += d.toString());
+  child.stderr.on('data', d => stderr += d.toString());
+  child.on('close', code => {
+    const combined = (stdout + (stderr ? '\n' + stderr : '')).trim();
+    const lean = new HelixLeanSwitch({ directory: path.join(STATE_DIR, 'programs') });
+    const shaped = lean.shapeCommandOutput(combined, { command: fullCmd, exitCode: code, toolName: 'run_command' });
+    process.stdout.write((shaped.output || combined) + '\n');
+    process.exit(code);
+  });
 } else if (command === 'skills') {
   const { Helix2LazyManager } = await import('../src/helix2-lazy-manager.mjs');
   const lm = new Helix2LazyManager();

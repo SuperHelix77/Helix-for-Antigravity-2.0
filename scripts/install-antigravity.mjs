@@ -41,10 +41,14 @@ if (fs.existsSync(mcpSrc)) {
   }
 }
 
-// 3. Make hook executable
-const hookPath = path.join(pluginDst, 'hooks/pre-invocation.mjs');
-if (fs.existsSync(hookPath)) {
-  fs.chmodSync(hookPath, 0o755);
+// 3. Make all hooks executable
+const hooksDir = path.join(pluginDst, 'hooks');
+if (fs.existsSync(hooksDir)) {
+  for (const f of fs.readdirSync(hooksDir)) {
+    if (f.endsWith('.mjs')) {
+      try { fs.chmodSync(path.join(hooksDir, f), 0o755); } catch {}
+    }
+  }
 }
 
 // 4. Create symlink in ~/.gemini/antigravity/bin/helix if bin dir exists
@@ -66,4 +70,4 @@ if (fs.existsSync(binDst)) {
 console.log('Helix for Antigravity - 2.0 successfully installed:');
 console.log(`- Plugin: ${pluginDst}`);
 console.log(`- MCP Schemas: ${mcpDst}`);
-console.log(`- Hook: ${hookPath}`);
+console.log(`- Hooks: ${hooksDir}`);
