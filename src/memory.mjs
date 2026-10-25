@@ -26,14 +26,33 @@ export class DeterministicMemory {
       CREATE INDEX IF NOT EXISTS idx_notes_project_task ON notes(project, task);
       CREATE VIRTUAL TABLE IF NOT EXISTS note_index USING fts5(title,body,content=notes,content_rowid=rowid);
       CREATE TRIGGER IF NOT EXISTS notes_insert AFTER INSERT ON notes BEGIN
-        INSERT INTO note_index(rowid,title,body) VALUES(new.rowid,new.title,new.body); END;`); }
+        INSERT INTO note_index(rowid,title,body) VALUES(new.rowid,new.title,new.body); END;
+      CREATE TRIGGER IF NOT EXISTS notes_delete AFTER DELETE ON notes BEGIN
+        INSERT INTO note_index(note_index,rowid,title,body) VALUES('delete',old.rowid,old.title,old.body); END;`); }
     catch (error) { this.db.close(); throw error; }
+  }
+  prune({project, maxNotes = 500, ttlDays = 30} = {}) {
+    try {
+      const cutoff = Date.now() - (ttlDays * 24 * 60 * 60 * 1000);
+      // Prune transient facts older than ttlDays; preserve architectural decisions and constraints
+      if (project) {
+        this.db.prepare(`DELETE FROM notes WHERE kind NOT IN ('decision', 'constraint') AND created < ? AND project = ?`).run(cutoff, project);
+        const countRow = this.db.prepare('SELECT count(*) as c FROM notes WHERE project = ?').get(project);
+        if (countRow && countRow.c > maxNotes) {
+          const excess = countRow.c - maxNotes;
+          this.db.prepare(`DELETE FROM notes WHERE id IN (SELECT id FROM notes WHERE project = ? AND kind NOT IN ('decision', 'constraint') ORDER BY created ASC LIMIT ?)`).run(project, excess);
+        }
+      } else {
+        this.db.prepare(`DELETE FROM notes WHERE kind NOT IN ('decision', 'constraint') AND created < ?`).run(cutoff);
+      }
+    } catch {}
   }
   put({project, task, title, body, kind = 'fact'}) {
     if (![project, task].every(v => text(v, 256)) || !text(title, 200) || !text(body, 50000) ||
         !['fact', 'decision', 'rejected', 'settled', 'constraint'].includes(kind)) throw new Error('Explicit project/task, title and literal memory body required');
     const id = randomUUID();
     this.db.prepare('INSERT INTO notes VALUES(?,?,?,?,?,?,?)').run(id, project, task, title, body, kind, Date.now());
+    this.prune({project});
     return {id, status: 'stored', model_calls: 0};
   }
   search({project, task, query, limit = 5, expand = false}) {

@@ -30,8 +30,10 @@ export class HelixLeanSwitch {
       return { output, receipt: null, savedBytes: 0, rawBytes: output ? Buffer.byteLength(output, 'utf8') : 0 };
     }
     const rawBytes = Buffer.byteLength(output, 'utf8');
+    const isEnv = /\b(?:env|printenv|export)\b/i.test(command);
     if (rawBytes < this.minSavedBytes) {
-      return { output: redactContextText(output), receipt: null, savedBytes: 0, rawBytes };
+      const safeOut = isEnv ? this.#summarizeEnvOutput(output) : redactContextText(output);
+      return { output: safeOut, receipt: null, savedBytes: 0, rawBytes };
     }
 
     const digest = createHash('sha256').update(output, 'utf8').digest('hex');
@@ -50,11 +52,13 @@ export class HelixLeanSwitch {
       leanText = this.#summarizeTestOutput(output, exitCode);
     } else if (isGit) {
       leanText = this.#summarizeGitOutput(output);
+    } else if (isEnv) {
+      leanText = this.#summarizeEnvOutput(output);
     } else {
       leanText = this.#summarizeGenericOutput(output);
     }
 
-    const safeLeanText = redactContextText(leanText);
+    const safeLeanText = isEnv ? leanText : redactContextText(leanText);
     const leanReceipt = [
       `${LEAN_SWITCH_RECEIPT_PREFIX} ${toolName} exit:${exitCode} raw:${rawBytes}B sha256:${digest.slice(0, 24)}; handle:${handle}]`,
       safeLeanText,
@@ -63,9 +67,10 @@ export class HelixLeanSwitch {
 
     const shapedBytes = Buffer.byteLength(leanReceipt, 'utf8');
     const savedBytes = Math.max(0, rawBytes - shapedBytes);
+    const finalOutput = savedBytes > 0 ? leanReceipt : (isEnv ? this.#summarizeEnvOutput(output) : redactContextText(output));
 
     return {
-      output: savedBytes > 0 ? leanReceipt : redactContextText(output),
+      output: finalOutput,
       receipt: handle,
       digest,
       savedBytes,
@@ -203,6 +208,31 @@ export class HelixLeanSwitch {
     }
     return lines.slice(0, 12).join('\n');
   }
+
+  #summarizeEnvOutput(output) {
+    const lines = output.split('\n');
+    const sanitized = [];
+    for (const line of lines) {
+      if (!line.trim()) continue;
+      // Redact sensitive credentials, secrets, tokens, and keys
+      if (/(=|\b)(?:[A-Za-z0-9_-]*(?:KEY|SECRET|TOKEN|PASS|AUTH|CREDENTIAL|PRIVATE)[A-Za-z0-9_-]*)=/i.test(line)) {
+        const key = line.split('=')[0];
+        sanitized.push(`${key}=[REDACTED_SECRET]`);
+      } else {
+        sanitized.push(line);
+      }
+    }
+    if (sanitized.length <= this.maxPreviewLines) {
+      return sanitized.join('\n');
+    }
+    const preview = [
+      ...sanitized.slice(0, Math.floor(this.maxPreviewLines / 2)),
+      `[... ${sanitized.length - this.maxPreviewLines} environment variables bounded for context safety; view full in raw ...]`,
+      ...sanitized.slice(-Math.floor(this.maxPreviewLines / 2))
+    ];
+    return preview.join('\n');
+  }
+
   #summarizeGenericOutput(output) {
     const shaped = shapeToolResult(output);
     const lines = shaped.split('\n');

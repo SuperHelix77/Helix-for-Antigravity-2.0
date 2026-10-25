@@ -158,13 +158,70 @@ function collapseDeeplyIndentedBlocks(lines) {
   return compacted;
 }
 
+export function shapeWebAndMcpPayload(value) {
+  if (typeof value !== 'string' || value.length < 2048) return value;
+
+  // 1. HTML detection & stripping
+  if (/<!DOCTYPE\s+html|<html[\s>]|<body[\s>]|<head[\s>]/i.test(value)) {
+    let clean = value
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+      .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+      .replace(/<svg\b[^<]*(?:(?!<\/svg>)<[^<]*)*<\/svg>/gi, '')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/[ \t]+/g, ' ')
+      .split('\n')
+      .map(l => l.trim())
+      .filter(Boolean)
+      .join('\n');
+
+    const lines = clean.split('\n');
+    if (lines.length > 30) {
+      clean = [
+        ...lines.slice(0, 15),
+        `[... ${lines.length - 30} lines of scraped web content distilled ...]`,
+        ...lines.slice(-15)
+      ].join('\n');
+    }
+    return clean.length < value.length ? `[HTML Document distilled into text preview (${lines.length} lines)]:\n${clean}` : value;
+  }
+
+  // 2. Large JSON detection & distillation (API dumps, MCP query responses)
+  const trimmed = value.trim();
+  if ((trimmed.startsWith('{') && trimmed.endsWith('}')) || (trimmed.startsWith('[') && trimmed.endsWith(']'))) {
+    try {
+      const parsed = JSON.parse(trimmed);
+      if (Array.isArray(parsed)) {
+        const sample = parsed.slice(0, 2);
+        return `[JSON Array (${parsed.length} records); sample records]:\n${JSON.stringify(sample, null, 2)}\n[... remaining ${parsed.length - sample.length} records distilled for context safety]`;
+      } else if (typeof parsed === 'object' && parsed !== null) {
+        const keys = Object.keys(parsed);
+        if (keys.length > 15 || value.length > 4096) {
+          const previewObj = {};
+          for (const k of keys.slice(0, 10)) {
+            const v = parsed[k];
+            previewObj[k] = Array.isArray(v) ? `[Array of ${v.length} items]` : (typeof v === 'object' && v !== null ? `[Object with ${Object.keys(v).length} keys]` : v);
+          }
+          return `[JSON Object (${keys.length} top-level keys: ${keys.slice(0, 10).join(', ')}${keys.length > 10 ? '...' : ''})]:\n${JSON.stringify(previewObj, null, 2)}`;
+        }
+      }
+    } catch {}
+  }
+
+  return value;
+}
+
 // A deliberately small, deterministic RTK-style shaper. It removes terminal
 // progress rewrites, exact repetition, blank-line runs, and deep boilerplate,
 // while preserving error-bearing lines. The caller keeps a digest and rerun
 // instruction because this is a lossy compaction optimization.
 export function shapeToolResult(value) {
   if (typeof value !== "string" || !value) return value;
-  const normalized = collapseTerminalRewrites(value);
+  const webShaped = shapeWebAndMcpPayload(value);
+  const normalized = collapseTerminalRewrites(webShaped);
   const repeated = collapseRepeatedLines(normalized.split("\n"));
   const shaped = collapseDeeplyIndentedBlocks(repeated).join("\n");
   return shaped.length < value.length ? shaped : value;

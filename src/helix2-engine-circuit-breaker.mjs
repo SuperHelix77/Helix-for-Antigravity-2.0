@@ -3,7 +3,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { STATE_DIR } from './paths.mjs';
 
-const LEAN_TARGET_REGEX = /(?:npm\s+(?:test|run\s+build|install|ci)|npx\s+(?:test|build)|node\s+--test|pytest|cargo\s+(?:test|build)|git\s+(?:diff|status|log)|vitest|jest|make\s+(?:test|build)|mvn\s+(?:test|compile)|gradle\s+(?:test|build)|vite\s+build|tsc\b)/i;
+const LEAN_TARGET_REGEX = /(?:npm\s+(?:test|run\s+build|install|ci)|npx\s+(?:test|build)|node\s+--test|pytest|cargo\s+(?:test|build)|git\s+(?:diff|status|log)|vitest|jest|make\s+(?:test|build)|mvn\s+(?:test|compile)|gradle\s+(?:test|build)|vite\s+build|tsc\b|\b(?:env|printenv)\b)/i;
 
 /**
  * Helix 2.0 Engine-Level Circuit Breaker
@@ -108,10 +108,44 @@ export class Helix2EngineCircuitBreaker {
     const toolName = toolCall.name;
     const args = toolCall.args || toolCall.arguments || {};
 
-    // --- read_file: bound to 300 lines max ---
+    // --- read_file: bound to 300 lines max & protect binary/lockfile traps ---
     if (toolName === 'read_file') {
+      const filePath = args.Path || args.path || args.file_path || '';
       const start = typeof args.StartLine === 'number' ? args.StartLine : (args.StartLine ? parseInt(args.StartLine, 10) : 1);
       const end = typeof args.EndLine === 'number' ? args.EndLine : (args.EndLine ? parseInt(args.EndLine, 10) : null);
+
+      // Defense 5A: Binary file extension guard (prevent tokenizer gibberish)
+      const isBinary = /\.(?:wasm|sqlite|sqlite3|db|bin|exe|pyc|class|so|dylib|dll|png|jpg|jpeg|gif|ico|webp|pdf|zip|tar|gz)$/i.test(filePath);
+      if (isBinary) {
+        return { decision: 'allow', overwrite: { StartLine: 1, EndLine: 1 } };
+      }
+
+      // Defense 5B: Massive lockfiles & minified bundles guard (bounded to 25 lines)
+      const isLockfileOrMinified = /(?:package-lock\.json|pnpm-lock\.yaml|yarn\.lock|Cargo\.lock|poetry\.lock|\.min\.(?:js|css)|\.map)$/i.test(filePath);
+      if (isLockfileOrMinified) {
+        const boundEnd = Math.min(end !== null ? end : start + 24, start + 24);
+        return { decision: 'allow', overwrite: { StartLine: start, EndLine: boundEnd } };
+      }
+
+      // Defense 4: Duplicate read amnesia guard (check recent reads in same turn)
+      const state = this.getState(conversationId);
+      if (state && Array.isArray(state.recentReads) && filePath) {
+        const isDuplicate = state.recentReads.some(r =>
+          r.path === filePath &&
+          r.start === start &&
+          (end === null || r.end === end)
+        );
+        if (isDuplicate && (!state.lastMutationFile || state.lastMutationFile !== path.resolve(workspaceDir, filePath))) {
+          // Bounded duplicate preview: 15 lines max
+          return {
+            decision: 'allow',
+            overwrite: {
+              StartLine: start,
+              EndLine: Math.min(end !== null ? end : start + 14, start + 14)
+            }
+          };
+        }
+      }
 
       if (end === null) {
         return { decision: 'allow', overwrite: { StartLine: start, EndLine: start + 299 } };
@@ -206,6 +240,12 @@ export class Helix2EngineCircuitBreaker {
       }
     } else if (toolName === 'read_file') {
       state.readsCount = (state.readsCount || 0) + 1;
+      const filePath = args.Path || args.path || args.file_path || '';
+      const start = typeof args.StartLine === 'number' ? args.StartLine : (args.StartLine ? parseInt(args.StartLine, 10) : 1);
+      const end = typeof args.EndLine === 'number' ? args.EndLine : (args.EndLine ? parseInt(args.EndLine, 10) : null);
+      if (!state.recentReads) state.recentReads = [];
+      state.recentReads.push({ path: filePath, start, end, at: Date.now() });
+      if (state.recentReads.length > 20) state.recentReads.shift();
     } else if (toolName === 'run_command') {
       state.commandsCount = (state.commandsCount || 0) + 1;
       const cmd = (args.CommandLine || '').trim();

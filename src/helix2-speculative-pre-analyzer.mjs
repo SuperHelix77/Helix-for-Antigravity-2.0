@@ -90,8 +90,23 @@ export class Helix2SpeculativePreAnalyzer {
 
       let summary = `• Working Tree: ${lines.length} changed file${lines.length > 1 ? 's' : ''} (${modifiedFiles.join(', ')}${remainingCount > 0 ? ` +${remainingCount} more` : ''})`;
 
-      // Get compact diff hunks for modified files (capped at maxDiffLines)
+      // Get compact diff hunks for modified files (bounded with adaptive diff compression)
       try {
+        let statSummary = '';
+        if (lines.length > 3) {
+          try {
+            const statOut = execFileSync('git', ['diff', '--stat', '--no-color'], {
+              cwd: workspaceDir,
+              encoding: 'utf8',
+              timeout: 1000
+            }).trim();
+            if (statOut) {
+              const statLines = statOut.split('\n');
+              statSummary = statLines.slice(-3).join('\n  ');
+            }
+          } catch {}
+        }
+
         const diffOut = execFileSync('git', ['diff', '-U1', '--no-color'], {
           cwd: workspaceDir,
           encoding: 'utf8',
@@ -101,10 +116,15 @@ export class Helix2SpeculativePreAnalyzer {
         if (diffOut) {
           const diffLines = diffOut.split('\n')
             .filter(l => l.startsWith('@@') || l.startsWith('+') || l.startsWith('-'))
-            .filter(l => !l.startsWith('+++') && !l.startsWith('---'))
-            .slice(0, this.maxDiffLines);
+            .filter(l => !l.startsWith('+++') && !l.startsWith('---'));
 
-          if (diffLines.length > 0) {
+          if (diffLines.length > this.maxDiffLines) {
+            // Adaptive Diff Bounding: Collapse to summary when dirty tree is large
+            summary += `\n  Pending Diff: ${diffLines.length} lines modified across working tree`;
+            if (statSummary) summary += `\n  Stat: ${statSummary}`;
+            summary += `\n  Key Hunks:\n  ` + diffLines.slice(0, 10).map(l => l.slice(0, 80)).join('\n  ');
+            summary += `\n  [... ${diffLines.length - 10} diff lines bounded for context safety]`;
+          } else if (diffLines.length > 0) {
             summary += `\n  Pending Diff (${diffLines.length} lines):\n  ` + diffLines.map(l => l.slice(0, 80)).join('\n  ');
           }
         }
