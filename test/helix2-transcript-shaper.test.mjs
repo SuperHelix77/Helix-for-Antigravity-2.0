@@ -103,3 +103,67 @@ test('Helix2TranscriptShaper syncChunks slices shaped transcript and purges orph
 
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
+
+test('Helix2TranscriptShaper folds intermediate historical tool steps into milestone checkpoints while preserving user inputs', async (t) => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'helix-shaper-milestone-test-'));
+  const logDir = path.join(tmpDir, '.system_generated', 'logs');
+  const chunkDir = path.join(logDir, 'chunks', 'transcript');
+  fs.mkdirSync(chunkDir, { recursive: true });
+
+  const transcriptPath = path.join(logDir, 'transcript.jsonl');
+  const fullTranscriptPath = path.join(logDir, 'transcript_full.jsonl');
+
+  // Create a 50-step transcript with 2 user prompts and 45 intermediate tool steps
+  const lines = [
+    JSON.stringify({ step_index: 0, type: 'USER_INPUT', content: 'First user prompt' })
+  ];
+
+  for (let i = 1; i <= 20; i++) {
+    lines.push(JSON.stringify({ step_index: i, type: 'GENERIC', content: `Tool output ${i} `.repeat(10) }));
+  }
+  lines.push(JSON.stringify({ step_index: 21, type: 'PLANNER_RESPONSE', content: 'Turn 1 done' }));
+
+  lines.push(JSON.stringify({ step_index: 22, type: 'USER_INPUT', content: 'Second user prompt' }));
+  for (let i = 23; i <= 40; i++) {
+    lines.push(JSON.stringify({ step_index: i, type: 'GENERIC', content: `Tool output ${i} `.repeat(10) }));
+  }
+  lines.push(JSON.stringify({ step_index: 41, type: 'PLANNER_RESPONSE', content: 'Turn 2 done' }));
+
+  // Recent 3 steps (should be kept raw)
+  lines.push(JSON.stringify({ step_index: 42, type: 'USER_INPUT', content: 'Third active prompt' }));
+  lines.push(JSON.stringify({ step_index: 43, type: 'PLANNER_RESPONSE', content: 'Active response in progress' }));
+
+  fs.writeFileSync(transcriptPath, lines.join('\n') + '\n');
+  fs.writeFileSync(fullTranscriptPath, lines.join('\n') + '\n');
+
+  const shaper = new Helix2TranscriptShaper({ retainRecentSteps: 2, archiveThresholdLines: 10 });
+  const res = await shaper.shapeTranscript({
+    transcriptPath,
+    fullTranscriptPath,
+    retainRecentSteps: 2,
+    archiveHistoricalTasks: true
+  });
+
+  assert.equal(res.status, 'shaped');
+  assert.ok(res.savedBytes > 0);
+
+  const shapedLines = fs.readFileSync(transcriptPath, 'utf8').trim().split('\n');
+  
+  // All 3 user inputs must be 100% preserved
+  const userPrompts = shapedLines.map(l => JSON.parse(l)).filter(item => item.type === 'USER_INPUT');
+  assert.equal(userPrompts.length, 3);
+  assert.equal(userPrompts[0].content, 'First user prompt');
+  assert.equal(userPrompts[1].content, 'Second user prompt');
+  assert.equal(userPrompts[2].content, 'Third active prompt');
+
+  // Intermediate tool calls must be consolidated into milestone checkpoints
+  const checkpoints = shapedLines.map(l => JSON.parse(l)).filter(item => item.type === 'CHECKPOINT');
+  assert.ok(checkpoints.length >= 1, 'Should have created milestone checkpoint');
+  assert.ok(checkpoints[0].content.includes('helix.task.archive.v1'));
+
+  // Raw full transcript must be 100% byte-complete
+  const fullLines = fs.readFileSync(fullTranscriptPath, 'utf8').trim().split('\n');
+  assert.equal(fullLines.length, lines.length, 'Full transcript must keep all lines');
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});

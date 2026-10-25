@@ -13,9 +13,10 @@ import readline from 'node:readline';
  * 4. Runs atomically in < 25ms.
  */
 export class Helix2TranscriptShaper {
-  constructor({ maxUncompactedBytes = 300 * 1024, retainRecentSteps = 8 } = {}) {
+  constructor({ maxUncompactedBytes = 300 * 1024, retainRecentSteps = 8, archiveThresholdLines = 150 } = {}) {
     this.maxUncompactedBytes = maxUncompactedBytes;
     this.retainRecentSteps = retainRecentSteps;
+    this.archiveThresholdLines = archiveThresholdLines;
   }
 
   /**
@@ -94,7 +95,7 @@ export class Helix2TranscriptShaper {
   /**
    * Shape transcript.jsonl in-place safely.
    */
-  async shapeTranscript({ transcriptPath, fullTranscriptPath, retainRecentSteps = this.retainRecentSteps }) {
+  async shapeTranscript({ transcriptPath, fullTranscriptPath, retainRecentSteps = this.retainRecentSteps, archiveHistoricalTasks = null }) {
     if (!transcriptPath || !fs.existsSync(transcriptPath)) {
       return { status: 'no_transcript' };
     }
@@ -133,14 +134,31 @@ export class Helix2TranscriptShaper {
       }
     } catch {}
 
+    const shouldArchive = archiveHistoricalTasks !== null
+      ? archiveHistoricalTasks
+      : totalLines > this.archiveThresholdLines;
+
     // 3. Second pass: shape older lines
     const cutoffIndex = totalLines - retainRecentSteps;
     const outputLines = [];
     let shapedCount = 0;
+    let pendingGenericCount = 0;
+    let lastGenericIndex = 0;
 
     for (let i = 0; i < totalLines; i++) {
       const line = rawLines[i];
       if (i >= cutoffIndex) {
+        if (shouldArchive && pendingGenericCount > 0) {
+          outputLines.push(JSON.stringify({
+            step_index: lastGenericIndex,
+            type: 'CHECKPOINT',
+            source: 'SYSTEM',
+            status: 'DONE',
+            content: `[helix.task.archive.v1] Sealed ${pendingGenericCount} historical tool steps; raw in transcript_full.jsonl`,
+            truncated_fields: ['content']
+          }));
+          pendingGenericCount = 0;
+        }
         // Keep recent turns 100% unmodified and full detail
         outputLines.push(line);
         continue;
@@ -158,7 +176,81 @@ export class Helix2TranscriptShaper {
           modified = true;
         }
 
-        // 1. Tool outputs (GENERIC type)
+        if (item.type === 'USER_INPUT') {
+          if (shouldArchive && pendingGenericCount > 0) {
+            outputLines.push(JSON.stringify({
+              step_index: lastGenericIndex,
+              type: 'CHECKPOINT',
+              source: 'SYSTEM',
+              status: 'DONE',
+              content: `[helix.task.archive.v1] Sealed ${pendingGenericCount} historical tool steps; raw in transcript_full.jsonl`,
+              truncated_fields: ['content']
+            }));
+            pendingGenericCount = 0;
+          }
+          if (item.content && typeof item.content === 'string') {
+            if (item.content.includes('<USER_SETTINGS_CHANGE>')) {
+              item.content = item.content.replace(/<USER_SETTINGS_CHANGE>[\s\S]*?<\/USER_SETTINGS_CHANGE>/g, '').trim();
+              const tf = new Set(item.truncated_fields || []);
+              tf.add('content');
+              item.truncated_fields = Array.from(tf);
+              modified = true;
+            }
+          }
+          outputLines.push(JSON.stringify(item));
+          shapedCount++;
+          continue;
+        }
+
+        if (shouldArchive) {
+          // In milestone archiving mode, fold intermediate tool executions
+          if (item.type === 'GENERIC' || item.type === 'EPHEMERAL_MESSAGE' || item.type === 'SYSTEM_MESSAGE') {
+            pendingGenericCount++;
+            lastGenericIndex = item.step_index || i;
+            shapedCount++;
+            continue;
+          }
+
+          if (item.type === 'PLANNER_RESPONSE') {
+            const nextLine = rawLines[i + 1];
+            let isFinalOfTurn = false;
+            if (nextLine) {
+              try {
+                const nextItem = JSON.parse(nextLine);
+                if (nextItem.type === 'USER_INPUT') isFinalOfTurn = true;
+              } catch {}
+            }
+            if (isFinalOfTurn) {
+              if (pendingGenericCount > 0) {
+                outputLines.push(JSON.stringify({
+                  step_index: lastGenericIndex,
+                  type: 'CHECKPOINT',
+                  source: 'SYSTEM',
+                  status: 'DONE',
+                  content: `[helix.task.archive.v1] Sealed ${pendingGenericCount} historical tool steps; raw in transcript_full.jsonl`,
+                  truncated_fields: ['content']
+                }));
+                pendingGenericCount = 0;
+              }
+              outputLines.push(JSON.stringify({
+                step_index: item.step_index || i,
+                source: 'MODEL',
+                type: 'PLANNER_RESPONSE',
+                status: 'DONE',
+                content: '[helix:raw]',
+                truncated_fields: ['content', 'thinking', 'tool_calls']
+              }));
+              shapedCount++;
+            } else {
+              pendingGenericCount++;
+              lastGenericIndex = item.step_index || i;
+              shapedCount++;
+            }
+            continue;
+          }
+        }
+
+        // Standard line-by-line shaping for smaller transcripts or non-archival mode
         if (item.type === 'GENERIC' && item.content) {
           let contentStr = typeof item.content === 'string' ? item.content : JSON.stringify(item.content);
           if (contentStr.length > 20 || contentStr.includes('[helix:raw]')) {
@@ -198,14 +290,6 @@ export class Helix2TranscriptShaper {
           }
           if (tf.size > 0) {
             item.truncated_fields = Array.from(tf);
-          }
-        } else if (item.type === 'USER_INPUT' && item.content && typeof item.content === 'string') {
-          if (item.content.includes('<USER_SETTINGS_CHANGE>')) {
-            item.content = item.content.replace(/<USER_SETTINGS_CHANGE>[\s\S]*?<\/USER_SETTINGS_CHANGE>/g, '').trim();
-            const tf = new Set(item.truncated_fields || []);
-            tf.add('content');
-            item.truncated_fields = Array.from(tf);
-            modified = true;
           }
         } else if ((item.type === 'SYSTEM_MESSAGE' || item.type === 'EPHEMERAL_MESSAGE' || item.type === 'CHECKPOINT') && item.content) {
           const contentStr = typeof item.content === 'string' ? item.content : JSON.stringify(item.content);
