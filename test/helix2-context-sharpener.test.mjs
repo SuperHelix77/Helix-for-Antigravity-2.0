@@ -54,6 +54,24 @@ test('Helix2ContextSharpener evacuates context to SQLite memory and retrieves sh
   assert.ok(shaped.includes('[HELIX 2.0 PROTOCOL ACTIVATED - ZERO-BLOAT EPHEMERAL CONTEXT]'));
   assert.ok(shaped.includes('latency'));
 
+  // 4. Test automated task complexity classification
+  const c1 = sharpener.classifyTaskComplexity({ userPrompt: 'sitrep?' });
+  assert.equal(c1.tier, 'MINIMAL');
+  assert.ok(c1.guidance.includes('MINIMAL'));
+
+  const c2 = sharpener.classifyTaskComplexity({
+    userPrompt: 'Fix bug in widgets.py',
+    astSnippet: '[HELIX UNIVERSAL 100% AST TARGET]\nFile: widgets.py'
+  });
+  assert.equal(c2.tier, 'SURGICAL');
+  assert.ok(c2.guidance.includes('SURGICAL'));
+
+  const c3 = sharpener.classifyTaskComplexity({
+    userPrompt: 'Architect a distributed fault-tolerant raft consensus engine across 5 nodes with complex split-brain recovery scenarios'
+  });
+  assert.equal(c3.tier, 'DEEP');
+  assert.ok(c3.guidance.includes('THOROUGH'));
+
   mem.close();
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });

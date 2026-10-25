@@ -157,6 +157,37 @@ export class Helix2ContextSharpener {
   }
 
   /**
+   * Automatically classify task complexity to allocate dynamic reasoning effort.
+   * Prevents burning 5,000+ reasoning tokens on trivial lookups, queries, or single-line fixes.
+   */
+  classifyTaskComplexity({ userPrompt = '', astSnippet = '', specSnippet = '' }) {
+    const prompt = (userPrompt || '').toLowerCase().trim();
+
+    // 1. Surgical tier: Exact symbol locus is pre-resolved (~1,000 tokens)
+    if (astSnippet && astSnippet.includes('[HELIX UNIVERSAL 100% AST TARGET]')) {
+      return {
+        tier: 'SURGICAL',
+        guidance: `Adaptive Reasoning Budget: SURGICAL (~1,000 tokens). Exact symbol locus is pre-resolved above. Formulate the minimal linear patch directly without repository exploration.`
+      };
+    }
+
+    // 2. Minimal / Mechanical tier (<500 thinking tokens): direct status queries, greetings, acknowledgments
+    const isInformational = /^(?:sitrep|status|token\s+savings|metrics|what\s+is|show\s+me|list|where\s+are|did\s+we|thanks|yes|no|ok|done)\b/i.test(prompt);
+    if (isInformational || (prompt.length < 25 && !prompt.includes('fix') && !prompt.includes('bug') && !prompt.includes('error'))) {
+      return {
+        tier: 'MINIMAL',
+        guidance: `Adaptive Reasoning Budget: MINIMAL (<500 tokens). This is a direct status query, lookup, or acknowledgment. Conclude directly without exploratory hypothetical branching.`
+      };
+    }
+
+    // 3. Deep / Thorough tier (Full capacity)
+    return {
+      tier: 'DEEP',
+      guidance: `Adaptive Reasoning Budget: THOROUGH. Complex or multi-component requirements. Rigorously analyze invariants, error cases, and dependencies before acting.`
+    };
+  }
+
+  /**
    * Build the complete ephemeral context for PreInvocation hook.
    */
   shapePreInvocation({ workspaceDir, transcriptPath, conversationId, latestUserPrompt }) {
@@ -226,6 +257,14 @@ export class Helix2ContextSharpener {
       dynamicTail.push(astSnippet.trim());
       dynamicTail.push(`CRITICAL EFFICIENCY DIRECTIVE: The exact target symbol has been pre-resolved above in [HELIX UNIVERSAL 100% AST TARGET]. Do NOT invoke read_file or grep to inspect it again. Formulate your minimal edit and invoke edit_file or a compound execution directly on Turn 1!`);
     }
+
+    // 5. Automated Dynamic Reasoning Allocation (Adaptive Budget)
+    const complexity = this.classifyTaskComplexity({
+      userPrompt: latestUserPrompt,
+      astSnippet,
+      specSnippet
+    });
+    dynamicTail.push(complexity.guidance);
 
     if (stableSections.length === 0 && dynamicTail.length === 0) return null;
 
