@@ -23,14 +23,24 @@ const CORE_ALWAYS_ACTIVE_MCP = new Set([
   'helix'
 ]);
 
+// Generic stop words that must NEVER trigger a skill injection
+const GENERIC_STOP_WORDS = new Set([
+  'app', 'apps', 'skill', 'skills', 'plugin', 'plugins', 'mcp', 'server', 'servers',
+  'tool', 'tools', 'make', 'sure', 'this', 'that', 'with', 'from', 'have', 'been',
+  'want', 'need', 'also', 'look', 'your', 'user', 'users', 'code', 'cli', 'command',
+  'instance', 'price', 'paying', 'invoke', 'easily', 'changes', 'help', 'review',
+  'commit', 'test', 'tests', 'testing', 'work', 'working', 'please', 'here', 'there',
+  'android', 'firebase', 'design', 'science'
+]);
+
 /**
  * Helix Automated Lazy Manager
  * 
- * Automatically intercepts newly installed plugins, skills, and MCP servers:
- * 1. Lazy Plugins: Automatically scopes non-core plugins to enabled:false in config.json.
- * 2. Lazy Skills: Indexes all skills from all plugins with keywords; activates them JIT ephemerally.
- * 3. Lazy MCP: Archives heavy MCP servers (like rea, ghidra) and isolates schemas; JIT enables on intent.
- * 4. Microsecond Cached: Uses filesystem mtimes so it costs < 20 microseconds per turn when stable.
+ * 1. Zero Prompt Cost: Non-core plugins and MCP servers are scoped off by default.
+ * 2. Explicit or High-Specificity JIT Skill Invocation: Skills are ONLY invoked when explicitly
+ *    called (e.g. `/skill <name>`, `use skill <name>`) or when exact domain identifiers match.
+ * 3. Never triggers on generic English or conversational words.
+ * 4. Microsecond cached execution.
  */
 export class Helix2LazyManager {
   constructor({
@@ -79,7 +89,7 @@ export class Helix2LazyManager {
   }
 
   /**
-   * Scan plugins directory and build index of all skills and keywords.
+   * Scan plugins directory and build index of all skills and unique domain keywords.
    */
   indexSkills() {
     const registry = {
@@ -102,7 +112,6 @@ export class Helix2LazyManager {
     for (const pluginName of pluginDirs) {
       const pluginPath = path.join(this.pluginsDir, pluginName);
       
-      // Look for skills in skills/ or directly in root
       const findSkillFiles = (dir) => {
         const results = [];
         try {
@@ -133,16 +142,16 @@ export class Helix2LazyManager {
             }
           }
 
-          // Extract keywords
-          const textToTokenize = `${name} ${description} ${pluginName}`.toLowerCase();
-          const tokens = [...new Set(textToTokenize.match(/\b[a-z0-9_-]{3,}\b/g) || [])];
+          // Extract ONLY high-specificity domain tokens (>= 5 chars, not in GENERIC_STOP_WORDS)
+          const allTokens = `${name} ${description}`.toLowerCase().match(/\b[a-z0-9_-]{5,}\b/g) || [];
+          const domainKeywords = [...new Set(allTokens.filter(t => !GENERIC_STOP_WORDS.has(t)))];
 
           registry.skills.push({
             name,
             plugin: pluginName,
             description: description.slice(0, 300),
             filePath: skillFile,
-            keywords: tokens
+            keywords: domainKeywords
           });
         } catch {}
       }
@@ -261,8 +270,34 @@ export class Helix2LazyManager {
   }
 
   /**
+   * Get list of all available lazy skills (for on-demand browsing).
+   */
+  listSkills() {
+    const reg = this.getRegistry();
+    return (reg.skills || []).map(s => ({
+      name: s.name,
+      plugin: s.plugin,
+      description: s.description
+    }));
+  }
+
+  /**
+   * Read exact content of a skill on-demand.
+   */
+  readSkill(skillName) {
+    const reg = this.getRegistry();
+    const target = (reg.skills || []).find(s => s.name.toLowerCase() === skillName.toLowerCase());
+    if (!target) return null;
+    try {
+      return fs.readFileSync(target.filePath, 'utf8');
+    } catch {
+      return null;
+    }
+  }
+
+  /**
    * Main synchronization entrypoint called before each invocation.
-   * Scopes newly added plugins and MCPs, and checks for JIT matches.
+   * Scopes newly added plugins and MCPs, and checks for explicit JIT skill invocations.
    */
   autoSync({ userPrompt } = {}) {
     // 1. Check for changes and automatically scope newly added plugins or MCPs
@@ -272,34 +307,33 @@ export class Helix2LazyManager {
     // 2. Load registry
     const registry = this.getRegistry();
 
-    // 3. JIT match against user prompt
     if (!userPrompt || typeof userPrompt !== 'string') {
       return { scopedPlugins, scopedMcp, jitMatches: [] };
     }
 
-    const promptTokens = new Set(userPrompt.toLowerCase().match(/\b[a-z0-9_-]{3,}\b/g) || []);
-    const stopWords = new Set(['what', 'when', 'where', 'which', 'make', 'sure', 'this', 'that', 'with', 'from', 'have', 'been', 'want', 'need', 'also', 'look', 'your']);
-    for (const s of stopWords) promptTokens.delete(s);
+    // 3. Explicit skill invocation triggers ONLY:
+    // e.g. "/skill <name>", "use skill <name>", "invoke skill <name>", "@skill/<name>"
+    const explicitMatch = userPrompt.match(/(?:\/skill|invoke-skill|invoke skill|@skill\/|use skill)\s+([a-zA-Z0-9_-]{3,})/i);
+    if (!explicitMatch) {
+      return { scopedPlugins, scopedMcp, jitMatches: [] };
+    }
+
+    const requestedSkill = explicitMatch[1].toLowerCase().replace(/_/g, '-');
+    const stopWordsAfterSkill = new Set(['while', 'that', 'with', 'from', 'when', 'more', 'some', 'each', 'what', 'this', 'here', 'without']);
+    if (requestedSkill.length < 3 || stopWordsAfterSkill.has(requestedSkill)) {
+      return { scopedPlugins, scopedMcp, jitMatches: [] };
+    }
 
     const matches = [];
     for (const skill of registry.skills || []) {
-      // Don't match always active plugins
       if (this.alwaysActivePlugins.has(skill.plugin)) continue;
 
-      let matchScore = 0;
-      for (const kw of skill.keywords) {
-        if (promptTokens.has(kw)) matchScore++;
-      }
-
-      if (matchScore >= 2 || (matchScore >= 1 && promptTokens.has(skill.name.toLowerCase()))) {
-        matches.push({
-          type: 'skill',
-          name: skill.name,
-          plugin: skill.plugin,
-          description: skill.description,
-          filePath: skill.filePath,
-          score: matchScore
-        });
+      const skillNameLower = skill.name.toLowerCase().replace(/_/g, '-');
+      if (skillNameLower === requestedSkill) {
+        matches.push({ ...skill, score: 100 });
+        break;
+      } else if (requestedSkill.length >= 4 && (skillNameLower.startsWith(requestedSkill) || skillNameLower.endsWith(requestedSkill))) {
+        matches.push({ ...skill, score: 60 });
       }
     }
 
@@ -307,7 +341,7 @@ export class Helix2LazyManager {
     return {
       scopedPlugins,
       scopedMcp,
-      jitMatches: matches.slice(0, 2)
+      jitMatches: matches.slice(0, 1) // strictly at most 1 skill to preserve context economy
     };
   }
 
@@ -316,17 +350,16 @@ export class Helix2LazyManager {
    */
   formatJitContext(jitMatches) {
     if (!jitMatches || jitMatches.length === 0) return null;
-    const blocks = jitMatches.map(m => {
-      let content = m.description;
-      try {
-        const raw = fs.readFileSync(m.filePath, 'utf8');
-        // Read up to first 20 lines of instructions
-        const bodyLines = raw.split('\n').filter(l => !l.startsWith('---')).slice(0, 20);
-        content = bodyLines.join('\n').trim();
-      } catch {}
-      return `[HELIX JIT LAZY SKILL ACTIVATED: ${m.name} (${m.plugin})]\n${content}`;
-    });
+    const m = jitMatches[0];
+    let content = m.description;
+    try {
+      const raw = fs.readFileSync(m.filePath, 'utf8');
+      // Extract only actionable instructions (skip frontmatter, take first 15 lines max)
+      const lines = raw.replace(/^---[\s\S]*?---/, '').trim().split('\n');
+      const snippet = lines.filter(l => l.trim().length > 0).slice(0, 12).join('\n');
+      content = snippet || m.description;
+    } catch {}
 
-    return blocks.join('\n\n');
+    return `[HELIX JIT SKILL ACTIVATED: ${m.name} (${m.plugin})]\n${content}\n(Ephemerally loaded for this turn only)`;
   }
 }

@@ -100,6 +100,18 @@ if (command === 'serve') {
       console.log('Note: Antigravity plugin installation skipped:', e.message);
     }
   }
+} else if (command === 'skills') {
+  const { Helix2LazyManager } = await import('../src/helix2-lazy-manager.mjs');
+  const lm = new Helix2LazyManager();
+  const query = process.argv[3];
+  if (query) {
+    const content = lm.readSkill(query);
+    if (content) console.log(content);
+    else console.log(`Skill "${query}" not found.`);
+  } else {
+    const list = lm.listSkills();
+    console.log(JSON.stringify(list, null, 2));
+  }
 } else if (command === 'scope') {
   const { Helix2EnvironmentOptimizer } = await import('../src/helix2-environment-optimizer.mjs');
   const optimizer = new Helix2EnvironmentOptimizer();

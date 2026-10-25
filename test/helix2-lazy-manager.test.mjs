@@ -5,7 +5,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { Helix2LazyManager } from '../src/helix2-lazy-manager.mjs';
 
-test('Helix2LazyManager automatically scopes plugins and MCP servers lazily with JIT activation', (t) => {
+test('Helix2LazyManager automatically scopes plugins and MCP servers lazily with explicit JIT activation', (t) => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'helix-lazy-test-'));
   const pluginsDir = path.join(tmpDir, 'plugins');
   const configJson = path.join(tmpDir, 'config.json');
@@ -55,8 +55,8 @@ Run genomics blast analysis.`);
     registryFile
   });
 
-  // Execute autoSync with a generic prompt
-  const res1 = manager.autoSync({ userPrompt: 'Fix the bug in src/index.js' });
+  // Execute autoSync with a generic prompt mentioning common words ("app", "skills", "user")
+  const res1 = manager.autoSync({ userPrompt: 'We are working on this app and skills now' });
 
   // Verify plugin was automatically scoped to false
   assert.ok(res1.scopedPlugins.includes('dummy-biology'));
@@ -71,17 +71,24 @@ Run genomics blast analysis.`);
   assert.ok(fs.existsSync(path.join(mcpDisabledDir, 'ghidra_mcp/decompile.json')));
   assert.ok(!fs.existsSync(path.join(mcpActiveDir, 'ghidra_mcp')));
 
-  // Verify no JIT match on generic prompt
+  // Verify zero JIT match on conversational prompts (zero prompt tokens cost)
   assert.equal(res1.jitMatches.length, 0);
 
-  // Execute autoSync with a prompt matching the lazy skill
-  const res2 = manager.autoSync({ userPrompt: 'Please analyze this genomic DNA sequence with BLAST' });
+  // Execute autoSync with explicit skill invocation (/skill genomics-analyzer or use skill genomics-analyzer)
+  const res2 = manager.autoSync({ userPrompt: 'Please /skill genomics-analyzer' });
   assert.ok(res2.jitMatches.length > 0);
   assert.equal(res2.jitMatches[0].name, 'genomics-analyzer');
 
   const formattedContext = manager.formatJitContext(res2.jitMatches);
-  assert.ok(formattedContext.includes('[HELIX JIT LAZY SKILL ACTIVATED: genomics-analyzer (dummy-biology)]'));
+  assert.ok(formattedContext.includes('[HELIX JIT SKILL ACTIVATED: genomics-analyzer (dummy-biology)]'));
   assert.ok(formattedContext.includes('Genomics Analyzer Instructions'));
+
+  // Also test on-demand listSkills and readSkill
+  const list = manager.listSkills();
+  assert.ok(list.some(s => s.name === 'genomics-analyzer'));
+
+  const content = manager.readSkill('genomics-analyzer');
+  assert.ok(content.includes('Run genomics blast analysis'));
 
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
