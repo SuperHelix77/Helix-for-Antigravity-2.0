@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { shapeToolResult } from './tool-result-aging.mjs';
 import { retainToolResult, readRetainedToolResult } from './tool-result-store.mjs';
+import { redactContextText } from './compaction-checkpoint.mjs';
 
 export const LEAN_SWITCH_RECEIPT_PREFIX = '[HELIX Lean Switch:';
 
@@ -30,7 +31,7 @@ export class HelixLeanSwitch {
     }
     const rawBytes = Buffer.byteLength(output, 'utf8');
     if (rawBytes < this.minSavedBytes) {
-      return { output, receipt: null, savedBytes: 0, rawBytes };
+      return { output: redactContextText(output), receipt: null, savedBytes: 0, rawBytes };
     }
 
     const digest = createHash('sha256').update(output, 'utf8').digest('hex');
@@ -53,9 +54,10 @@ export class HelixLeanSwitch {
       leanText = this.#summarizeGenericOutput(output);
     }
 
+    const safeLeanText = redactContextText(leanText);
     const leanReceipt = [
       `${LEAN_SWITCH_RECEIPT_PREFIX} ${toolName} exit:${exitCode} raw:${rawBytes}B sha256:${digest.slice(0, 24)}; handle:${handle}]`,
-      leanText,
+      safeLeanText,
       `[Exact original retained in HELIX archive; retrieve with context raw receipt ${handle}]`
     ].join('\n');
 
@@ -63,7 +65,7 @@ export class HelixLeanSwitch {
     const savedBytes = Math.max(0, rawBytes - shapedBytes);
 
     return {
-      output: savedBytes > 0 ? leanReceipt : output,
+      output: savedBytes > 0 ? leanReceipt : redactContextText(output),
       receipt: handle,
       digest,
       savedBytes,

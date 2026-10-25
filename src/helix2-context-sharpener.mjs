@@ -4,6 +4,7 @@ import os from 'node:os';
 import { extractTargetContext } from './helix2-ast-inliner.mjs';
 import { DeterministicMemory } from './memory.mjs';
 import { Helix2LazyManager } from './helix2-lazy-manager.mjs';
+import { redactContextText } from './compaction-checkpoint.mjs';
 import { STATE_DIR } from './paths.mjs';
 
 const CACHE_DIR = path.join(STATE_DIR, 'cache');
@@ -42,7 +43,11 @@ export class Helix2ContextSharpener {
       }
     } catch {}
 
-    const project = path.basename(workspaceDir || process.cwd()) || 'default';
+    const home = os.homedir();
+    const isGenericDir = !workspaceDir || workspaceDir === '/' || workspaceDir === home || workspaceDir === path.join(home, '.gemini/antigravity/scratch');
+    const project = (!isGenericDir && fs.existsSync(workspaceDir))
+      ? path.basename(workspaceDir)
+      : (conversationId ? `session-${conversationId.slice(0, 16)}` : 'default');
     let lines = [];
     try {
       const content = fs.readFileSync(transcriptPath, 'utf8');
@@ -61,14 +66,15 @@ export class Helix2ContextSharpener {
         const item = JSON.parse(lines[i]);
         const stepIdx = item.step_index ?? i;
 
-        // Evacuate tool outputs and verifiable results only (never save raw user prompt strings)
+        // Evacuate tool outputs and verifiable results with full credential redaction
         if (item.type === 'PLANNER_RESPONSE' && item.tool_calls && item.tool_calls.length > 0) {
           for (const tc of item.tool_calls) {
             const toolName = tc.name || tc.tool || 'tool';
             const cmd = tc.arguments?.CommandLine || tc.arguments?.Path || '';
             if (cmd) {
-              const title = `${toolName}: ${cmd.slice(0, 50)}`;
-              const body = `Step ${stepIdx}: ${toolName} ${cmd.slice(0, 100)}`;
+              const sanitizedCmd = redactContextText(cmd);
+              const title = `${toolName}: ${sanitizedCmd.slice(0, 50)}`;
+              const body = `Step ${stepIdx}: ${toolName} ${sanitizedCmd.slice(0, 100)}`;
               try {
                 this.memory.put({
                   project,
@@ -98,7 +104,11 @@ export class Helix2ContextSharpener {
    */
   retrieveSharpContext({ workspaceDir, conversationId, userPrompt, limit = 2 }) {
     if (!userPrompt || typeof userPrompt !== 'string') return '';
-    const project = path.basename(workspaceDir || process.cwd()) || 'default';
+    const home = os.homedir();
+    const isGenericDir = !workspaceDir || workspaceDir === '/' || workspaceDir === home || workspaceDir === path.join(home, '.gemini/antigravity/scratch');
+    const project = (!isGenericDir && fs.existsSync(workspaceDir))
+      ? path.basename(workspaceDir)
+      : (conversationId ? `session-${conversationId.slice(0, 16)}` : 'default');
     
     // Extract domain search terms (words >= 4 chars, strictly excluding conversational stop words)
     const words = userPrompt.match(/\b[a-zA-Z_][a-zA-Z0-9_-]{3,}\b/g) || [];
