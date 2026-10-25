@@ -93,9 +93,9 @@ export class Helix2TranscriptShaper {
   }
 
   /**
-   * Shape transcript.jsonl in-place safely.
+   * Shape transcript.jsonl in-place safely (synchronous, <15ms execution).
    */
-  async shapeTranscript({ transcriptPath, fullTranscriptPath, retainRecentSteps = this.retainRecentSteps, archiveHistoricalTasks = null }) {
+  shapeTranscript({ transcriptPath, fullTranscriptPath, retainRecentSteps = this.retainRecentSteps, archiveHistoricalTasks = null }) {
     if (!transcriptPath || !fs.existsSync(transcriptPath)) {
       return { status: 'no_transcript' };
     }

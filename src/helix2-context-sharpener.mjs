@@ -23,13 +23,14 @@ try { fs.mkdirSync(CACHE_DIR, { recursive: true, mode: 0o700 }); } catch {}
  * 5. Injects context as an ephemeral message so that transcript.jsonl NEVER bloats.
  */
 export class Helix2ContextSharpener {
-  constructor({ memory, stateDir = STATE_DIR, lazyManager, preAnalyzer } = {}) {
+  constructor({ memory, stateDir = STATE_DIR, lazyManager, preAnalyzer, transcriptShaper } = {}) {
     this.memory = memory || new DeterministicMemory(stateDir);
     this.stateDir = stateDir;
     this.cacheDir = path.join(stateDir, 'cache');
     try { fs.mkdirSync(this.cacheDir, { recursive: true, mode: 0o700 }); } catch {}
     this.lazyManager = lazyManager || new Helix2LazyManager();
     this.preAnalyzer = preAnalyzer || new Helix2SpeculativePreAnalyzer();
+    this.transcriptShaper = transcriptShaper || new Helix2TranscriptShaper({ maxUncompactedBytes: 40 * 1024, retainRecentSteps: 4, archiveThresholdLines: 15 });
   }
 
   /**
@@ -174,13 +175,12 @@ export class Helix2ContextSharpener {
       }
     } catch {}
 
-    // 1. Evacuate stale context to SQLite & auto-shape transcript
+    // 1. Evacuate stale context to SQLite & auto-shape transcript (<15ms synchronous)
     this.evacuateStaleContext({ transcriptPath, workspaceDir, conversationId });
     try {
       if (transcriptPath && fs.existsSync(transcriptPath)) {
-        const shaper = new Helix2TranscriptShaper();
-        if (shaper.needsShaping(transcriptPath)) {
-          shaper.shapeTranscript({ transcriptPath });
+        if (this.transcriptShaper.needsShaping(transcriptPath)) {
+          this.transcriptShaper.shapeTranscript({ transcriptPath });
         }
       }
     } catch {}

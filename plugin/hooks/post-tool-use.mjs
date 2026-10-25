@@ -82,7 +82,7 @@ async function main() {
       const { Helix2TranscriptShaper } = await import('/Users/mert/.gemini/antigravity/scratch/HELIX-1.0/src/helix2-transcript-shaper.mjs');
       const shaper = new Helix2TranscriptShaper({ maxUncompactedBytes: 40 * 1024, retainRecentSteps: 4, archiveThresholdLines: 15 });
       if (shaper.needsShaping(transcriptPath)) {
-        await shaper.shapeTranscript({ transcriptPath });
+        shaper.shapeTranscript({ transcriptPath });
       }
     } catch {}
   }
