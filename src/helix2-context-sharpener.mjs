@@ -16,7 +16,6 @@ const STATIC_PROTOCOL_HEADER = Object.freeze([
   `[HELIX 2.0 PROTOCOL ACTIVATED - ZERO-BLOAT EPHEMERAL CONTEXT]`,
   `• Execution: STRICT 1-FLOW: Max 1-2 invocations per turn. Group inspection, edits, and verification into a single parallel compound step.`,
   `• Quota & Output: Dense answers (<150 words). Anchor edit targets to 2-3 lines max. Zero reassurance checks.`,
-  `• Tool Policy: COMPOUND FLOW DEFAULT: Unified multi-tool parallel pipelines active. Zero-Tool remains experimental opt-in.`, 
   `• Reasoning: [S] (State) → [T] (Target) → [A] (Action). Use logic operators (→ implies, ⊨ verifies, ¬ not, Δ diff). Omit narrative filler.`
 ]);
 
