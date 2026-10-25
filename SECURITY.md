@@ -4,7 +4,8 @@ HELIX is a local development tool, not a hardened multi-user service or command 
 
 ## Boundaries
 
-- The service binds only to `127.0.0.1` and requires an owner-private random capability. Browser-origin HTTP requests are rejected.
+- The service binds only to `127.0.0.1` and requires an owner-private random capability (256-bit bearer token in `endpoint.json` with strict `0o600` file permissions). Browser-origin HTTP requests and unauthenticated RPC calls are rejected.
+- **Antigravity Sandbox Isolation**: In Google Antigravity, shell and terminal command executions must always be executed via Antigravity's native `run_command` tool to preserve the IDE's security sandbox (`BypassSandbox: false`) and user confirmation policies. Helix MCP meta-tools are reserved for static analysis (`ast_inspect`), deterministic memory (`memory`), evidence history recovery (`context raw`), and task sealing (`context seal`). Never route unsandboxed host commands through MCP to bypass client restrictions.
 - Electron uses context isolation, sandboxing and no renderer Node integration. Navigation, new windows, downloads and permissions are denied. The renderer CSP blocks external network access. IPC checks the owned top-level frame and exposes bounded operations only.
 - Release mode exposes no benchmark IPC or view. Monitor mode reads a selected local directory; it does not start runs.
 - Local memory and goal execution do not call a model. Optional OpenAI traffic requires explicit startup configuration and caller-supplied authorization. No authentication discovery, third-party model fallback or automatic model retry is performed by that proxy.

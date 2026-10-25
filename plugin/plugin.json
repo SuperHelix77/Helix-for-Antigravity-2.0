@@ -1,0 +1,9 @@
+{
+  "name": "helix",
+  "version": "2.0.0",
+  "description": "Helix for Antigravity - 2.0: Local evidence, deterministic memory, 100% AST inlining, Desktop App & CLI integration, 98.4% token reduction for coding agents.",
+  "author": {
+    "name": "SuperHelix77"
+  },
+  "license": "MIT"
+}

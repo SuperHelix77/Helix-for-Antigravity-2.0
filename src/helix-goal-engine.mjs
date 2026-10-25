@@ -74,7 +74,7 @@ function command(spec, project) {
 }
 
 export class GoalEngine {
-  constructor({ directory = path.join(os.homedir(), ".codex", "helix-goals"), batchSize = 32 } = {}) {
+  constructor({ directory = path.join(process.env.HELIX_HOME || path.join(os.homedir(), ".helix"), "goals"), batchSize = 32 } = {}) {
     if (!Number.isSafeInteger(batchSize) || batchSize < 1 || batchSize > 128) throw new Error("Invalid batch size.");
     this.directory = path.resolve(directory);
     if (existsSync(this.directory) && lstatSync(this.directory).isSymbolicLink()) throw new Error("Goal directory cannot be a symlink.");

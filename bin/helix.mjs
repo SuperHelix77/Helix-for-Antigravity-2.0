@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
+import os from 'node:os';
 import readline from 'node:readline';
 import {fileURLToPath} from 'node:url';
 import {STATE_DIR} from '../src/paths.mjs';
@@ -86,10 +87,26 @@ if (command === 'serve') {
   const file = path.join(STATE_DIR, 'codex-mcp.toml');
   if (fs.existsSync(file) && fs.readFileSync(file, 'utf8') !== template) throw new Error('Existing installation differs; no configuration overwritten');
   fs.writeFileSync(file, template, {mode: 0o600});
-  console.log('Installation registered in HELIX_HOME/codex-mcp.toml. Existing Codex config/auth untouched.\nUse the documented Codex MCP registration command after reviewing the generated entry.');
+  console.log('Installation registered in HELIX_HOME/codex-mcp.toml. Existing client config/auth untouched.');
+
+  // Antigravity Native Plugin & MCP registration
+  const installer = path.join(path.dirname(path.dirname(entry)), 'scripts', 'install-antigravity.mjs');
+  if (fs.existsSync(installer)) {
+    try {
+      const { spawnSync } = await import('node:child_process');
+      const res = spawnSync(process.execPath, [installer], { stdio: 'inherit' });
+      if (res.status === 0) console.log('Antigravity Desktop App and CLI integration installed successfully.');
+    } catch (e) {
+      console.log('Note: Antigravity plugin installation skipped:', e.message);
+    }
+  }
 } else if (command === 'uninstall') {
   try { await request('/shutdown', {value: {}}); } catch {}
   const file = path.join(STATE_DIR, 'codex-mcp.toml');
   if (fs.existsSync(file)) fs.unlinkSync(file);
-  console.log('HELIX stopped; owned registration removed. Goals, memory and exact recovery archives preserved. Codex config/auth unchanged.');
+  const binTarget = path.join(os.homedir(), '.gemini/antigravity/bin/helix');
+  if (fs.existsSync(binTarget) || (() => { try { return fs.lstatSync(binTarget).isSymbolicLink(); } catch { return false; } })()) {
+    try { fs.unlinkSync(binTarget); } catch {}
+  }
+  console.log('HELIX stopped; owned registration removed. Goals, memory and exact recovery archives preserved.');
 } else throw new Error('Commands: install, start, serve, status, stop, observe-codex [THREAD_ID], mcp, memory-mcp, memory-write-mcp, memory-hook, inherit-memory SOURCE [AUXILIARY...], rtk HASH FILTER, watch DIRECTORY, uninstall');

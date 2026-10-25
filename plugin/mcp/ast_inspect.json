@@ -1,0 +1,26 @@
+{
+  "name": "ast_inspect",
+  "description": "HELIX Universal 100% Precision AST & Symbol Extractor. Resolves exact class, function, or traceback crash loci with lines from the codebase without wandering.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "problem": {
+        "type": "string",
+        "description": "Error message, traceback, or problem statement"
+      },
+      "file": {
+        "type": "string",
+        "description": "Relative path to target source file"
+      },
+      "symbol": {
+        "type": "string",
+        "description": "Symbol name (function or class)"
+      },
+      "source": {
+        "type": "string",
+        "description": "Project or workspace directory (defaults to cwd)"
+      }
+    },
+    "additionalProperties": false
+  }
+}

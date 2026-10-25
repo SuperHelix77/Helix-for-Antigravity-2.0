@@ -17,7 +17,7 @@ import { Helix2ToolPipeline } from "../src/helix2-tool-pipeline.mjs";
 import { spawn } from "node:child_process";
 
 const routerRoot = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
-const localPolicy = process.env.HELIX_CONTEXT_SKILL ?? path.join(os.homedir(), ".codex", "skills", "helixcontext", "SKILL.md");
+const localPolicy = process.env.HELIX_CONTEXT_SKILL ?? path.join(os.homedir(), ".gemini", "config", "plugins", "helix", "skills", "helixcontext", "SKILL.md");
 const policyFile = existsSync(localPolicy) ? localPolicy : path.join(routerRoot, "skills", "helixcontext", "SKILL.md");
 const engine = new GoalEngine(process.env.HELIX_GOAL_DIR ? { directory: process.env.HELIX_GOAL_DIR } : {});
 const evidence = new HelixEvidence(engine, process.env.HELIX_EVIDENCE_CACHE_BYTES === undefined ? {} : { cacheBytes: Number(process.env.HELIX_EVIDENCE_CACHE_BYTES) });

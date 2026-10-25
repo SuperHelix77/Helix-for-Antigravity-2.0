@@ -1,0 +1,12 @@
+{
+  "helix-ast-navigator": {
+    "enabled": true,
+    "PreInvocation": [
+      {
+        "type": "command",
+        "command": "node /Users/mert/.gemini/config/plugins/helix/hooks/pre-invocation.mjs",
+        "timeout": 10
+      }
+    ]
+  }
+}

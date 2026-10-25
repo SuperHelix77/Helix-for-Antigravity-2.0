@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "helix": {
+      "command": "node",
+      "args": [
+        "/Users/mert/.gemini/antigravity/scratch/HELIX-1.0/bin/helix.mjs",
+        "mcp"
+      ]
+    }
+  }
+}

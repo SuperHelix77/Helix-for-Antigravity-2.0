@@ -23,7 +23,30 @@ The default state directory is `~/.helix`. Set `HELIX_HOME` to an absolute, owne
 
 The service binds to an ephemeral `127.0.0.1` port. Its bearer capability is stored in `HELIX_HOME/endpoint.json`, mode 0600 on POSIX. Its singleton directory is `service.lock`. Memory, goals, encrypted retention and raw evidence persist independently of the desktop window.
 
-## Codex Registration
+## Google Antigravity Desktop App & CLI Installation
+
+To install the native plugin, PreInvocation AST hook, and MCP schemas into Google Antigravity:
+
+```sh
+npm run install:antigravity
+# or
+node bin/helix.mjs install
+```
+
+This automatically configures your Antigravity environment:
+1. **Desktop App Plugin**: `~/.gemini/config/plugins/helix/plugin.json` (connects into `/Applications/Antigravity.app`)
+2. **PreInvocation Lifecycle Hook**: `~/.gemini/config/plugins/helix/hooks/pre-invocation.mjs` (inlines verified crash loci into conversation prompts in <5ms before model generation)
+3. **MCP Tool Schemas**: `~/.gemini/antigravity/mcp/helix/` (`ast_inspect.json`, `context.json`, `goal.json`, `memory.json`)
+4. **Agent Execution Protocol**: `~/.gemini/config/plugins/helix/rules/AGENTS.md`
+5. **Context Skill**: `~/.gemini/config/plugins/helix/skills/helixcontext/SKILL.md`
+6. **CLI Executable**: Symlinked to `~/.gemini/antigravity/bin/helix`
+
+To verify installation in Antigravity:
+```sh
+node bin/helix.mjs status
+```
+
+## Legacy Codex Registration (Optional)
 
 `install` generates `HELIX_HOME/codex-mcp.toml`, refusing to overwrite a differing registration. It does not modify the client. Review the entry and explicitly register:
 
