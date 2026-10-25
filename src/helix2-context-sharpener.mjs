@@ -200,32 +200,36 @@ export class Helix2ContextSharpener {
       });
     } catch {}
 
-    const sections = [];
-    if (astSnippet && astSnippet.trim().length > 0) {
-      sections.push(astSnippet.trim());
-    }
-    if (specSnippet && specSnippet.trim().length > 0) {
-      sections.push(specSnippet.trim());
+    // Structure prompt for Maximum Prompt Cache Hit Rate:
+    // [1] Static Protocol Header & Instructions (100% byte-stable prefix)
+    // [2] Stable Project Memory & Directives (stable session prefix)
+    // [3] Dynamic Per-Turn Suffix (Speculative workspace state & AST target locus)
+    const staticHeader = [
+      `[HELIX 2.0 PROTOCOL ACTIVATED - ZERO-BLOAT EPHEMERAL CONTEXT]`,
+      `Instructions: STRICT ONE FLOW LAW: Maximum 1 compound tool invocation per turn. Group all inspection, execution, and verification into a single unified step, then deliver your response directly. Serialized micro-reads and iterative thought-act ping-pong are strictly forbidden.`
+    ];
+
+    const stableSections = [];
+    if (jitContext && jitContext.trim().length > 0) {
+      stableSections.push(jitContext.trim());
     }
     if (memorySnippet && memorySnippet.trim().length > 0) {
-      sections.push(memorySnippet.trim());
-    }
-    if (jitContext && jitContext.trim().length > 0) {
-      sections.push(jitContext.trim());
+      stableSections.push(memorySnippet.trim());
     }
 
-    if (sections.length === 0) return null;
+    const dynamicTail = [];
+    if (specSnippet && specSnippet.trim().length > 0) {
+      dynamicTail.push(specSnippet.trim());
+    }
+    if (astSnippet && astSnippet.trim().length > 0) {
+      dynamicTail.push(astSnippet.trim());
+      dynamicTail.push(`CRITICAL EFFICIENCY DIRECTIVE: The exact target symbol has been pre-resolved above in [HELIX UNIVERSAL 100% AST TARGET]. Do NOT invoke read_file or grep to inspect it again. Formulate your minimal edit and invoke edit_file or a compound execution directly on Turn 1!`);
+    }
 
-    const astDirective = (astSnippet && astSnippet.trim().length > 0)
-      ? `\nCRITICAL EFFICIENCY DIRECTIVE: The exact target symbol has been pre-resolved above in [HELIX UNIVERSAL 100% AST TARGET]. Do NOT invoke read_file or grep to inspect it again. Formulate your minimal edit and invoke edit_file or a compound execution directly on Turn 1!`
-      : '';
+    if (stableSections.length === 0 && dynamicTail.length === 0) return null;
 
-    const sharpContext = (
-      `[HELIX 2.0 PROTOCOL ACTIVATED - ZERO-BLOAT EPHEMERAL CONTEXT]\n` +
-      sections.join('\n\n') +
-      astDirective +
-      `\nInstructions: STRICT ONE FLOW LAW: Maximum 1 compound tool invocation per turn. Group all inspection, execution, and verification into a single unified step, then deliver your response directly. Serialized micro-reads and iterative thought-act ping-pong are strictly forbidden.`
-    );
+    const allSections = [...staticHeader, ...stableSections, ...dynamicTail];
+    const sharpContext = allSections.join('\n\n');
 
     return sharpContext;
   }

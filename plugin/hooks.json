@@ -39,13 +39,6 @@
         ]
       }
     ],
-    "PostInvocation": [
-      {
-        "type": "command",
-        "command": "node /Users/mert/.gemini/config/plugins/helix/hooks/post-invocation.mjs",
-        "timeout": 10
-      }
-    ],
     "Stop": [
       {
         "type": "command",
