@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
-import { extractTargetContext } from './ast-inliner.mjs';
 
 async function main() {
   const chunks = [];
@@ -21,6 +20,7 @@ async function main() {
   const workspacePaths = input.workspacePaths || [];
   const workspaceDir = workspacePaths[0] || process.cwd();
   const transcriptPath = input.transcriptPath;
+  const conversationId = input.conversationId || 'default';
 
   if (!fs.existsSync(workspaceDir) || !transcriptPath || !fs.existsSync(transcriptPath)) {
     process.stdout.write(JSON.stringify({}));
@@ -48,28 +48,44 @@ async function main() {
   }
 
   try {
-    const astSnippet = extractTargetContext(workspaceDir, latestUserPrompt);
-    if (astSnippet && astSnippet.trim().length > 0) {
-      const systemMessage = (
-        `[HELIX 2.3c PROTOCOL ACTIVATED]\n` +
-        astSnippet +
-        `\nInstructions: The target locus has been resolved above with 100% precision.\n` +
-        `Inspect surrounding lines or formulate your minimal edit directly without repository-wide search.`
-      );
+    const { Helix2ContextSharpener } = await import('/Users/mert/.gemini/antigravity/scratch/HELIX-1.0/src/helix2-context-sharpener.mjs');
+    const sharpener = new Helix2ContextSharpener();
+    const sharpContext = sharpener.shapePreInvocation({
+      workspaceDir,
+      transcriptPath,
+      conversationId,
+      latestUserPrompt
+    });
 
+    if (sharpContext && sharpContext.trim().length > 0) {
       const output = {
         injectSteps: [
           {
-            systemMessage: {
-              systemMessage
-            }
+            ephemeralMessage: sharpContext
           }
         ]
       };
       process.stdout.write(JSON.stringify(output));
       return;
     }
-  } catch (e) {}
+  } catch (e) {
+    // Fallback: minimal AST extraction if sharpener encounters any issue
+    try {
+      const { extractTargetContext } = await import('./ast-inliner.mjs');
+      const astSnippet = extractTargetContext(workspaceDir, latestUserPrompt);
+      if (astSnippet && astSnippet.trim().length > 0) {
+        const output = {
+          injectSteps: [
+            {
+              ephemeralMessage: `[HELIX 2.0 PROTOCOL ACTIVATED]\n${astSnippet}`
+            }
+          ]
+        };
+        process.stdout.write(JSON.stringify(output));
+        return;
+      }
+    } catch {}
+  }
 
   process.stdout.write(JSON.stringify({}));
 }

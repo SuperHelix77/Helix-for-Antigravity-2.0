@@ -100,6 +100,18 @@ if (command === 'serve') {
       console.log('Note: Antigravity plugin installation skipped:', e.message);
     }
   }
+} else if (command === 'scope') {
+  const { Helix2EnvironmentOptimizer } = await import('../src/helix2-environment-optimizer.mjs');
+  const optimizer = new Helix2EnvironmentOptimizer();
+  const sub = process.argv[3];
+  if (sub === 'enable' && process.argv[4]) {
+    optimizer.restorePlugin(process.argv[4]);
+    console.log(`Enabled ${process.argv[4]}`);
+  } else {
+    const mcpRes = optimizer.optimizeMcp({ enableRea: false });
+    const pluginRes = optimizer.optimizePlugins();
+    console.log(JSON.stringify({ mcp: mcpRes, plugins: pluginRes }, null, 2));
+  }
 } else if (command === 'uninstall') {
   try { await request('/shutdown', {value: {}}); } catch {}
   const file = path.join(STATE_DIR, 'codex-mcp.toml');
