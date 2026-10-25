@@ -13,7 +13,7 @@ import readline from 'node:readline';
  * 4. Runs atomically in < 25ms.
  */
 export class Helix2TranscriptShaper {
-  constructor({ maxUncompactedBytes = 500 * 1024, retainRecentSteps = 25 } = {}) {
+  constructor({ maxUncompactedBytes = 400 * 1024, retainRecentSteps = 15 } = {}) {
     this.maxUncompactedBytes = maxUncompactedBytes;
     this.retainRecentSteps = retainRecentSteps;
   }
@@ -29,8 +29,8 @@ export class Helix2TranscriptShaper {
       const lastCheckFile = `${transcriptPath}.last_shaped_size`;
       if (fs.existsSync(lastCheckFile)) {
         const lastSize = parseInt(fs.readFileSync(lastCheckFile, 'utf8').trim(), 10) || 0;
-        if (stat.size - lastSize > 40 * 1024) return true;
-      } else if (stat.size > 100 * 1024) {
+        if (stat.size - lastSize > 30 * 1024) return true;
+      } else if (stat.size > 80 * 1024) {
         return true;
       }
       return false;
@@ -100,36 +100,43 @@ export class Helix2TranscriptShaper {
 
         // 1. Tool outputs (GENERIC type)
         if (item.type === 'GENERIC' && item.content) {
-          const contentStr = typeof item.content === 'string' ? item.content : JSON.stringify(item.content);
-          if (contentStr.length > 200) {
-            const preview = contentStr.slice(0, 120).trim();
+          let contentStr = typeof item.content === 'string' ? item.content : JSON.stringify(item.content);
+          const cleanedStr = contentStr.replace(/^Created At: [^\n]+\nCompleted At: [^\n]+\n?/i, '');
+          if (cleanedStr.length > 120) {
+            const preview = cleanedStr.slice(0, 80).trim();
             item.content = `${preview}\n[... truncated by Helix Lean Switch, full raw preserved in transcript_full.jsonl]`;
             const tf = new Set(item.truncated_fields || []);
             tf.add('content');
             item.truncated_fields = Array.from(tf);
             modified = true;
+          } else if (cleanedStr !== contentStr) {
+            item.content = cleanedStr;
+            modified = true;
           }
         } else if (item.type === 'PLANNER_RESPONSE') {
           const tf = new Set(item.truncated_fields || []);
           // Truncate older thinking blocks
-          if (item.thinking && item.thinking.length > 100) {
-            item.thinking = item.thinking.slice(0, 80) + '...';
+          if (item.thinking && item.thinking.length > 80) {
+            item.thinking = item.thinking.slice(0, 60) + '...';
             tf.add('thinking');
             modified = true;
           }
           // Truncate older response markdown
-          if (item.content && typeof item.content === 'string' && item.content.length > 200) {
-            item.content = item.content.slice(0, 120).trim() + '\n[... truncated by Helix Lean Switch, full raw preserved in transcript_full.jsonl]';
+          if (item.content && typeof item.content === 'string' && item.content.length > 150) {
+            item.content = item.content.slice(0, 80).trim() + '\n[... truncated by Helix Lean Switch, full raw preserved in transcript_full.jsonl]';
             tf.add('content');
             modified = true;
           }
-          // Truncate bulky tool arguments (e.g. write_file payloads)
+          // Truncate bulky tool arguments (both args and arguments)
           if (item.tool_calls && Array.isArray(item.tool_calls)) {
             for (const tc of item.tool_calls) {
-              if (tc.arguments) {
-                for (const [k, v] of Object.entries(tc.arguments)) {
-                  if (typeof v === 'string' && v.length > 150) {
-                    tc.arguments[k] = v.slice(0, 80) + '... [truncated]';
+              const argsObj = tc.args || tc.arguments;
+              if (argsObj) {
+                delete argsObj.toolAction;
+                delete argsObj.toolSummary;
+                for (const [k, v] of Object.entries(argsObj)) {
+                  if (typeof v === 'string' && v.length > 80) {
+                    argsObj[k] = v.slice(0, 50) + '... [truncated]';
                     tf.add('tool_calls');
                     modified = true;
                   }
@@ -140,10 +147,18 @@ export class Helix2TranscriptShaper {
           if (tf.size > 0) {
             item.truncated_fields = Array.from(tf);
           }
+        } else if (item.type === 'USER_INPUT' && item.content && typeof item.content === 'string') {
+          if (item.content.includes('<USER_SETTINGS_CHANGE>')) {
+            item.content = item.content.replace(/<USER_SETTINGS_CHANGE>[\s\S]*?<\/USER_SETTINGS_CHANGE>/g, '').trim();
+            const tf = new Set(item.truncated_fields || []);
+            tf.add('content');
+            item.truncated_fields = Array.from(tf);
+            modified = true;
+          }
         } else if ((item.type === 'SYSTEM_MESSAGE' || item.type === 'EPHEMERAL_MESSAGE' || item.type === 'CHECKPOINT') && item.content) {
           const contentStr = typeof item.content === 'string' ? item.content : JSON.stringify(item.content);
-          if (contentStr.length > 200) {
-            const preview = contentStr.slice(0, 120).trim();
+          if (contentStr.length > 150) {
+            const preview = contentStr.slice(0, 80).trim();
             item.content = `${preview}\n[... truncated by Helix Lean Switch, full raw preserved in transcript_full.jsonl]`;
             const tf = new Set(item.truncated_fields || []);
             tf.add('content');
