@@ -202,7 +202,7 @@ export class Helix2ContextSharpener {
     // 3. Default to MINIMAL (<500 thinking tokens): chat, feedback, status, fixes, reviews, queries
     return {
       tier: 'MINIMAL',
-      guidance: `Adaptive Reasoning Budget: MINIMAL (<500 tokens). Focus reasoning purely on the immediate direct response or compound execution. Omit exploratory narrative.`
+      guidance: ``
     };
   }
 
