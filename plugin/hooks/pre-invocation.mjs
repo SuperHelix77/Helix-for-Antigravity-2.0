@@ -48,6 +48,17 @@ async function main() {
     return;
   }
 
+  // Launch non-blocking background speculative execution concurrently while model is thinking (<1ms)
+  try {
+    const { Helix2SpeculativeWorker } = await import('/Users/mert/.gemini/antigravity/scratch/HELIX-1.0/src/helix2-speculative-worker.mjs');
+    const worker = new Helix2SpeculativeWorker();
+    worker.launchSpeculativePreFlight({
+      workspaceDir,
+      userPrompt: latestUserPrompt,
+      conversationId
+    });
+  } catch {}
+
   try {
     const __dirname = path.dirname(fileURLToPath(import.meta.url));
     const candidates = [

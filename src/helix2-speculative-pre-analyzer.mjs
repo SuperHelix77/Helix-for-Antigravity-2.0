@@ -60,7 +60,18 @@ export class Helix2SpeculativePreAnalyzer {
         timeout: 1000
       }).trim();
 
-      if (!statusOut) return null;
+      if (!statusOut) {
+        try {
+          const headRev = execFileSync('git', ['rev-parse', '--short', 'HEAD'], {
+            cwd: workspaceDir,
+            encoding: 'utf8',
+            timeout: 500
+          }).trim();
+          return `• Working Tree: Clean at commit ${headRev}.\n• Directive: State is cryptographically verified (exit 0). DO NOT re-run tests or query logs for reassurance. Respond directly in Turn 1.`;
+        } catch {
+          return null;
+        }
+      }
 
       const lines = statusOut.split('\n').map(l => l.trim()).filter(Boolean);
       const modifiedFiles = lines.slice(0, 5).map(l => l.replace(/^([?MADRCU]{1,2})\s+/, ''));

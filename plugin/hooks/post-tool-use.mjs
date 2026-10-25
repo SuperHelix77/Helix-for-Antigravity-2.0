@@ -56,6 +56,16 @@ async function main() {
     } catch {}
   }
 
+  // Record verified command pass if exit code was 0 (<2ms)
+  if (toolName === 'run_command' && !input.error) {
+    try {
+      const { Helix2SpeculativeWorker } = await import('/Users/mert/.gemini/antigravity/scratch/HELIX-1.0/src/helix2-speculative-worker.mjs');
+      const worker = new Helix2SpeculativeWorker();
+      const cmd = input.toolCall?.args?.CommandLine || input.toolCall?.arguments?.CommandLine || '';
+      if (cmd) worker.recordVerifiedPass(cmd, workspaceDir, 0);
+    } catch {}
+  }
+
   if (transcriptPath && fs.existsSync(transcriptPath)) {
     try {
       const { Helix2ContextSharpener } = await import('/Users/mert/.gemini/antigravity/scratch/HELIX-1.0/src/helix2-context-sharpener.mjs');

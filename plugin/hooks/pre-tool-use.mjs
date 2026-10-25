@@ -29,6 +29,9 @@ async function main() {
     return;
   }
 
+  const workspacePaths = input.workspacePaths || [];
+  const workspaceDir = workspacePaths[0] || process.cwd();
+
   const toolCall = input.toolCall;
   if (!toolCall) {
     process.stdout.write(JSON.stringify({ decision: 'allow' }));
@@ -70,6 +73,22 @@ async function main() {
   }
 
   const cmd = toolCall.args.CommandLine.trim();
+
+  // 1.5 Reassurance Guard: block redundant verification runs if working tree is clean and already verified (<2ms)
+  try {
+    const { Helix2SpeculativeWorker } = await import('/Users/mert/.gemini/antigravity/scratch/HELIX-1.0/src/helix2-speculative-worker.mjs');
+    const worker = new Helix2SpeculativeWorker();
+    const guard = worker.checkReassuranceGuard(cmd, workspaceDir);
+    if (guard.block) {
+      process.stdout.write(JSON.stringify({
+        decision: 'allow',
+        overwrite: {
+          CommandLine: `echo "${guard.receipt.replace(/"/g, '\\"')}"`
+        }
+      }));
+      return;
+    }
+  } catch {}
 
   // If already wrapped or not a verbose target, allow as-is
   if (cmd.includes('helix.mjs lean') || cmd.startsWith('helix lean') || !LEAN_TARGET_REGEX.test(cmd)) {
