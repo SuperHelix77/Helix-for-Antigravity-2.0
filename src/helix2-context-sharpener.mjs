@@ -4,6 +4,7 @@ import os from 'node:os';
 import { extractTargetContext } from './helix2-ast-inliner.mjs';
 import { DeterministicMemory } from './memory.mjs';
 import { Helix2LazyManager } from './helix2-lazy-manager.mjs';
+import { Helix2TranscriptShaper } from './helix2-transcript-shaper.mjs';
 import { redactContextText } from './compaction-checkpoint.mjs';
 import { STATE_DIR } from './paths.mjs';
 
@@ -147,8 +148,16 @@ export class Helix2ContextSharpener {
       }
     } catch {}
 
-    // 1. Evacuate stale context to SQLite
+    // 1. Evacuate stale context to SQLite & auto-shape transcript
     this.evacuateStaleContext({ transcriptPath, workspaceDir, conversationId });
+    try {
+      if (transcriptPath && fs.existsSync(transcriptPath)) {
+        const shaper = new Helix2TranscriptShaper();
+        if (shaper.needsShaping(transcriptPath)) {
+          shaper.shapeTranscript({ transcriptPath });
+        }
+      }
+    } catch {}
 
     // 2. Retrieve relevant sharp memory
     const memorySnippet = this.retrieveSharpContext({ workspaceDir, conversationId, userPrompt: latestUserPrompt });
@@ -177,7 +186,7 @@ export class Helix2ContextSharpener {
     const sharpContext = (
       `[HELIX 2.0 PROTOCOL ACTIVATED - ZERO-BLOAT EPHEMERAL CONTEXT]\n` +
       sections.join('\n\n') +
-      `\nInstructions: Stale context has been evacuated to SQLite memory (~/.helix/memory.sqlite). Proceed surgically.`
+      `\nInstructions: Stale context evacuated to SQLite (~/.helix/memory.sqlite). Batch inspection, execution, and verification into unified 1-turn pipelines. Single-pass verification.`
     );
 
     return sharpContext;

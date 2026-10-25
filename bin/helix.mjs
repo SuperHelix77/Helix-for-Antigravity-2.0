@@ -149,6 +149,40 @@ if (command === 'serve') {
     const pluginRes = optimizer.optimizePlugins();
     console.log(JSON.stringify({ mcp: mcpRes, plugins: pluginRes }, null, 2));
   }
+} else if (command === 'shape') {
+  const { Helix2TranscriptShaper } = await import('../src/helix2-transcript-shaper.mjs');
+  const targetPath = process.argv[3];
+  const shaper = new Helix2TranscriptShaper({ retainRecentSteps: 25 });
+  if (targetPath) {
+    const res = await shaper.shapeTranscript({ transcriptPath: targetPath });
+    console.log(JSON.stringify(res, null, 2));
+  } else {
+    const brainDir = path.join(os.homedir(), '.gemini/antigravity/brain');
+    let shaped = 0;
+    if (fs.existsSync(brainDir)) {
+      for (const conv of fs.readdirSync(brainDir)) {
+        const tPath = path.join(brainDir, conv, '.system_generated/logs/transcript.jsonl');
+        if (fs.existsSync(tPath) && shaper.needsShaping(tPath)) {
+          const res = await shaper.shapeTranscript({ transcriptPath: tPath });
+          console.log(`Shaped ${conv}: ${res.savedPercent} (${res.savedBytes}B saved)`);
+          shaped++;
+        }
+      }
+    }
+    console.log(`Transcript shaping complete: ${shaped} conversations processed.`);
+  }
+} else if (command === 'pipeline') {
+  const { Helix2ToolPipeline } = await import('../src/helix2-tool-pipeline.mjs');
+  const specPath = process.argv[3];
+  if (!specPath) {
+    console.error('Usage: helix pipeline <spec.json>');
+    process.exit(1);
+  }
+  const spec = JSON.parse(fs.readFileSync(specPath, 'utf8'));
+  const pipeline = new Helix2ToolPipeline({ directory: process.cwd() });
+  const result = await pipeline.executePipeline(spec.project || process.cwd(), spec.operations || spec.steps || []);
+  console.log(result.summary);
+  if (!result.success) process.exit(1);
 } else if (command === 'uninstall') {
   try { await request('/shutdown', {value: {}}); } catch {}
   const file = path.join(STATE_DIR, 'codex-mcp.toml');
@@ -158,4 +192,4 @@ if (command === 'serve') {
     try { fs.unlinkSync(binTarget); } catch {}
   }
   console.log('HELIX stopped; owned registration removed. Goals, memory and exact recovery archives preserved.');
-} else throw new Error('Commands: install, start, serve, status, stop, observe-codex [THREAD_ID], mcp, memory-mcp, memory-write-mcp, memory-hook, inherit-memory SOURCE [AUXILIARY...], rtk HASH FILTER, watch DIRECTORY, uninstall');
+} else throw new Error('Commands: install, start, serve, status, stop, observe-codex [THREAD_ID], mcp, memory-mcp, memory-write-mcp, memory-hook, inherit-memory SOURCE [AUXILIARY...], rtk HASH FILTER, watch DIRECTORY, lean, skills, scope, shape, pipeline, uninstall');
