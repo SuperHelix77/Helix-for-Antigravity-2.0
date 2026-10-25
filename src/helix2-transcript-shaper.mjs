@@ -109,10 +109,13 @@ export class Helix2TranscriptShaper {
         // 1. Tool outputs (GENERIC type)
         if (item.type === 'GENERIC' && item.content) {
           let contentStr = typeof item.content === 'string' ? item.content : JSON.stringify(item.content);
-          contentStr = contentStr.replace(/^Created At: [^\n]+\nCompleted At: [^\n]+\n?/i, '')
+          contentStr = contentStr
+            .replace(/^Created At: [^\n]+\nCompleted At: [^\n]+\n?/i, '')
+            .replace(/The command exited with code \d+\.\n(?:Output:\n)?/g, '')
+            .replace(/Command output:\n/g, '')
             .replace(/\n?\[\.\.\. truncated by Helix Lean Switch, full raw preserved in transcript_full\.jsonl\]/g, '\n[helix:raw]');
-          if (contentStr.length > 60) {
-            const preview = contentStr.slice(0, 40).trim();
+          if (contentStr.length > 50) {
+            const preview = contentStr.slice(0, 35).trim();
             item.content = `${preview}\n[helix:raw]`;
             const tf = new Set(item.truncated_fields || []);
             tf.add('content');
@@ -125,16 +128,16 @@ export class Helix2TranscriptShaper {
         } else if (item.type === 'PLANNER_RESPONSE') {
           const tf = new Set(item.truncated_fields || []);
           // Truncate older thinking blocks
-          if (item.thinking && item.thinking.length > 40) {
-            item.thinking = item.thinking.slice(0, 30) + '...';
+          if (item.thinking) {
+            item.thinking = '...';
             tf.add('thinking');
             modified = true;
           }
           // Truncate older response markdown
           if (item.content && typeof item.content === 'string') {
             let cStr = item.content.replace(/\n?\[\.\.\. truncated by Helix Lean Switch, full raw preserved in transcript_full\.jsonl\]/g, '\n[helix:raw]');
-            if (cStr.length > 70) {
-              item.content = cStr.slice(0, 50).trim() + '\n[helix:raw]';
+            if (cStr.length > 50) {
+              item.content = cStr.slice(0, 35).trim() + '\n[helix:raw]';
               tf.add('content');
               modified = true;
             } else if (cStr !== item.content) {
@@ -142,22 +145,16 @@ export class Helix2TranscriptShaper {
               modified = true;
             }
           }
-          // Truncate bulky tool arguments (both args and arguments)
+          // Historical tool calls only need tool name; full arguments in transcript_full
           if (item.tool_calls && Array.isArray(item.tool_calls)) {
-            for (const tc of item.tool_calls) {
-              const argsObj = tc.args || tc.arguments;
-              if (argsObj) {
-                delete argsObj.toolAction;
-                delete argsObj.toolSummary;
-                delete argsObj.toolDescription;
-                for (const [k, v] of Object.entries(argsObj)) {
-                  if (typeof v === 'string' && v.length > 30) {
-                    argsObj[k] = v.slice(0, 25) + '... [raw]';
-                    tf.add('tool_calls');
-                    modified = true;
-                  }
-                }
-              }
+            let tcModified = false;
+            item.tool_calls = item.tool_calls.map(tc => {
+              if (tc.args || tc.arguments) tcModified = true;
+              return { name: tc.name || tc.tool || 'tool' };
+            });
+            if (tcModified) {
+              tf.add('tool_calls');
+              modified = true;
             }
           }
           if (tf.size > 0) {

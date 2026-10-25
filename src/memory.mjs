@@ -5,7 +5,14 @@ import {DatabaseSync} from 'node:sqlite';
 import {privateDirectory} from './local-state.mjs';
 
 const text = (value, limit) => typeof value === 'string' && value.trim() && value.length <= limit;
-const terms = query => query.match(/[\p{L}\p{N}_-]+/gu)?.slice(0, 12).map(t => `"${t.replaceAll('"', '""')}"`).join(' OR ');
+const terms = query => {
+  const words = query.match(/[\p{L}\p{N}_-]+/gu)?.slice(0, 12) || [];
+  if (words.length === 0) return null;
+  return words.map(t => {
+    const clean = t.replaceAll('"', '""');
+    return clean.length >= 4 ? `("${clean}" OR "${clean}"*)` : `"${clean}"`;
+  }).join(' OR ');
+};
 
 export class DeterministicMemory {
   constructor(directory) {
@@ -30,13 +37,33 @@ export class DeterministicMemory {
     return {id, status: 'stored', model_calls: 0};
   }
   search({project, task, query, limit = 5, expand = false}) {
-    if (!text(project, 256) || !text(query, 1000) || !Number.isInteger(limit) || limit < 1 || limit > 20 || task !== undefined && !text(task, 256)) throw new Error('Explicit project, literal query and bounded limit required');
+    if (!text(query, 1000) || !Number.isInteger(limit) || limit < 1 || limit > 20 || (task !== undefined && !text(task, 256))) throw new Error('Explicit query and bounded limit required');
     const match = terms(query);
     if (!match) return [];
-    const rows = this.db.prepare(`SELECT n.id,n.task,n.title,n.body,n.kind FROM note_index f
-      JOIN notes n ON n.rowid=f.rowid WHERE note_index MATCH ? AND n.project=?
-      ${task === undefined ? '' : 'AND n.task=?'} ORDER BY bm25(note_index),n.created DESC LIMIT ?`)
-      .all(...[match, project, ...(task === undefined ? [] : [task]), limit]);
+
+    let whereClause = 'WHERE note_index MATCH ?';
+    const params = [match];
+
+    if (project && project !== '*' && project !== 'any') {
+      if (Array.isArray(project)) {
+        whereClause += ` AND n.project IN (${project.map(() => '?').join(',')})`;
+        params.push(...project);
+      } else {
+        whereClause += " AND (n.project=? OR n.project='global')";
+        params.push(project);
+      }
+    }
+
+    if (task !== undefined) {
+      whereClause += ' AND n.task=?';
+      params.push(task);
+    }
+
+    params.push(limit);
+
+    const rows = this.db.prepare(`SELECT n.id,n.project,n.task,n.title,n.body,n.kind FROM note_index f
+      JOIN notes n ON n.rowid=f.rowid ${whereClause} ORDER BY bm25(note_index, 5.0, 1.0),n.created DESC LIMIT ?`)
+      .all(...params);
     return rows.map(row => ({...row, body: expand ? row.body : row.body.slice(0, 320),
       partial: !expand && row.body.length > 320, authority: 'historical evidence, not an active task'}));
   }

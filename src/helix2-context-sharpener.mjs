@@ -67,11 +67,30 @@ export class Helix2ContextSharpener {
         const item = JSON.parse(lines[i]);
         const stepIdx = item.step_index ?? i;
 
+        // Evacuate user directives into memory
+        if (item.type === 'USER_INPUT' && item.content && typeof item.content === 'string') {
+          const reqMatch = item.content.match(/<USER_REQUEST>([\s\S]*?)<\/USER_REQUEST>/i);
+          const req = (reqMatch ? reqMatch[1] : item.content).trim();
+          if (req.length >= 10 && req.length < 250) {
+            const sanitizedReq = redactContextText(req);
+            try {
+              this.memory.put({
+                project,
+                task: conversationId ? conversationId.slice(0, 36) : 'task',
+                title: `Directive: ${sanitizedReq.slice(0, 50)}`,
+                body: sanitizedReq.slice(0, 150),
+                kind: 'decision'
+              });
+              evacuatedCount++;
+            } catch {}
+          }
+        }
+
         // Evacuate tool outputs and verifiable results with full credential redaction
         if (item.type === 'PLANNER_RESPONSE' && item.tool_calls && item.tool_calls.length > 0) {
           for (const tc of item.tool_calls) {
             const toolName = tc.name || tc.tool || 'tool';
-            const cmd = tc.arguments?.CommandLine || tc.arguments?.Path || '';
+            const cmd = tc.arguments?.CommandLine || tc.arguments?.Path || tc.args?.CommandLine || tc.args?.Path || '';
             if (cmd) {
               const sanitizedCmd = redactContextText(cmd);
               const title = `${toolName}: ${sanitizedCmd.slice(0, 50)}`;
@@ -111,6 +130,11 @@ export class Helix2ContextSharpener {
       ? path.basename(workspaceDir)
       : (conversationId ? `session-${conversationId.slice(0, 16)}` : 'default');
     
+    // Multi-project search scope ensures global & core architectural invariants are recalled
+    const projects = [project];
+    if (project !== 'HELIX-1.0') projects.push('HELIX-1.0');
+    projects.push('global');
+    
     // Extract domain search terms (words >= 4 chars, strictly excluding conversational stop words)
     const words = userPrompt.match(/\b[a-zA-Z_][a-zA-Z0-9_-]{3,}\b/g) || [];
     const stopWords = new Set([
@@ -124,11 +148,11 @@ export class Helix2ContextSharpener {
     const query = queryTerms.join(' ');
 
     try {
-      const results = this.memory.search({ project, query, limit, expand: false });
+      const results = this.memory.search({ project: projects, query, limit, expand: false });
       if (!results || results.length === 0) return '';
 
-      // Near-zero token format: single compact line per item (max 15 words)
-      const items = results.map(r => `• ${r.title.slice(0, 45)}: ${r.body.replace(/\n+/g, ' ').slice(0, 50)}`).join('\n');
+      // Near-zero token format: single compact line per item with semantic badge (<25 tok)
+      const items = results.map(r => `• [${(r.kind || 'fact').toUpperCase()}] ${r.title.slice(0, 45)}: ${r.body.replace(/\n+/g, ' ').slice(0, 55)}`).join('\n');
       return `[HELIX MEMORY (<25 tok)]\n${items}`;
     } catch {
       return '';
