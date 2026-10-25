@@ -216,9 +216,14 @@ export class Helix2ContextSharpener {
 
     if (sections.length === 0) return null;
 
+    const astDirective = (astSnippet && astSnippet.trim().length > 0)
+      ? `\nCRITICAL EFFICIENCY DIRECTIVE: The exact target symbol has been pre-resolved above in [HELIX UNIVERSAL 100% AST TARGET]. Do NOT invoke read_file or grep to inspect it again. Formulate your minimal edit and invoke edit_file or a compound execution directly on Turn 1!`
+      : '';
+
     const sharpContext = (
       `[HELIX 2.0 PROTOCOL ACTIVATED - ZERO-BLOAT EPHEMERAL CONTEXT]\n` +
       sections.join('\n\n') +
+      astDirective +
       `\nInstructions: STRICT ONE FLOW LAW: Maximum 1 compound tool invocation per turn. Group all inspection, execution, and verification into a single unified step, then deliver your response directly. Serialized micro-reads and iterative thought-act ping-pong are strictly forbidden.`
     );
 

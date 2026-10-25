@@ -51,3 +51,8 @@ Antigravity operates under the HELIX (Hierarchical Evidence Loading and Intellig
 - Execute all inspection, mutations, verification, and git operations in a SINGLE COMPOUND FLOW per turn.
 - Strictly eliminate serialized `thought -> tool -> thought -> tool` loops. Model must think ONCE, execute the compound batch or pipeline in ONE single compound tool invocation, and conclude directly.
 - MAXIMUM 1 COMPOUND ACTION PER TURN: Never perform iterative, serialized micro-reads across turns (`thought -> read_file -> thought -> read_file`). If multiple files or checks are needed, compose them into a unified shell pipeline or 1-turn parallel batch, execute once, and deliver the user response immediately. Zero exploratory mid-turn pauses.
+
+### 13. Pre-Resolved AST Locus & Turn-1 Immediacy Mandate
+- When target symbol loci are pre-resolved in the ephemeral context (`[HELIX UNIVERSAL 100% AST TARGET]`), do NOT call `read_file` or `grep` to inspect them again.
+- Formulate the minimal surgical edit and execute the mutation directly on Turn 1 via `edit_file` or a compound pipeline (`helix flow`).
+- Stop at the lowest rung of the ladder: reuse existing patterns, shortest working diff, verify once, and conclude immediately. Eliminates redundant inspection turns entirely.
