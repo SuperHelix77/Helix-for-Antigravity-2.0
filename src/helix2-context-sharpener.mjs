@@ -3,6 +3,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { extractTargetContext } from './helix2-ast-inliner.mjs';
 import { DeterministicMemory } from './memory.mjs';
+import { Helix2LazyManager } from './helix2-lazy-manager.mjs';
 import { STATE_DIR } from './paths.mjs';
 
 const CACHE_DIR = path.join(STATE_DIR, 'cache');
@@ -15,14 +16,16 @@ try { fs.mkdirSync(CACHE_DIR, { recursive: true, mode: 0o700 }); } catch {}
  *    into deterministic SQLite memory (~/.helix/memory.sqlite).
  * 2. Deterministically retrieves only the most relevant memories for the current prompt.
  * 3. Inlines AST loci with 100% precision.
- * 4. Injects context as an ephemeral message so that transcript.jsonl NEVER bloats.
+ * 4. Automatically intercepts newly installed plugins, skills, and MCP servers to keep them lazy.
+ * 5. Injects context as an ephemeral message so that transcript.jsonl NEVER bloats.
  */
 export class Helix2ContextSharpener {
-  constructor({ memory, stateDir = STATE_DIR } = {}) {
+  constructor({ memory, stateDir = STATE_DIR, lazyManager } = {}) {
     this.memory = memory || new DeterministicMemory(stateDir);
     this.stateDir = stateDir;
     this.cacheDir = path.join(stateDir, 'cache');
     try { fs.mkdirSync(this.cacheDir, { recursive: true, mode: 0o700 }); } catch {}
+    this.lazyManager = lazyManager || new Helix2LazyManager();
   }
 
   /**
@@ -133,6 +136,15 @@ export class Helix2ContextSharpener {
    * Build the complete ephemeral context for PreInvocation hook.
    */
   shapePreInvocation({ workspaceDir, transcriptPath, conversationId, latestUserPrompt }) {
+    // 0. Auto-sync lazy manager (scopes newly added plugins/MCPs, matches JIT skills)
+    let jitContext = '';
+    try {
+      const syncResult = this.lazyManager.autoSync({ userPrompt: latestUserPrompt });
+      if (syncResult && syncResult.jitMatches && syncResult.jitMatches.length > 0) {
+        jitContext = this.lazyManager.formatJitContext(syncResult.jitMatches) || '';
+      }
+    } catch {}
+
     // 1. Evacuate stale context to SQLite
     this.evacuateStaleContext({ transcriptPath, workspaceDir, conversationId });
 
@@ -153,6 +165,9 @@ export class Helix2ContextSharpener {
     }
     if (memorySnippet && memorySnippet.trim().length > 0) {
       sections.push(memorySnippet.trim());
+    }
+    if (jitContext && jitContext.trim().length > 0) {
+      sections.push(jitContext.trim());
     }
 
     if (sections.length === 0) return null;
