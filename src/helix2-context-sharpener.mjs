@@ -149,7 +149,8 @@ export class Helix2ContextSharpener {
     ]);
     const queryTerms = words.filter(w => !stopWords.has(w.toLowerCase())).slice(0, 6);
     
-    if (queryTerms.length === 0) return '';
+    // Relevance Gate: Short conversational prompts (<20 chars) or single generic words inject 0 memory tokens
+    if (queryTerms.length === 0 || (userPrompt.trim().length < 20 && queryTerms.length < 2)) return '';
     const query = queryTerms.join(' ');
 
     try {

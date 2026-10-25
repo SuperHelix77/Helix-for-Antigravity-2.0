@@ -152,6 +152,11 @@ export class HelixLeanSwitch {
       }
     }
 
+    // Optimization 1: Zero-Noise Test Success Collapsing (1-line clean summary)
+    if (exitCode === 0) {
+      return summaryLines.length ? summaryLines.join('\n') : `✔ All tests passed (exit 0; ${lines.length} lines)`;
+    }
+
     if (exitCode !== 0) {
       // Framework Stack Trace Pruning: Strip external plumbing (site-packages, node_modules)
       const isExternalPlumbing = l => /(?:site-packages|node_modules|dist-packages|\/usr\/lib\/python|\/lib\/node_modules|\/internal\/modules)/i.test(l);
