@@ -53,7 +53,7 @@ test('Helix2TranscriptShaper safely shapes older transcript lines while preservi
 
   const line1 = JSON.parse(shapedContent[1]);
   assert.ok(line1.truncated_fields.includes('content'));
-  assert.ok(line1.content.includes('[... truncated by Helix Lean Switch'));
+  assert.ok(line1.content.includes('[helix:raw]'));
 
   // Last 3 lines (recent) must be 100% UNMODIFIED
   const lastLine = JSON.parse(shapedContent[9]);

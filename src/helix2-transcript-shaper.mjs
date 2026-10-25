@@ -109,31 +109,38 @@ export class Helix2TranscriptShaper {
         // 1. Tool outputs (GENERIC type)
         if (item.type === 'GENERIC' && item.content) {
           let contentStr = typeof item.content === 'string' ? item.content : JSON.stringify(item.content);
-          const cleanedStr = contentStr.replace(/^Created At: [^\n]+\nCompleted At: [^\n]+\n?/i, '');
-          if (cleanedStr.length > 80) {
-            const preview = cleanedStr.slice(0, 50).trim();
-            item.content = `${preview}\n[... truncated by Helix Lean Switch, full raw preserved in transcript_full.jsonl]`;
+          contentStr = contentStr.replace(/^Created At: [^\n]+\nCompleted At: [^\n]+\n?/i, '')
+            .replace(/\n?\[\.\.\. truncated by Helix Lean Switch, full raw preserved in transcript_full\.jsonl\]/g, '\n[helix:raw]');
+          if (contentStr.length > 60) {
+            const preview = contentStr.slice(0, 40).trim();
+            item.content = `${preview}\n[helix:raw]`;
             const tf = new Set(item.truncated_fields || []);
             tf.add('content');
             item.truncated_fields = Array.from(tf);
             modified = true;
-          } else if (cleanedStr !== contentStr) {
-            item.content = cleanedStr;
+          } else if (contentStr !== item.content) {
+            item.content = contentStr;
             modified = true;
           }
         } else if (item.type === 'PLANNER_RESPONSE') {
           const tf = new Set(item.truncated_fields || []);
           // Truncate older thinking blocks
-          if (item.thinking && item.thinking.length > 50) {
-            item.thinking = item.thinking.slice(0, 40) + '...';
+          if (item.thinking && item.thinking.length > 40) {
+            item.thinking = item.thinking.slice(0, 30) + '...';
             tf.add('thinking');
             modified = true;
           }
           // Truncate older response markdown
-          if (item.content && typeof item.content === 'string' && item.content.length > 100) {
-            item.content = item.content.slice(0, 60).trim() + '\n[... truncated by Helix Lean Switch, full raw preserved in transcript_full.jsonl]';
-            tf.add('content');
-            modified = true;
+          if (item.content && typeof item.content === 'string') {
+            let cStr = item.content.replace(/\n?\[\.\.\. truncated by Helix Lean Switch, full raw preserved in transcript_full\.jsonl\]/g, '\n[helix:raw]');
+            if (cStr.length > 70) {
+              item.content = cStr.slice(0, 50).trim() + '\n[helix:raw]';
+              tf.add('content');
+              modified = true;
+            } else if (cStr !== item.content) {
+              item.content = cStr;
+              modified = true;
+            }
           }
           // Truncate bulky tool arguments (both args and arguments)
           if (item.tool_calls && Array.isArray(item.tool_calls)) {
@@ -144,8 +151,8 @@ export class Helix2TranscriptShaper {
                 delete argsObj.toolSummary;
                 delete argsObj.toolDescription;
                 for (const [k, v] of Object.entries(argsObj)) {
-                  if (typeof v === 'string' && v.length > 50) {
-                    argsObj[k] = v.slice(0, 35) + '... [truncated]';
+                  if (typeof v === 'string' && v.length > 30) {
+                    argsObj[k] = v.slice(0, 25) + '... [raw]';
                     tf.add('tool_calls');
                     modified = true;
                   }
@@ -166,9 +173,9 @@ export class Helix2TranscriptShaper {
           }
         } else if ((item.type === 'SYSTEM_MESSAGE' || item.type === 'EPHEMERAL_MESSAGE' || item.type === 'CHECKPOINT') && item.content) {
           const contentStr = typeof item.content === 'string' ? item.content : JSON.stringify(item.content);
-          if (contentStr.length > 100) {
-            const preview = contentStr.slice(0, 60).trim();
-            item.content = `${preview}\n[... truncated by Helix Lean Switch, full raw preserved in transcript_full.jsonl]`;
+          if (contentStr.length > 70) {
+            const preview = contentStr.slice(0, 40).trim();
+            item.content = `${preview}\n[helix:raw]`;
             const tf = new Set(item.truncated_fields || []);
             tf.add('content');
             item.truncated_fields = Array.from(tf);
