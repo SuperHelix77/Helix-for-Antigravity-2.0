@@ -1,5 +1,16 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
+import path from 'node:path';
+import os from 'node:os';
+import { fileURLToPath } from 'node:url';
+
+const currentDir = path.dirname(fileURLToPath(import.meta.url));
+const candidateRunners = [
+  path.resolve(currentDir, '../../bin/helix.mjs'),
+  '/Users/mert/.gemini/antigravity/scratch/HELIX-1.0/bin/helix.mjs',
+  path.join(os.homedir(), '.gemini/antigravity/bin/helix')
+];
+const leanRunner = candidateRunners.find(p => fs.existsSync(p)) || 'helix';
 
 const LEAN_TARGET_REGEX = /(?:npm\s+(?:test|run\s+build|install|ci)|npx\s+(?:test|build)|node\s+--test|pytest|cargo\s+(?:test|build)|git\s+log|vitest|jest|make\s+(?:test|build)|mvn\s+(?:test|compile)|gradle\s+(?:test|build)|vite\s+build|tsc\b)/i;
 
@@ -67,10 +78,13 @@ async function main() {
   }
 
   // Wrap with Helix Lean Switch for 90%+ terminal output token compression
-  const leanRunner = '/Users/mert/.gemini/antigravity/scratch/HELIX-1.0/bin/helix.mjs';
-  // Safely escape and quote command to preserve compound chains (e.g. cd /dir && npm test)
-  const escapedCmd = cmd.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
-  const overwrittenCmd = `node "${leanRunner}" lean -- "${escapedCmd}"`;
+  const isWin = process.platform === 'win32';
+  const escapedCmd = isWin
+    ? cmd.replace(/"/g, '""')
+    : cmd.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  const overwrittenCmd = isWin
+    ? `node "${path.normalize(leanRunner)}" lean -- ${cmd}`
+    : `node "${leanRunner}" lean -- "${escapedCmd}"`;
 
   const output = {
     decision: 'allow',

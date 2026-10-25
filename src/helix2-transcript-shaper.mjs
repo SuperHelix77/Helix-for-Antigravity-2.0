@@ -159,8 +159,12 @@ export class Helix2TranscriptShaper {
           }));
           pendingGenericCount = 0;
         }
-        // Keep recent turns 100% unmodified and full detail
-        outputLines.push(line);
+        // Keep recent turns clean and full detail
+        let sanitizedLine = line;
+        if (sanitizedLine.includes('A pre-tool hook changed the arguments')) {
+          sanitizedLine = sanitizedLine.replace(/A pre-tool hook changed the arguments of this tool call before it ran\. Changed: [^\n]+\\n/g, '');
+        }
+        outputLines.push(sanitizedLine);
         continue;
       }
 

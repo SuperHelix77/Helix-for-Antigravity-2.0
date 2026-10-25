@@ -51,19 +51,46 @@ if (fs.existsSync(hooksDir)) {
   }
 }
 
-// 4. Create symlink in ~/.gemini/antigravity/bin/helix if bin dir exists
+// 4. Create CLI executable (symlink on Unix/macOS, batch/powershell shim on Windows, wrapper fallback)
 if (fs.existsSync(binDst)) {
   const symTarget = path.join(binDst, 'helix');
-  try {
-    if (fs.existsSync(symTarget) || fs.lstatSync(symTarget).isSymbolicLink()) {
-      fs.unlinkSync(symTarget);
+  const entryPath = path.join(root, 'bin/helix.mjs');
+  
+  if (process.platform === 'win32') {
+    // Windows: create .cmd batch shim and .ps1 script
+    try {
+      const cmdShim = path.join(binDst, 'helix.cmd');
+      const psShim = path.join(binDst, 'helix.ps1');
+      fs.writeFileSync(cmdShim, `@ECHO OFF\r\nnode "${entryPath}" %*\r\n`);
+      fs.writeFileSync(psShim, `& node "${entryPath}" $args\r\n`);
+      console.log(`Created Windows CLI shims: ${cmdShim}, ${psShim}`);
+    } catch (err) {
+      console.log(`Note: could not write Windows shims: ${err.message}`);
     }
-  } catch {}
-  try {
-    fs.symlinkSync(path.join(root, 'bin/helix.mjs'), symTarget);
-    console.log(`Symlinked CLI: ${symTarget} -> ${path.join(root, 'bin/helix.mjs')}`);
-  } catch (err) {
-    console.log(`Note: could not symlink CLI: ${err.message}`);
+  } else {
+    // macOS / Linux: try symlink, fallback to executable shell script wrapper
+    try {
+      if (fs.existsSync(symTarget) || (() => { try { return fs.lstatSync(symTarget).isSymbolicLink(); } catch { return false; } })()) {
+        fs.unlinkSync(symTarget);
+      }
+    } catch {}
+    
+    let symlinked = false;
+    try {
+      fs.symlinkSync(entryPath, symTarget);
+      console.log(`Symlinked CLI: ${symTarget} -> ${entryPath}`);
+      symlinked = true;
+    } catch (err) {
+      // Fallback: create executable POSIX wrapper script
+      try {
+        const shContent = `#!/bin/sh\nexec node "${entryPath}" "$@"\n`;
+        fs.writeFileSync(symTarget, shContent, { mode: 0o755 });
+        console.log(`Created CLI wrapper script: ${symTarget}`);
+        symlinked = true;
+      } catch (wrapperErr) {
+        console.log(`Note: could not create CLI binary: ${wrapperErr.message}`);
+      }
+    }
   }
 }
 

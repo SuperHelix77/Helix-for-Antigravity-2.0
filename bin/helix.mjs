@@ -120,7 +120,7 @@ if (command === 'serve') {
   child.stderr.on('data', d => stderr += d.toString());
   child.on('close', code => {
     const combined = (stdout + (stderr ? '\n' + stderr : '')).trim();
-    const lean = new HelixLeanSwitch({ directory: path.join(STATE_DIR, 'programs') });
+    const lean = new HelixLeanSwitch();
     const shaped = lean.shapeCommandOutput(combined, { command: fullCmd, exitCode: code, toolName: 'run_command' });
     process.stdout.write((shaped.output || combined) + '\n');
     process.exit(code);
@@ -183,6 +183,25 @@ if (command === 'serve') {
   const result = await pipeline.executePipeline(spec.project || process.cwd(), spec.operations || spec.steps || []);
   console.log(result.summary);
   if (!result.success) process.exit(1);
+} else if (command === 'raw' || command === 'recover') {
+  const handle = process.argv[3];
+  if (!handle) {
+    console.error('Usage: helix raw <handle>');
+    process.exit(1);
+  }
+  const { readRetainedToolResult } = await import('../src/tool-result-store.mjs');
+  const path = await import('node:path');
+  let raw = null;
+  try { raw = readRetainedToolResult(handle); } catch {}
+  if (raw === null || raw === undefined) {
+    try { raw = readRetainedToolResult(handle, { directory: path.join(STATE_DIR, 'programs') }); } catch {}
+  }
+  if (raw !== null && raw !== undefined) {
+    process.stdout.write(raw + '\n');
+  } else {
+    console.error(`HELIX archive: handle "${handle}" not found in retention store.`);
+    process.exit(1);
+  }
 } else if (command === 'uninstall') {
   try { await request('/shutdown', {value: {}}); } catch {}
   const file = path.join(STATE_DIR, 'codex-mcp.toml');

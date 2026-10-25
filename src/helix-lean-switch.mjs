@@ -58,7 +58,7 @@ export class HelixLeanSwitch {
     const leanReceipt = [
       `${LEAN_SWITCH_RECEIPT_PREFIX} ${toolName} exit:${exitCode} raw:${rawBytes}B sha256:${digest.slice(0, 24)}; handle:${handle}]`,
       safeLeanText,
-      `[Exact original retained in HELIX archive; retrieve with context raw receipt ${handle}]`
+      `[Exact original retained in HELIX archive; view with: helix raw ${handle}]`
     ].join('\n');
 
     const shapedBytes = Buffer.byteLength(leanReceipt, 'utf8');
@@ -106,7 +106,7 @@ export class HelixLeanSwitch {
     const receipt = [
       `${LEAN_SWITCH_RECEIPT_PREFIX} file:${filePath} lines:${totalLines} (${rawBytes}B) sha256:${digest.slice(0, 24)}; handle:${handle}]`,
       preview,
-      `[Exact file content retained in HELIX archive; retrieve with context raw receipt ${handle}]`
+      `[Exact file content retained in HELIX archive; view with: helix raw ${handle}]`
     ].join('\n');
 
     const shapedBytes = Buffer.byteLength(receipt, 'utf8');
