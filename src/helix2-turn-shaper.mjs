@@ -44,7 +44,7 @@ export class Helix2TurnShaper {
       }
 
       // Check if message content is collapsible
-      const content = typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content);
+      const content = typeof msg.content === 'string' ? msg.content : (msg.content ? JSON.stringify(msg.content) : '');
       const rawBytes = Buffer.byteLength(content, 'utf8');
 
       if (rawBytes < this.minCollapsibleBytes) {

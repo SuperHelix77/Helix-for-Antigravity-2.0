@@ -2,6 +2,49 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 
+const classLocationCache = new Map();
+const CACHE_TTL_MS = 60000;
+
+function findClassFiles(repoDir, cls, isSourceFile) {
+  const now = Date.now();
+  let cached = classLocationCache.get(repoDir);
+  if (!cached || (now - cached.timestamp > CACHE_TTL_MS)) {
+    const map = new Map();
+    function scanDir(dir, depth = 0) {
+      if (depth > 6) return;
+      let entries;
+      try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch { return; }
+      for (const entry of entries) {
+        if (entry.name.startsWith('.') || entry.name === 'node_modules' || entry.name.includes('venv') || entry.name === '__pycache__') continue;
+        const full = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          const l = entry.name.toLowerCase();
+          if (!l.includes('test') && !l.includes('doc') && !l.includes('tutorial') && !l.includes('example') && !l.includes('benchmark')) {
+            scanDir(full, depth + 1);
+          }
+        } else if (entry.name.endsWith('.py') && !entry.name.toLowerCase().includes('test')) {
+          const rel = path.relative(repoDir, full);
+          if (isSourceFile(rel)) {
+            try {
+              const text = fs.readFileSync(full, 'utf8');
+              const classMatches = text.matchAll(/^class\s+([a-zA-Z0-9_]+)\b/gm);
+              for (const cm of classMatches) {
+                const name = cm[1];
+                if (!map.has(name)) map.set(name, []);
+                map.get(name).push(rel);
+              }
+            } catch {}
+          }
+        }
+      }
+    }
+    scanDir(repoDir);
+    cached = { timestamp: now, map };
+    classLocationCache.set(repoDir, cached);
+  }
+  return cached.map.get(cls) || [];
+}
+
 /**
  * HELIX Universal 100% Precision AST & Context Extractor
  * 
@@ -41,7 +84,7 @@ export function extractTargetContext(repoDir, problemStatement) {
   const backtickedWords = new Set((problemStatement.match(/`([a-zA-Z_][a-zA-Z0-9_]{3,})`/g) || []).map(s => s.replace(/`/g, '')));
   const snakeCaseWords = new Set(problemStatement.match(/\b[a-z_][a-z0-9_]{3,}\b/g) || []);
   const stopWords = new Set([
-    'Django', 'Python', 'Remove', 'Update', 'Create', 'Change', 'Feature', 'Please', 'Issue', 'Error', 'Problem',
+    'Traceback', 'Django', 'Python', 'Remove', 'Update', 'Create', 'Change', 'Feature', 'Please', 'Issue', 'Error', 'Problem',
     'Expected', 'Actual', 'Current', 'Testing', 'Fixed', 'Support', 'Allow', 'When', 'Then', 'With', 'From',
     'QuerySet', 'Model', 'View', 'Form', 'Symbol', 'MatrixSymbol', 'ExpressionWrapper', 'Exists', 'DataFrame', 'Series', 'OneToOneField', 'execute_sql', '_execute', 'cursor'
   ]);
@@ -135,15 +178,9 @@ export function extractTargetContext(repoDir, problemStatement) {
   // -------------------------------------------------------------------------
   const candidateClasses = [...new Set((title.match(/\b[A-Z][a-zA-Z0-9]{3,}\b/g) || []).filter(c => !stopWords.has(c)))];
   for (const cls of candidateClasses) {
-    const grep = spawnSync('git', ['grep', '-l', `class ${cls}\\b`, '--', '*.py'], {
-      cwd: repoDir,
-      encoding: 'utf8',
-      timeout: 3000
-    });
-    if (grep.status === 0 && grep.stdout.trim()) {
-      const files = grep.stdout.trim().split('\n').filter(f => isSourceFile(f));
-      if (files.length === 1) {
-        const f = files[0];
+    const files = findClassFiles(repoDir, cls, isSourceFile);
+    if (files.length === 1) {
+      const f = files[0];
         try {
           const content = fs.readFileSync(path.join(repoDir, f), 'utf8');
           const fileLines = content.split('\n');
@@ -170,7 +207,6 @@ export function extractTargetContext(repoDir, problemStatement) {
           }
         } catch (e) {}
       }
-    }
   }
 
   // -------------------------------------------------------------------------

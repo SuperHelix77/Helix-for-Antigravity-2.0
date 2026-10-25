@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
-import { extractTargetContext } from '/Users/mert/.gemini/antigravity/scratch/HELIX-1.0/harness/helix2.3-ast-inliner.mjs';
+import { extractTargetContext } from './ast-inliner.mjs';
 
 async function main() {
   const chunks = [];

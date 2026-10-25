@@ -13,9 +13,10 @@ export class DeterministicMemory {
     if (fs.existsSync(file) && fs.lstatSync(file).isSymbolicLink()) throw new Error('Unsafe memory database');
     this.db = new DatabaseSync(file);
     fs.chmodSync(file, 0o600);
-    try { this.db.exec(`PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000;
+    try { this.db.exec(`PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL; PRAGMA temp_store=MEMORY; PRAGMA busy_timeout=5000;
       CREATE TABLE IF NOT EXISTS notes(id TEXT PRIMARY KEY,project TEXT NOT NULL,task TEXT NOT NULL,
         title TEXT NOT NULL,body TEXT NOT NULL,kind TEXT NOT NULL,created INTEGER NOT NULL);
+      CREATE INDEX IF NOT EXISTS idx_notes_project_task ON notes(project, task);
       CREATE VIRTUAL TABLE IF NOT EXISTS note_index USING fts5(title,body,content=notes,content_rowid=rowid);
       CREATE TRIGGER IF NOT EXISTS notes_insert AFTER INSERT ON notes BEGIN
         INSERT INTO note_index(rowid,title,body) VALUES(new.rowid,new.title,new.body); END;`); }
