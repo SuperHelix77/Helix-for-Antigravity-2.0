@@ -130,6 +130,6 @@ test('Efficiency 5: Static protocol header pins 3-Phase Thinking Scaffold', () =
     latestUserPrompt: 'Fix bug'
   });
 
-  assert.ok(ctx.includes('[State] -> [Target] -> [Compound Action]'), 'Header must contain 3-phase thinking scaffold');
+  assert.ok(ctx.includes('[S] (State) → [T] (Target) → [A] (Action)'), 'Header must contain 3-phase thinking scaffold');
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });

@@ -19,7 +19,7 @@ test('Red Team Guard: Secrets are redacted from SQLite memory and Lean Switch re
   fs.writeFileSync(transcriptPath, JSON.stringify({
     step_index: 0,
     type: 'USER_INPUT',
-    content: `Run curl with secret: ${sensitiveCmd}`
+    content: `Must ensure curl with secret: ${sensitiveCmd}`
   }) + '\n' + JSON.stringify({
     step_index: 1,
     type: 'USER_INPUT',

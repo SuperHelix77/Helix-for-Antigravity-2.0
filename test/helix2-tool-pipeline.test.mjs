@@ -74,7 +74,7 @@ test('helix flow CLI supports flags and inline JSON pipelines', async () => {
   const testFile = path.join(tmpDir, 'sample.txt');
   fs.writeFileSync(testFile, 'initial content', 'utf8');
 
-  const helixBin = path.resolve('bin/helix.mjs');
+  const helixBin = path.resolve(new URL('../bin/helix.mjs', import.meta.url).pathname);
 
   // Test 1: Flag-based execution
   const flagOut = execFileSync(process.execPath, [
