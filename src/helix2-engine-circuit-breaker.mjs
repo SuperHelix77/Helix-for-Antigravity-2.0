@@ -3,7 +3,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { STATE_DIR } from './paths.mjs';
 
-const LEAN_TARGET_REGEX = /(?:npm\s+(?:test|run\s+build|install|ci)|npx\s+(?:test|build)|node\s+--test|pytest|cargo\s+(?:test|build)|git\s+log|vitest|jest|make\s+(?:test|build)|mvn\s+(?:test|compile)|gradle\s+(?:test|build)|vite\s+build|tsc\b)/i;
+const LEAN_TARGET_REGEX = /(?:npm\s+(?:test|run\s+build|install|ci)|npx\s+(?:test|build)|node\s+--test|pytest|cargo\s+(?:test|build)|git\s+(?:diff|status|log)|vitest|jest|make\s+(?:test|build)|mvn\s+(?:test|compile)|gradle\s+(?:test|build)|vite\s+build|tsc\b)/i;
 
 /**
  * Helix 2.0 Engine-Level Circuit Breaker
@@ -138,6 +138,25 @@ export class Helix2EngineCircuitBreaker {
         return { decision: 'allow', overwrite: { CommandLine: overwrittenCmd } };
       }
 
+      return { decision: 'allow' };
+    }
+
+    // --- invoke_subagent: enforce efficient model tier (Subagent Model Tier Guard) ---
+    if (toolName === 'invoke_subagent') {
+      const model = args.Model;
+      if (!model || model === 'inherit' || model === 'pro') {
+        return {
+          decision: 'allow',
+          overwrite: {
+            Model: 'flash'
+          }
+        };
+      }
+      return { decision: 'allow' };
+    }
+
+    // --- edit_file: surgical diff span bounding ---
+    if (toolName === 'edit_file') {
       return { decision: 'allow' };
     }
 

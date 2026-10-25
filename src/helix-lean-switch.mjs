@@ -135,8 +135,43 @@ export class HelixLeanSwitch {
     }
 
     if (exitCode !== 0) {
-      const errorLines = lines.filter(l => /\b(FAIL|ERROR|AssertionError|Exception|Traceback|SyntaxError)\b/i.test(l)).slice(0, 10);
-      return [...errorLines, '--- test status ---', ...summaryLines].join('\n');
+      // Framework Stack Trace Pruning: Strip external plumbing (site-packages, node_modules)
+      const isExternalPlumbing = l => /(?:site-packages|node_modules|dist-packages|\/usr\/lib\/python|\/lib\/node_modules|\/internal\/modules)/i.test(l);
+      
+      const relevantLines = [];
+      let inTraceback = false;
+
+      for (const line of lines) {
+        if (/Traceback \(most recent call last\):/i.test(line)) {
+          inTraceback = true;
+          relevantLines.push(line);
+          continue;
+        }
+
+        if (inTraceback) {
+          if (isExternalPlumbing(line)) {
+            // Drop external framework frame
+            continue;
+          }
+          if (/\b(?:AssertionError|Exception|Error|TypeError|ValueError|IndexError|KeyError)\b/i.test(line)) {
+            inTraceback = false;
+            relevantLines.push(line);
+            continue;
+          }
+          if (/^\s*File\s+/i.test(line) || /^\s+at\s+/i.test(line)) {
+            relevantLines.push(line);
+          } else if (line.trim().length > 0 && relevantLines.length < 15) {
+            relevantLines.push(line);
+          }
+        } else if (/\b(FAIL|ERROR|AssertionError|Exception|SyntaxError)\b/i.test(line)) {
+          if (!isExternalPlumbing(line)) {
+            relevantLines.push(line);
+          }
+        }
+      }
+
+      const displayErrors = relevantLines.length > 0 ? relevantLines.slice(0, 12) : lines.filter(l => !isExternalPlumbing(l)).slice(0, 10);
+      return [...displayErrors, '--- test status ---', ...summaryLines].join('\n');
     }
 
     return summaryLines.length ? summaryLines.join('\n') : `Exit code ${exitCode}; ${lines.length} lines executed.`;
@@ -144,14 +179,30 @@ export class HelixLeanSwitch {
 
   #summarizeGitOutput(output) {
     const lines = output.split('\n');
+    // Check if git status
+    const isStatus = lines.some(l => /On branch|Changes to be committed|Changes not staged|Untracked files/i.test(l));
+    if (isStatus) {
+      const statusLines = lines.filter(l => /modified:|new file:|deleted:|untracked/i.test(l) || /On branch/i.test(l));
+      if (statusLines.length > 15) {
+        return `${statusLines[0]}\nModified/Untracked: ${statusLines.length - 1} files\n` + statusLines.slice(1, 10).join('\n') + `\n[... ${statusLines.length - 10} files omitted; see raw]`;
+      }
+      return statusLines.join('\n');
+    }
+
+    // Git diff
     const fileHeaders = lines.filter(l => /^diff --git|^--- |^\+\+\+ |@@/i.test(l));
     if (fileHeaders.length) {
-      const files = lines.filter(l => /^diff --git/i.test(l)).map(l => l.replace(/^diff --git a\//, '').replace(/ b\/.*$/, ''));
-      return `Modified ${files.length} file(s): ${files.join(', ')}\n` + fileHeaders.slice(0, 12).join('\n');
+      const files = lines.filter(l => /^diff --git/i.test(l)).map(l => l.replace(/^diff --git\//, '').replace(/ b\/.*$/, ''));
+      if (lines.length > 40) {
+        // Multi-file or large diff: summarize files and hunks
+        return `Modified ${files.length} file(s): ${files.slice(0, 5).join(', ')}${files.length > 5 ? '...' : ''}\n` +
+          fileHeaders.slice(0, 12).join('\n') +
+          `\n[... Diff truncated for context safety (${lines.length} lines); exact diff in raw]`;
+      }
+      return output;
     }
-    return lines.slice(0, 10).join('\n');
+    return lines.slice(0, 12).join('\n');
   }
-
   #summarizeGenericOutput(output) {
     const shaped = shapeToolResult(output);
     const lines = shaped.split('\n');

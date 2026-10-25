@@ -174,6 +174,47 @@ test('PostInvocation: respects configurable maxInvocations', (t) => {
 });
 
 // =============================================================================
+// Subagent Model Tier Guard
+// =============================================================================
+
+test('PreToolUse: rewrites heavy subagent models (pro / inherit) to flash to prevent compute explosion', (t) => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'helix-cb-'));
+  const breaker = new Helix2EngineCircuitBreaker({ stateDir: tmpDir });
+
+  // 1. Pro model is rewritten to flash
+  const resPro = breaker.checkPreToolUse({
+    toolCall: {
+      name: 'invoke_subagent',
+      args: { TypeName: 'research', Role: 'Researcher', Prompt: 'Analyze logs', Model: 'pro' }
+    }
+  });
+  assert.equal(resPro.decision, 'allow');
+  assert.equal(resPro.overwrite?.Model, 'flash');
+
+  // 2. Inherit model is rewritten to flash
+  const resInherit = breaker.checkPreToolUse({
+    toolCall: {
+      name: 'invoke_subagent',
+      args: { TypeName: 'research', Role: 'Researcher', Prompt: 'Analyze logs', Model: 'inherit' }
+    }
+  });
+  assert.equal(resInherit.decision, 'allow');
+  assert.equal(resInherit.overwrite?.Model, 'flash');
+
+  // 3. Flash_lite or explicit flash is preserved
+  const resLite = breaker.checkPreToolUse({
+    toolCall: {
+      name: 'invoke_subagent',
+      args: { TypeName: 'research', Role: 'Researcher', Prompt: 'Analyze logs', Model: 'flash_lite' }
+    }
+  });
+  assert.equal(resLite.decision, 'allow');
+  assert.equal(resLite.overwrite, undefined);
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+// =============================================================================
 // Turn reset
 // =============================================================================
 

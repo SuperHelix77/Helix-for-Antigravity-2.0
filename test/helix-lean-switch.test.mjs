@@ -108,6 +108,92 @@ test('HelixLeanSwitch compacts large file content with exact recovery', t => {
   assert.equal(recovered, largeCode, 'Original code must recover byte-for-byte');
 });
 
+test('HelixLeanSwitch prunes external framework plumbing frames from failure tracebacks', t => {
+  const { directory } = fixture(t);
+  const lean = new HelixLeanSwitch({ directory });
+
+  const tracebackWithPlumbing = [
+    '============================= test session starts ==============================',
+    'platform darwin -- Python 3.11.8',
+    ...Array.from({ length: 50 }, (_, i) => `running test item ${i}... passed`),
+    '=================================== FAILURES ===================================',
+    'Traceback (most recent call last):',
+    '  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner',
+    '    response = get_response(request)',
+    '  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response',
+    '    response = wrapped_callback(request, *callback_args, **callback_kwargs)',
+    '  File "/workspace/my_app/views.py", line 42, in user_profile_view',
+    '    user = get_user_object(pk)',
+    '  File "/workspace/my_app/models.py", line 18, in get_user_object',
+    '    assert user.is_active is True',
+    'AssertionError: Expected active user',
+    '=========================== 1 failed in 0.23s =========================='
+  ].join('\n');
+
+  const result = lean.shapeCommandOutput(tracebackWithPlumbing, {
+    command: 'pytest',
+    exitCode: 1,
+    toolName: 'run_command'
+  });
+
+  // Verify external site-packages frames are stripped
+  assert.ok(!result.output.includes('django/core/handlers/exception.py'), 'site-packages frames must be pruned');
+  assert.ok(!result.output.includes('django/core/handlers/base.py'), 'base.py plumbing frame must be pruned');
+
+  // Verify user repo frames are retained
+  assert.ok(result.output.includes('my_app/views.py'), 'User repo source frame must be preserved');
+  assert.ok(result.output.includes('my_app/models.py'), 'User repo model frame must be preserved');
+  assert.ok(result.output.includes('AssertionError: Expected active user'), 'Exception must be preserved');
+});
+
+test('HelixLeanSwitch compacts large git diff and git status output', t => {
+  const { directory } = fixture(t);
+  const lean = new HelixLeanSwitch({ directory });
+
+  // Large multi-file git diff
+  const largeDiff = [
+    'diff --git a/src/a.js b/src/a.js',
+    '--- a/src/a.js',
+    '+++ b/src/a.js',
+    '@@ -1,5 +1,5 @@',
+    '+ const a = 1;',
+    'diff --git a/src/b.js b/src/b.js',
+    '--- a/src/b.js',
+    '+++ b/src/b.js',
+    '@@ -10,5 +10,5 @@',
+    '+ const b = 2;',
+    ...Array.from({ length: 60 }, (_, i) => `+ extra line ${i} in diff`)
+  ].join('\n');
+
+  const resDiff = lean.shapeCommandOutput(largeDiff, {
+    command: 'git diff',
+    exitCode: 0,
+    toolName: 'run_command'
+  });
+
+  assert.ok(resDiff.receipt);
+  assert.ok(resDiff.output.includes('Modified 2 file(s)'));
+  assert.ok(resDiff.output.includes('Diff truncated for context safety'));
+
+  // Git status
+  const gitStatusOutput = [
+    'On branch main',
+    'Changes not staged for commit:',
+    ...Array.from({ length: 30 }, (_, i) => `\tmodified:   src/file_${i}.js`),
+    'Untracked files:',
+    ...Array.from({ length: 20 }, (_, i) => `\tsrc/new_${i}.js`)
+  ].join('\n');
+
+  const resStatus = lean.shapeCommandOutput(gitStatusOutput, {
+    command: 'git status',
+    exitCode: 0,
+    toolName: 'run_command'
+  });
+
+  assert.ok(resStatus.receipt);
+  assert.ok(resStatus.output.includes('Modified/Untracked:'));
+});
+
 test('HelixLeanSwitch disabled mode preserves exact input without archiving', t => {
   const { directory } = fixture(t);
   const lean = new HelixLeanSwitch({ directory, enabled: false });
