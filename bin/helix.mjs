@@ -171,17 +171,28 @@ if (command === 'serve') {
     }
     console.log(`Transcript shaping complete: ${shaped} conversations processed.`);
   }
-} else if (command === 'pipeline' || command === 'flow') {
+} else if (command === 'pipeline' || command === 'flow' || command === 'patch') {
   const { Helix2ToolPipeline } = await import('../src/helix2-tool-pipeline.mjs');
   let operations = [];
   let project = process.cwd();
 
   const editIdx = process.argv.indexOf('--edit');
+  const patchIdx = process.argv.indexOf('--patch');
   const targetIdx = process.argv.indexOf('--target');
   const replaceIdx = process.argv.indexOf('--replace');
   const testIdx = process.argv.indexOf('--test');
 
-  if (editIdx !== -1) {
+  if (command === 'patch' || patchIdx !== -1) {
+    const patchArg = command === 'patch' ? process.argv[3] : process.argv[patchIdx + 1];
+    if (!patchArg || patchArg === '--help' || patchArg === '-h') {
+      console.log('Usage: helix patch <patch.diff|patch_text> [--test <cmd|auto>]');
+      process.exit(0);
+    }
+    const patchContent = fs.existsSync(patchArg) ? fs.readFileSync(patchArg, 'utf8') : patchArg;
+    operations.push({ kind: 'patch', patch: patchContent, rollbackOnFailure: true });
+    const testCmd = testIdx !== -1 ? process.argv[testIdx + 1] : 'auto';
+    operations.push({ kind: 'command', command: testCmd });
+  } else if (editIdx !== -1) {
     operations.push({
       kind: 'edit',
       file: process.argv[editIdx + 1],
@@ -197,7 +208,7 @@ if (command === 'serve') {
   } else {
     const rawArg = process.argv[3];
     if (!rawArg || rawArg === '--help' || rawArg === '-h') {
-      console.log('Usage: helix flow --edit <file> --target <str> --replace <str> [--test <cmd>] OR helix flow <spec.json|json_string>');
+      console.log('Usage: helix flow --edit <file> --target <str> --replace <str> [--test <cmd>] OR helix patch <patch.diff> [--test <cmd>] OR helix flow <spec.json|json_string>');
       process.exit(0);
     }
 

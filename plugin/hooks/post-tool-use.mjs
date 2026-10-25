@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
+import path from 'node:path';
+import os from 'node:os';
 
 async function main() {
   const chunks = [];
@@ -21,6 +23,39 @@ async function main() {
   const transcriptPath = input.transcriptPath;
   const conversationId = input.conversationId || 'default';
 
+  // Fast background syntax pre-flight on edited files (<10ms)
+  const toolName = input.toolCall?.name || '';
+  const filePath = input.toolCall?.args?.Path || input.toolCall?.arguments?.Path || '';
+  if (filePath && (toolName === 'edit_file' || toolName === 'write_file')) {
+    try {
+      const { spawnSync } = await import('node:child_process');
+      const ext = path.extname(filePath);
+      const isJs = ['.js', '.mjs', '.cjs'].includes(ext);
+      const isPy = ext === '.py';
+      const cacheDir = path.join(os.homedir(), '.helix', 'cache');
+      try { fs.mkdirSync(cacheDir, { recursive: true, mode: 0o700 }); } catch {}
+      const syntaxErrorFile = path.join(cacheDir, `${conversationId}.syntax_error`);
+
+      if (isJs && fs.existsSync(filePath)) {
+        const res = spawnSync(process.execPath, ['--check', filePath], { timeout: 1000, encoding: 'utf8' });
+        if (res.status !== 0) {
+          const errText = (res.stderr || res.stdout || '').trim().split('\n').slice(0, 3).join('\n');
+          fs.writeFileSync(syntaxErrorFile, JSON.stringify({ file: filePath, error: errText, at: Date.now() }), 'utf8');
+        } else {
+          try { fs.unlinkSync(syntaxErrorFile); } catch {}
+        }
+      } else if (isPy && fs.existsSync(filePath)) {
+        const res = spawnSync('python3', ['-m', 'py_compile', filePath], { timeout: 1000, encoding: 'utf8' });
+        if (res.status !== 0) {
+          const errText = (res.stderr || res.stdout || '').trim().split('\n').slice(0, 3).join('\n');
+          fs.writeFileSync(syntaxErrorFile, JSON.stringify({ file: filePath, error: errText, at: Date.now() }), 'utf8');
+        } else {
+          try { fs.unlinkSync(syntaxErrorFile); } catch {}
+        }
+      }
+    } catch {}
+  }
+
   if (transcriptPath && fs.existsSync(transcriptPath)) {
     try {
       const { Helix2ContextSharpener } = await import('/Users/mert/.gemini/antigravity/scratch/HELIX-1.0/src/helix2-context-sharpener.mjs');
@@ -35,7 +70,7 @@ async function main() {
     // Auto-shape transcript if it exceeds bounded limit (Solution A: O(1) auto-compaction)
     try {
       const { Helix2TranscriptShaper } = await import('/Users/mert/.gemini/antigravity/scratch/HELIX-1.0/src/helix2-transcript-shaper.mjs');
-      const shaper = new Helix2TranscriptShaper({ maxUncompactedBytes: 300 * 1024, retainRecentSteps: 8 });
+      const shaper = new Helix2TranscriptShaper({ maxUncompactedBytes: 100 * 1024, retainRecentSteps: 8 });
       if (shaper.needsShaping(transcriptPath)) {
         await shaper.shapeTranscript({ transcriptPath });
       }

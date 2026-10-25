@@ -128,6 +128,26 @@ export class Helix2SpeculativePreAnalyzer {
   }
 
   #detectLastToolFailure(transcriptPath) {
+    // First priority: check background syntax pre-flight cache (<2ms)
+    try {
+      const home = process.env.HOME || process.env.USERPROFILE || '';
+      if (home) {
+        const cacheDir = path.join(home, '.helix', 'cache');
+        if (fs.existsSync(cacheDir)) {
+          const errorFiles = fs.readdirSync(cacheDir).filter(f => f.endsWith('.syntax_error'));
+          for (const ef of errorFiles) {
+            try {
+              const errData = JSON.parse(fs.readFileSync(path.join(cacheDir, ef), 'utf8'));
+              if (errData && errData.file && (Date.now() - (errData.at || 0) < 300000)) {
+                const rel = path.basename(errData.file);
+                return `• Background Pre-Flight Syntax Error in ${rel}:\n  ` + (errData.error || '').split('\n').slice(0, 2).map(l => l.slice(0, 80)).join('\n  ');
+              }
+            } catch {}
+          }
+        }
+      }
+    } catch {}
+
     if (!transcriptPath || !fs.existsSync(transcriptPath)) return null;
 
     try {

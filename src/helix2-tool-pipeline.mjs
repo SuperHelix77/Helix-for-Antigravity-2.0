@@ -3,6 +3,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import { createHash } from 'node:crypto';
 import { Helix2ElasticFrontier } from './helix2-elastic-frontier.mjs';
+import { Helix2PatchEngine } from './helix2-patch-engine.mjs';
 
 /**
  * Helix2ToolPipeline
@@ -10,14 +11,15 @@ import { Helix2ElasticFrontier } from './helix2-elastic-frontier.mjs';
  * Executes bounded, pre-authorized multi-step tool pipelines locally
  * without intermediate LLM round-trips.
  * 
- * Example: Edit file -> Run test suite -> Check git diff in ONE model turn.
+ * Example: Edit/Patch file -> Run test suite -> Check git diff in ONE model turn.
  * If any step fails, halts immediately and invokes Elastic Frontier diagnostics.
  */
 export class Helix2ToolPipeline {
   constructor({ directory, timeoutMs = 180000 } = {}) {
     this.directory = directory;
     this.timeoutMs = timeoutMs;
-    this.frontier = new Helix2ElasticFrontier({ directory });
+    this.frontier = new Helix2ElasticFrontier(directory ? { directory } : {});
+    this.patchEngine = new Helix2PatchEngine();
   }
 
   /**
@@ -30,6 +32,8 @@ export class Helix2ToolPipeline {
     }
 
     const results = [];
+    const touchedFiles = [];
+    let lastBackups = null;
     let halt = false;
 
     for (let i = 0; i < operations.length; i++) {
@@ -48,11 +52,39 @@ export class Helix2ToolPipeline {
       if (op.kind === 'edit') {
         const editRes = this.#applyEdit(cwd, op);
         results.push({ step: i, kind: 'edit', ...editRes });
+        if (editRes.success && op.file) touchedFiles.push(op.file);
         if (!editRes.success) halt = true;
+      } else if (op.kind === 'patch') {
+        const patchRes = this.patchEngine.applyPatch(cwd, op.patch || op.diff);
+        results.push({
+          step: i,
+          kind: 'patch',
+          ...patchRes,
+          summary: patchRes.success
+            ? `Patched ${patchRes.filesModified?.length || 0} file(s) (${patchRes.filesModified?.join(', ') || ''})`
+            : patchRes.error
+        });
+        if (patchRes.success) {
+          if (patchRes.filesModified) touchedFiles.push(...patchRes.filesModified);
+          if (patchRes.backups) lastBackups = patchRes.backups;
+        } else {
+          halt = true;
+        }
       } else if (op.kind === 'command') {
+        // Targeted subtest auto-discovery
+        if (op.command === 'auto' || op.command === '--test auto') {
+          op.command = this.resolveTargetedTestCommand(cwd, touchedFiles);
+        }
         const cmdRes = await this.#executeCommand(cwd, op, { taskId, signal });
         results.push({ step: i, kind: 'command', ...cmdRes });
-        if (cmdRes.exitCode !== 0) halt = true;
+        if (cmdRes.exitCode !== 0) {
+          halt = true;
+          // Auto-revert patch on failure if configured or if backups exist
+          if (lastBackups && op.rollbackOnFailure !== false) {
+            this.patchEngine.revertPatch(lastBackups);
+            results.push({ step: i + 0.5, kind: 'rollback', status: 'REVERTED', summary: 'Reverted patch after command failure' });
+          }
+        }
       } else {
         results.push({ step: i, status: 'ERROR', error: `Unknown pipeline operation: ${op.kind}` });
         halt = true;
@@ -62,7 +94,7 @@ export class Helix2ToolPipeline {
     const allPassed = results.every(r => r.success || r.exitCode === 0);
     const summary = [
       `[HELIX 2.0 Pipeline: ${operations.length} steps executed; status:${allPassed ? 'SUCCESS' : 'HALTED'}]`,
-      ...results.map((r, idx) => `Step #${idx + 1} (${r.kind || 'op'}): ${r.status || (r.exitCode === 0 ? 'PASS' : 'FAIL')} ${r.summary || ''}`),
+      ...results.map((r, idx) => `Step #${idx + 1} (${r.kind || 'op'}): ${r.status || (r.success || r.exitCode === 0 ? 'PASS' : 'FAIL')} ${r.summary || ''}`),
       allPassed ? '[All pipeline steps completed successfully.]' : '[Pipeline halted at first failure boundary. Examine diagnostics.]'
     ].join('\n');
 
@@ -72,6 +104,45 @@ export class Helix2ToolPipeline {
       results,
       summary
     };
+  }
+
+  /**
+   * Resolves a targeted test command for touched files to avoid running full regression suites.
+   */
+  resolveTargetedTestCommand(cwd, touchedFiles = []) {
+    for (const relFile of touchedFiles) {
+      const ext = path.extname(relFile);
+      const base = path.basename(relFile, ext);
+      const isPython = ext === '.py';
+
+      if (isPython) {
+        const candidateTests = [
+          path.join('tests', `test_${base}.py`),
+          path.join('test', `test_${base}.py`),
+          `${base}_test.py`
+        ];
+        for (const cand of candidateTests) {
+          if (fs.existsSync(path.resolve(cwd, cand))) {
+            return `pytest "${cand}"`;
+          }
+        }
+        return `python3 -m py_compile "${relFile}"`;
+      } else {
+        const candidateTests = [
+          path.join('test', `${base}.test.mjs`),
+          path.join('test', `${base}.test.js`),
+          path.join('test', `${base}.spec.js`),
+          path.join('tests', `${base}.test.js`)
+        ];
+        for (const cand of candidateTests) {
+          if (fs.existsSync(path.resolve(cwd, cand))) {
+            return `node --test "${cand}"`;
+          }
+        }
+        return `node --check "${relFile}"`;
+      }
+    }
+    return 'node --check package.json';
   }
 
   #applyEdit(cwd, op) {
