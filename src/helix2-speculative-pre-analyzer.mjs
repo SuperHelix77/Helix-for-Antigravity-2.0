@@ -58,7 +58,7 @@ export class Helix2SpeculativePreAnalyzer {
     const indexPath = path.join(gitDir, 'index');
     const indexMtime = fs.existsSync(indexPath) ? fs.statSync(indexPath).mtimeMs : 0;
     const cached = this.gitCache.get(workspaceDir);
-    if (cached && cached.indexMtime === indexMtime && (Date.now() - cached.at < 3000)) {
+    if (cached && cached.indexMtime === indexMtime && (Date.now() - cached.at < 15000)) {
       return cached.result;
     }
 

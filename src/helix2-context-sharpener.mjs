@@ -14,11 +14,9 @@ try { fs.mkdirSync(CACHE_DIR, { recursive: true, mode: 0o700 }); } catch {}
 
 const STATIC_PROTOCOL_HEADER = Object.freeze([
   `[HELIX 2.0 PROTOCOL ACTIVATED - ZERO-BLOAT EPHEMERAL CONTEXT]`,
-  `Instructions: STRICT ONE FLOW LAW: Maximum 1 compound tool invocation per turn. Group all inspection, execution, and verification into a single unified step, then deliver your response directly. Serialized micro-reads and iterative thought-act ping-pong are strictly forbidden.`,
-  `Quota Protection Mandate: 5-HOUR USAGE PRESERVATION: Resolve every request in max 1-2 invocations. Use native parallel tool calls (emit multiple edits and tests in a single step) rather than serializing across multiple turns. Never burn turns on reassurance checks.`,
-  `Output Density Governor: Keep conversational responses high-density (<150 words). Avoid narrative filler, repeated diffs, and redundant recitations of verified outputs.`,
-  `Edit Span Minimization: Anchor Target spans to 2-3 minimal unique context lines max. Never repeat multi-line boilerplate or whole functions in edit_file targets.`,
-  `Reasoning Mandate: TELEGRAPHIC GLYPH DRAFT: Structure internal thinking strictly as [S] (State) → [T] (Target) → [A] (Action). Use 1-token logic operators (→ implies, ⊨ verifies, ¬ not, Δ diff). Omit conversational filler, rhetorical narrative, and hypothetical backtracking to minimize token overhead while maximizing analytical rigor.`
+  `• Execution: STRICT 1-FLOW: Max 1-2 invocations per turn. Group inspection, edits, and verification into a single parallel compound step.`,
+  `• Quota & Output: Dense answers (<150 words). Anchor edit targets to 2-3 lines max. Zero reassurance checks.`,
+  `• Reasoning: [S] (State) → [T] (Target) → [A] (Action). Use logic operators (→ implies, ⊨ verifies, ¬ not, Δ diff). Omit narrative filler.`
 ]);
 
 /**
@@ -157,8 +155,13 @@ export class Helix2ContextSharpener {
       const results = this.memory.search({ project: projects, query, limit, expand: false });
       if (!results || results.length === 0) return '';
 
-      // Near-zero token format: single compact line per item with semantic badge (<25 tok)
-      const items = results.map(r => `• [${(r.kind || 'fact').toUpperCase()}] ${r.title.slice(0, 45)}: ${r.body.replace(/\n+/g, ' ').slice(0, 55)}`).join('\n');
+      // Near-zero token format: single compact line per item with de-duplicated body (<20 tok)
+      const items = results.map(r => {
+        const cleanTitle = r.title.replace(/^Directive:\s*/i, '').slice(0, 45).trim();
+        const cleanBody = r.body.replace(/\n+/g, ' ').slice(0, 55).trim();
+        const text = cleanBody.toLowerCase().includes(cleanTitle.toLowerCase()) ? cleanBody : `${cleanTitle}: ${cleanBody}`;
+        return `• [${(r.kind || 'fact').toUpperCase()}] ${text}`;
+      }).join('\n');
       return `[HELIX MEMORY (<25 tok)]\n${items}`;
     } catch {
       return '';
