@@ -16,6 +16,7 @@ const STATIC_PROTOCOL_HEADER = Object.freeze([
   `[HELIX 2.0 PROTOCOL ACTIVATED - ZERO-BLOAT EPHEMERAL CONTEXT]`,
   `Instructions: STRICT ONE FLOW LAW: Maximum 1 compound tool invocation per turn. Group all inspection, execution, and verification into a single unified step, then deliver your response directly. Serialized micro-reads and iterative thought-act ping-pong are strictly forbidden.`,
   `Quota Protection Mandate: 5-HOUR USAGE PRESERVATION: Resolve every request in max 1-2 invocations. Use native parallel tool calls (emit multiple edits and tests in a single step) rather than serializing across multiple turns. Never burn turns on reassurance checks.`,
+  `Output Density Governor: Keep conversational responses high-density (<150 words). Avoid narrative filler, repeated diffs, and redundant recitations of verified outputs.`,
   `Reasoning Mandate: CHAIN-OF-DRAFT (3-PHASE SCAFFOLD): Structure internal thinking strictly as [State] -> [Target] -> [Compound Action]. Reason telegraphically. Omit conversational narrative, rhetorical filler, and hypothetical backtracking to minimize token overhead while maximizing analytical rigor.`
 ]);
 
@@ -37,7 +38,7 @@ export class Helix2ContextSharpener {
     try { fs.mkdirSync(this.cacheDir, { recursive: true, mode: 0o700 }); } catch {}
     this.lazyManager = lazyManager || new Helix2LazyManager();
     this.preAnalyzer = preAnalyzer || new Helix2SpeculativePreAnalyzer();
-    this.transcriptShaper = transcriptShaper || new Helix2TranscriptShaper({ maxUncompactedBytes: 40 * 1024, retainRecentSteps: 4, archiveThresholdLines: 15 });
+    this.transcriptShaper = transcriptShaper || new Helix2TranscriptShaper({ maxUncompactedBytes: 20 * 1024, retainRecentSteps: 3, archiveThresholdLines: 12 });
   }
 
   /**
@@ -168,7 +169,12 @@ export class Helix2ContextSharpener {
    * Prevents burning 5,000+ reasoning tokens on trivial lookups, queries, or single-line fixes.
    */
   classifyTaskComplexity({ userPrompt = '', astSnippet = '', specSnippet = '' }) {
-    const prompt = (userPrompt || '').toLowerCase().trim();
+    // Strip XML tags and metadata to get the actual user request text
+    const cleanPrompt = (userPrompt || '')
+      .replace(/<USER_REQUEST>([\s\S]*?)<\/USER_REQUEST>/i, '$1')
+      .replace(/<ADDITIONAL_METADATA>[\s\S]*?<\/ADDITIONAL_METADATA>/gi, '')
+      .toLowerCase()
+      .trim();
 
     // 1. Surgical tier: Exact symbol locus is pre-resolved (~1,000 tokens)
     if (astSnippet && astSnippet.includes('[HELIX UNIVERSAL 100% AST TARGET]')) {
@@ -178,9 +184,11 @@ export class Helix2ContextSharpener {
       };
     }
 
-    // 2. Minimal / Mechanical tier (<500 thinking tokens): direct status queries, greetings, acknowledgments
-    const isInformational = /^(?:sitrep|status|token\s+savings|metrics|what\s+is|show\s+me|list|where\s+are|did\s+we|thanks|yes|no|ok|done)\b/i.test(prompt);
-    if (isInformational || (prompt.length < 25 && !prompt.includes('fix') && !prompt.includes('bug') && !prompt.includes('error'))) {
+    // 2. Minimal / Mechanical tier (<500 thinking tokens): direct status queries, feedback, greetings, acknowledgments, Q&A
+    const isInformationalOrFeedback = /^(?:sitrep|status|token\s+savings|metrics|what\s+is|show\s+me|list|where\s+are|did\s+we|thanks|yes|no|ok|done|nice|cost|burn|quota|optimization|speed|latency|usage|rate\s+limit|how\s+much|why|tell\s+me)\b/i.test(cleanPrompt)
+      || /(?:any\s+more|burned\s+through|cost\s+optimization|usage\s+preservation)\b/i.test(cleanPrompt);
+
+    if (isInformationalOrFeedback || (cleanPrompt.length < 45 && !cleanPrompt.includes('refactor') && !cleanPrompt.includes('architect') && !cleanPrompt.includes('build'))) {
       return {
         tier: 'MINIMAL',
         guidance: `Adaptive Reasoning Budget: MINIMAL (<500 tokens). This is a direct status query, lookup, or acknowledgment. Conclude directly without exploratory hypothetical branching.`
