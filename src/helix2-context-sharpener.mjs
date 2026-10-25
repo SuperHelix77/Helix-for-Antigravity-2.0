@@ -77,11 +77,12 @@ export class Helix2ContextSharpener {
         const item = JSON.parse(lines[i]);
         const stepIdx = item.step_index ?? i;
 
-        // Evacuate user directives into memory
+        // Evacuate user directives into memory: strictly filter to architectural requirements and decisions
         if (item.type === 'USER_INPUT' && item.content && typeof item.content === 'string') {
           const reqMatch = item.content.match(/<USER_REQUEST>([\s\S]*?)<\/USER_REQUEST>/i);
           const req = (reqMatch ? reqMatch[1] : item.content).trim();
-          if (req.length >= 10 && req.length < 250) {
+          const isArchitecturalDirective = /\b(?:must|always|never|prefer|use|ensure|protocol|architect|rule|constraint|invariant|quota|limit|governor|optimize|speed|latency)\b/i.test(req);
+          if (isArchitecturalDirective && req.length >= 10 && req.length < 250) {
             const sanitizedReq = redactContextText(req);
             try {
               this.memory.put({

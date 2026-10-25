@@ -189,8 +189,13 @@ export class Helix2EngineCircuitBreaker {
       return { decision: 'allow' };
     }
 
-    // --- edit_file: surgical diff span bounding ---
+    // --- edit_file: surgical diff span bounding & zero-diff suppression ---
     if (toolName === 'edit_file') {
+      const target = args.Target ?? '';
+      const replacement = args.Replacement ?? '';
+      if (target && target === replacement) {
+        return { decision: 'allow', overwrite: { Target: '', Replacement: '' } };
+      }
       return { decision: 'allow' };
     }
 
