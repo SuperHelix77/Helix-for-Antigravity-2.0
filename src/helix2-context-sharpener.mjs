@@ -219,7 +219,7 @@ export class Helix2ContextSharpener {
     const sharpContext = (
       `[HELIX 2.0 PROTOCOL ACTIVATED - ZERO-BLOAT EPHEMERAL CONTEXT]\n` +
       sections.join('\n\n') +
-      `\nInstructions: ONE FLOW LAW: Think once, execute all batch inspections, edits, or tests in a single compound tool invocation, and conclude directly. Zero mid-turn thinking loops. Stale context evacuated to SQLite (~/.helix/memory.sqlite).`
+      `\nInstructions: STRICT ONE FLOW LAW: Maximum 1 compound tool invocation per turn. Group all inspection, execution, and verification into a single unified step, then deliver your response directly. Serialized micro-reads and iterative thought-act ping-pong are strictly forbidden.`
     );
 
     return sharpContext;

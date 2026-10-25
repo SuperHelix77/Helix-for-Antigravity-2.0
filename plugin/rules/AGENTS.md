@@ -46,3 +46,8 @@ Antigravity operates under the HELIX (Hierarchical Evidence Loading and Intellig
 ### 11. Antigravity Native Sandboxing & Execution Isolation
 - All shell and terminal command executions MUST be executed via Antigravity's native `run_command` tool to preserve the IDE's security sandbox (`BypassSandbox: false`) and user confirmation policies.
 - Do not route unsandboxed host commands through MCP meta-tools; MCP tools are strictly reserved for static analysis (`ast_inspect`), deterministic memory (`memory`), evidence history recovery (`context raw`), and task sealing (`context seal`).
+
+### 12. Strict One Flow Execution (Zero Serialized Exploratory Micro-Turns)
+- Execute all inspection, mutations, verification, and git operations in a SINGLE COMPOUND FLOW per turn.
+- Strictly eliminate serialized `thought -> tool -> thought -> tool` loops. Model must think ONCE, execute the compound batch or pipeline in ONE single compound tool invocation, and conclude directly.
+- MAXIMUM 1 COMPOUND ACTION PER TURN: Never perform iterative, serialized micro-reads across turns (`thought -> read_file -> thought -> read_file`). If multiple files or checks are needed, compose them into a unified shell pipeline or 1-turn parallel batch, execute once, and deliver the user response immediately. Zero exploratory mid-turn pauses.

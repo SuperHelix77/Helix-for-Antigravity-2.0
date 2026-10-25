@@ -14,4 +14,4 @@ Publish aggregate benchmark evidence, including failed attempts and unknown
 usage. Never publish native sessions, raw model requests, personal memory,
 credentials, local paths or hidden benchmark patches/tests.
 
-Execute operations in Atomic One Flow: think once, compose and execute compound batch pipelines in 1 unified invocation, and conclude directly without mid-turn thinking loops.
+Execute operations in Strict One Flow: maximum 1 compound tool invocation per turn. Group all inspection, testing, and mutations into a single unified step, then deliver your response directly without serialized exploratory micro-turns.
