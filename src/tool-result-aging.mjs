@@ -6,9 +6,9 @@ import { createHash } from "node:crypto";
 // results above this floor qualify, and the newest result frontier stays
 // byte-for-byte intact on ordinary turns. RTK-style shaping is reserved for an
 // actual routed compaction request, after the client has decided it needs one.
-export const TOOL_RESULT_AGING_MIN_BYTES = 8 * 1024;
+export const TOOL_RESULT_AGING_MIN_BYTES = 2 * 1024;
 export const TOOL_RESULT_AGING_FRONTIER = 1;
-export const DENSE_SHAPING_MIN_BYTES = 8 * 1024;
+export const DENSE_SHAPING_MIN_BYTES = 2 * 1024;
 export const OPENAI_TOOL_RESULT_AGING_MIN_BYTES = 256;
 export const OPENAI_TOOL_RESULT_PREVIEW_CODE_UNITS = 24;
 export const OPENAI_TOOL_RESULT_AGING_FRONTIER_MAX_BYTES = 32 * 1024;

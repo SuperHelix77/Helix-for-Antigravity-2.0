@@ -13,7 +13,7 @@ import readline from 'node:readline';
  * 4. Runs atomically in < 25ms.
  */
 export class Helix2TranscriptShaper {
-  constructor({ maxUncompactedBytes = 80 * 1024, retainRecentSteps = 6, archiveThresholdLines = 20, batchDeltaBytes = 32 * 1024 } = {}) {
+  constructor({ maxUncompactedBytes = 30 * 1024, retainRecentSteps = 3, archiveThresholdLines = 10, batchDeltaBytes = 16 * 1024 } = {}) {
     this.maxUncompactedBytes = maxUncompactedBytes;
     this.retainRecentSteps = retainRecentSteps;
     this.archiveThresholdLines = archiveThresholdLines;
