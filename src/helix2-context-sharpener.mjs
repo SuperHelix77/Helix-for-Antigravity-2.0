@@ -89,26 +89,20 @@ export class Helix2ContextSharpener {
           }
         }
 
-        // Evacuate tool outputs and verifiable results with full credential redaction
-        if (item.type === 'PLANNER_RESPONSE' && item.tool_calls && item.tool_calls.length > 0) {
-          for (const tc of item.tool_calls) {
-            const toolName = tc.name || tc.tool || 'tool';
-            const cmd = tc.arguments?.CommandLine || tc.arguments?.Path || tc.args?.CommandLine || tc.args?.Path || '';
-            if (cmd) {
-              const sanitizedCmd = redactContextText(cmd);
-              const title = `${toolName}: ${sanitizedCmd.slice(0, 50)}`;
-              const body = `Step ${stepIdx}: ${toolName} ${sanitizedCmd.slice(0, 100)}`;
-              try {
-                this.memory.put({
-                  project,
-                  task: conversationId ? conversationId.slice(0, 36) : 'task',
-                  title: title.slice(0, 100),
-                  body,
-                  kind: 'fact'
-                });
-                evacuatedCount++;
-              } catch {}
-            }
+        // Evacuate only verified task conclusions and milestones, not mechanical tool invocations
+        if (item.type === 'CHECKPOINT' && item.content && typeof item.content === 'string') {
+          const match = item.content.match(/Sealed (\d+) steps/);
+          if (match) {
+            try {
+              this.memory.put({
+                project,
+                task: conversationId ? conversationId.slice(0, 36) : 'task',
+                title: `Milestone: Sealed ${match[1]} steps`,
+                body: `Step ${stepIdx}: Automated archival milestone`,
+                kind: 'settled'
+              });
+              evacuatedCount++;
+            } catch {}
           }
         }
       } catch {}

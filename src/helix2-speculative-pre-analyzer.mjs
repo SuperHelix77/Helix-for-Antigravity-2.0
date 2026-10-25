@@ -17,6 +17,7 @@ export class Helix2SpeculativePreAnalyzer {
     this.maxDiffLines = maxDiffLines;
     this.maxLocusLines = maxLocusLines;
     this.indexer = new Helix2AstIndexer();
+    this.gitCache = new Map();
   }
 
   /**
@@ -51,7 +52,15 @@ export class Helix2SpeculativePreAnalyzer {
   }
 
   #detectGitStatusAndDiff(workspaceDir) {
-    if (!fs.existsSync(path.join(workspaceDir, '.git'))) return null;
+    const gitDir = path.join(workspaceDir, '.git');
+    if (!fs.existsSync(gitDir)) return null;
+
+    const indexPath = path.join(gitDir, 'index');
+    const indexMtime = fs.existsSync(indexPath) ? fs.statSync(indexPath).mtimeMs : 0;
+    const cached = this.gitCache.get(workspaceDir);
+    if (cached && cached.indexMtime === indexMtime && (Date.now() - cached.at < 3000)) {
+      return cached.result;
+    }
 
     try {
       const statusOut = execFileSync('git', ['status', '--porcelain', '-uall'], {
@@ -67,7 +76,9 @@ export class Helix2SpeculativePreAnalyzer {
             encoding: 'utf8',
             timeout: 500
           }).trim();
-          return `• Working Tree: Clean at commit ${headRev}.\n• Directive: State is cryptographically verified (exit 0). DO NOT re-run tests or query logs for reassurance. Respond directly in Turn 1.`;
+          const cleanRes = `• Working Tree: Clean at commit ${headRev}.\n• Directive: State is cryptographically verified (exit 0). DO NOT re-run tests or query logs for reassurance. Respond directly in Turn 1.`;
+          this.gitCache.set(workspaceDir, { indexMtime, result: cleanRes, at: Date.now() });
+          return cleanRes;
         } catch {
           return null;
         }
@@ -99,6 +110,7 @@ export class Helix2SpeculativePreAnalyzer {
         }
       } catch {}
 
+      this.gitCache.set(workspaceDir, { indexMtime, result: summary, at: Date.now() });
       return summary;
     } catch {
       return null;
