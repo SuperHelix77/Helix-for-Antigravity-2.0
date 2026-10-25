@@ -34,7 +34,9 @@ async function main() {
 
   // Wrap with Helix Lean Switch for 90%+ terminal output token compression
   const leanRunner = '/Users/mert/.gemini/antigravity/scratch/HELIX-1.0/bin/helix.mjs';
-  const overwrittenCmd = `node ${leanRunner} lean -- ${cmd}`;
+  // Safely escape and quote command to preserve compound chains (e.g. cd /dir && npm test)
+  const escapedCmd = cmd.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  const overwrittenCmd = `node "${leanRunner}" lean -- "${escapedCmd}"`;
 
   const output = {
     decision: 'allow',
