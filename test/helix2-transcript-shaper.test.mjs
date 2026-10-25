@@ -159,7 +159,7 @@ test('Helix2TranscriptShaper folds intermediate historical tool steps into miles
   // Intermediate tool calls must be consolidated into milestone checkpoints
   const checkpoints = shapedLines.map(l => JSON.parse(l)).filter(item => item.type === 'CHECKPOINT');
   assert.ok(checkpoints.length >= 1, 'Should have created milestone checkpoint');
-  assert.ok(checkpoints[0].content.includes('helix.task.archive.v1'));
+  assert.ok(checkpoints[0].content.includes('helix:archive'));
 
   // Raw full transcript must be 100% byte-complete
   const fullLines = fs.readFileSync(fullTranscriptPath, 'utf8').trim().split('\n');

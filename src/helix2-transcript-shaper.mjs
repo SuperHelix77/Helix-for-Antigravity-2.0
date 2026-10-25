@@ -13,7 +13,7 @@ import readline from 'node:readline';
  * 4. Runs atomically in < 25ms.
  */
 export class Helix2TranscriptShaper {
-  constructor({ maxUncompactedBytes = 300 * 1024, retainRecentSteps = 8, archiveThresholdLines = 150 } = {}) {
+  constructor({ maxUncompactedBytes = 50 * 1024, retainRecentSteps = 4, archiveThresholdLines = 15 } = {}) {
     this.maxUncompactedBytes = maxUncompactedBytes;
     this.retainRecentSteps = retainRecentSteps;
     this.archiveThresholdLines = archiveThresholdLines;
@@ -154,7 +154,7 @@ export class Helix2TranscriptShaper {
             type: 'CHECKPOINT',
             source: 'SYSTEM',
             status: 'DONE',
-            content: `[helix.task.archive.v1] Sealed ${pendingGenericCount} historical tool steps; raw in transcript_full.jsonl`,
+            content: `[helix:archive] Sealed ${pendingGenericCount} steps; raw in transcript_full.jsonl`,
             truncated_fields: ['content']
           }));
           pendingGenericCount = 0;
@@ -187,14 +187,28 @@ export class Helix2TranscriptShaper {
               type: 'CHECKPOINT',
               source: 'SYSTEM',
               status: 'DONE',
-              content: `[helix.task.archive.v1] Sealed ${pendingGenericCount} historical tool steps; raw in transcript_full.jsonl`,
+              content: `[helix:archive] Sealed ${pendingGenericCount} steps; raw in transcript_full.jsonl`,
               truncated_fields: ['content']
             }));
             pendingGenericCount = 0;
           }
           if (item.content && typeof item.content === 'string') {
-            if (item.content.includes('<USER_SETTINGS_CHANGE>')) {
-              item.content = item.content.replace(/<USER_SETTINGS_CHANGE>[\s\S]*?<\/USER_SETTINGS_CHANGE>/g, '').trim();
+            let cleanContent = item.content;
+            if (cleanContent.includes('<USER_SETTINGS_CHANGE>')) {
+              cleanContent = cleanContent.replace(/<USER_SETTINGS_CHANGE>[\s\S]*?<\/USER_SETTINGS_CHANGE>/g, '').trim();
+            }
+            if (cleanContent.includes('<ADDITIONAL_METADATA>')) {
+              cleanContent = cleanContent.replace(/<ADDITIONAL_METADATA>[\s\S]*?<\/ADDITIONAL_METADATA>/g, '').trim();
+            }
+            if (shouldArchive) {
+              const reqMatch = cleanContent.match(/<USER_REQUEST>([\s\S]*?)<\/USER_REQUEST>/i);
+              cleanContent = (reqMatch ? reqMatch[1] : cleanContent).trim();
+              if (cleanContent.length > 80) {
+                cleanContent = cleanContent.slice(0, 80) + '...';
+              }
+            }
+            if (cleanContent !== item.content) {
+              item.content = cleanContent;
               const tf = new Set(item.truncated_fields || []);
               tf.add('content');
               item.truncated_fields = Array.from(tf);
@@ -207,49 +221,12 @@ export class Helix2TranscriptShaper {
         }
 
         if (shouldArchive) {
-          // In milestone archiving mode, fold intermediate tool executions
-          if (item.type === 'GENERIC' || item.type === 'EPHEMERAL_MESSAGE' || item.type === 'SYSTEM_MESSAGE') {
-            pendingGenericCount++;
+          // In milestone archiving mode, fold intermediate tool executions, old checkpoints and historical responses
+          if (item.type === 'GENERIC' || item.type === 'EPHEMERAL_MESSAGE' || item.type === 'SYSTEM_MESSAGE' || item.type === 'CHECKPOINT' || item.type === 'PLANNER_RESPONSE') {
+            const countMatch = typeof item.content === 'string' ? item.content.match(/Sealed (\d+) historical/) : null;
+            pendingGenericCount += countMatch ? parseInt(countMatch[1], 10) : 1;
             lastGenericIndex = item.step_index || i;
             shapedCount++;
-            continue;
-          }
-
-          if (item.type === 'PLANNER_RESPONSE') {
-            const nextLine = rawLines[i + 1];
-            let isFinalOfTurn = false;
-            if (nextLine) {
-              try {
-                const nextItem = JSON.parse(nextLine);
-                if (nextItem.type === 'USER_INPUT') isFinalOfTurn = true;
-              } catch {}
-            }
-            if (isFinalOfTurn) {
-              if (pendingGenericCount > 0) {
-                outputLines.push(JSON.stringify({
-                  step_index: lastGenericIndex,
-                  type: 'CHECKPOINT',
-                  source: 'SYSTEM',
-                  status: 'DONE',
-                  content: `[helix.task.archive.v1] Sealed ${pendingGenericCount} historical tool steps; raw in transcript_full.jsonl`,
-                  truncated_fields: ['content']
-                }));
-                pendingGenericCount = 0;
-              }
-              outputLines.push(JSON.stringify({
-                step_index: item.step_index || i,
-                source: 'MODEL',
-                type: 'PLANNER_RESPONSE',
-                status: 'DONE',
-                content: '[helix:raw]',
-                truncated_fields: ['content', 'thinking', 'tool_calls']
-              }));
-              shapedCount++;
-            } else {
-              pendingGenericCount++;
-              lastGenericIndex = item.step_index || i;
-              shapedCount++;
-            }
             continue;
           }
         }
