@@ -98,12 +98,20 @@ export class Helix2TranscriptShaper {
         const item = JSON.parse(line);
         let modified = false;
 
+        // Strip internal token metrics from historical steps (full metrics retained in transcript_full)
+        if (item.input_tokens !== undefined || item.cache_read_tokens !== undefined || item.output_tokens !== undefined) {
+          delete item.input_tokens;
+          delete item.cache_read_tokens;
+          delete item.output_tokens;
+          modified = true;
+        }
+
         // 1. Tool outputs (GENERIC type)
         if (item.type === 'GENERIC' && item.content) {
           let contentStr = typeof item.content === 'string' ? item.content : JSON.stringify(item.content);
           const cleanedStr = contentStr.replace(/^Created At: [^\n]+\nCompleted At: [^\n]+\n?/i, '');
-          if (cleanedStr.length > 120) {
-            const preview = cleanedStr.slice(0, 80).trim();
+          if (cleanedStr.length > 80) {
+            const preview = cleanedStr.slice(0, 50).trim();
             item.content = `${preview}\n[... truncated by Helix Lean Switch, full raw preserved in transcript_full.jsonl]`;
             const tf = new Set(item.truncated_fields || []);
             tf.add('content');
@@ -116,14 +124,14 @@ export class Helix2TranscriptShaper {
         } else if (item.type === 'PLANNER_RESPONSE') {
           const tf = new Set(item.truncated_fields || []);
           // Truncate older thinking blocks
-          if (item.thinking && item.thinking.length > 80) {
-            item.thinking = item.thinking.slice(0, 60) + '...';
+          if (item.thinking && item.thinking.length > 50) {
+            item.thinking = item.thinking.slice(0, 40) + '...';
             tf.add('thinking');
             modified = true;
           }
           // Truncate older response markdown
-          if (item.content && typeof item.content === 'string' && item.content.length > 150) {
-            item.content = item.content.slice(0, 80).trim() + '\n[... truncated by Helix Lean Switch, full raw preserved in transcript_full.jsonl]';
+          if (item.content && typeof item.content === 'string' && item.content.length > 100) {
+            item.content = item.content.slice(0, 60).trim() + '\n[... truncated by Helix Lean Switch, full raw preserved in transcript_full.jsonl]';
             tf.add('content');
             modified = true;
           }
@@ -134,9 +142,10 @@ export class Helix2TranscriptShaper {
               if (argsObj) {
                 delete argsObj.toolAction;
                 delete argsObj.toolSummary;
+                delete argsObj.toolDescription;
                 for (const [k, v] of Object.entries(argsObj)) {
-                  if (typeof v === 'string' && v.length > 80) {
-                    argsObj[k] = v.slice(0, 50) + '... [truncated]';
+                  if (typeof v === 'string' && v.length > 50) {
+                    argsObj[k] = v.slice(0, 35) + '... [truncated]';
                     tf.add('tool_calls');
                     modified = true;
                   }
@@ -157,8 +166,8 @@ export class Helix2TranscriptShaper {
           }
         } else if ((item.type === 'SYSTEM_MESSAGE' || item.type === 'EPHEMERAL_MESSAGE' || item.type === 'CHECKPOINT') && item.content) {
           const contentStr = typeof item.content === 'string' ? item.content : JSON.stringify(item.content);
-          if (contentStr.length > 150) {
-            const preview = contentStr.slice(0, 80).trim();
+          if (contentStr.length > 100) {
+            const preview = contentStr.slice(0, 60).trim();
             item.content = `${preview}\n[... truncated by Helix Lean Switch, full raw preserved in transcript_full.jsonl]`;
             const tf = new Set(item.truncated_fields || []);
             tf.add('content');
